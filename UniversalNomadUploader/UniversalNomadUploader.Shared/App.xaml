@@ -4,27 +4,27 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:UniversalNomadUploader">
 
-  <Application.Resources>
-    <x:String x:Key="DatabaseName">db.sqlite</x:String>
-    <x:String x:Key="AppName">OneFile Nomad Uploader</x:String>
+    <Application.Resources>
+        <x:String x:Key="DatabaseName">db.sqlite</x:String>
+        <x:String x:Key="AppName">Nomad Uploader</x:String>
 
 
-    <!-- Global variables -->
-    <x:String x:Key="BackGroundColour">#F2F2F2</x:String>
-    <x:Double x:Key="LargeFontSize">22</x:Double>
-    <x:Double x:Key="ExtraLargeFontSize">40</x:Double>
+        <!-- Global variables -->
+        <x:String x:Key="BackGroundColour">#F2F2F2</x:String>
+        <x:Double x:Key="LargeFontSize">22</x:Double>
+        <x:Double x:Key="ExtraLargeFontSize">40</x:Double>
 
 
 
 
-    <!-- Global solid colour brushes -->
-    <SolidColorBrush x:Key="LogonBorderBrush" Color="#F15C22"></SolidColorBrush>
-    <SolidColorBrush x:Key="IgniteOrange" Color="#F15C22" ></SolidColorBrush>
-    <SolidColorBrush x:Key="IgniteOrange70Percent" Color="#F15C22" Opacity="0.7" ></SolidColorBrush>
-    <SolidColorBrush x:Key="IgniteOrange20Percent" Color="#F15C22" Opacity="0.2" ></SolidColorBrush>
-    <SolidColorBrush x:Key="FadedLogon" Color="#F15C22" Opacity="0.4" ></SolidColorBrush>
+        <!-- Global solid colour brushes -->
+        <SolidColorBrush x:Key="LogonBorderBrush" Color="#7CADD3"></SolidColorBrush>
+        <SolidColorBrush x:Key="NomadBlue" Color="#7CADD3" ></SolidColorBrush>
+        <SolidColorBrush x:Key="NomadBlue70Percent" Color="#7CADD3" Opacity="0.7" ></SolidColorBrush>
+        <SolidColorBrush x:Key="NomadBlue20Percent" Color="#7CADD3" Opacity="0.2" ></SolidColorBrush>
+        <SolidColorBrush x:Key="FadedLogon" Color="#7CADD3" Opacity="0.4" ></SolidColorBrush>
 
-    <!-- Global Image brushes -->
-    <ImageBrush x:Key="HubBackgroundImageBrush" ImageSource="Assets/HubBackground.png"/>
-  </Application.Resources>
+        <!-- Global Image brushes -->
+        <ImageBrush x:Key="HubBackgroundImageBrush" ImageSource="Assets/HubBackground.png"/>
+    </Application.Resources>
 </Application>

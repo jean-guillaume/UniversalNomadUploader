@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using UniversalNomadUploader.Common;
+using UniversalNomadUploader.SQLUtils;
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
 
@@ -48,6 +49,9 @@ namespace UniversalNomadUploader
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            TableUtil.CreateTables();
+            ServerUtil.SetServers();
+
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {

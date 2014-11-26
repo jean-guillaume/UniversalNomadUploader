@@ -8,15 +8,16 @@ using UniversalNomadUploader.DataModels.SQLModels;
 
 namespace UniversalNomadUploader.SQLUtils
 {
-  public class TableUtil
-  {
-    public static void CreateTables()
+    public class TableUtil
     {
-      using (var db = new SQLiteConnection(GlobalVariables.dbPath))
-      {
-        db.CreateTable<Server>();
-        db.CreateTable<User>();
-      }
+        public static void CreateTables()
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                db.CreateTable<Server>();
+                db.CreateTable<User>();
+                db.CreateTable<Evidence>();
+            }
+        }
     }
-  }
 }

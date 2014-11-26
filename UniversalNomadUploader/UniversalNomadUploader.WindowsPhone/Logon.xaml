@@ -8,47 +8,55 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-  <Grid>
-    <Grid.ChildrenTransitions>
-      <TransitionCollection>
-        <EntranceThemeTransition/>
-      </TransitionCollection>
-    </Grid.ChildrenTransitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="110"/>
-      <RowDefinition Height="*"/>
-    </Grid.RowDefinitions>
+    <Grid>
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
 
-    <Grid Grid.Row="1">
-      <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="350" Height="250" Background="{StaticResource FadedLogon}">
-        <Grid Margin="0,20,0,0" Height="210">
-          <Grid.RowDefinitions>
-            <RowDefinition Height="40" />
-            <RowDefinition Height="40" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="50" />
-          </Grid.RowDefinitions>
-          <TextBlock Text="Username" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Right" Margin="40,5,200,5" Grid.Row="0" ></TextBlock>
-          <TextBox x:Name="Username" Height="30" Width="150" VerticalAlignment="Top" Margin="155,2,45,0" Grid.Row="0"  />
-          <TextBlock Text="Password" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Right" Margin="40,5,200,5" Grid.Row="1" ></TextBlock>
-          <PasswordBox Name="Password" Height="30" Width="150" Margin="155,2,45,0" Grid.Row="1" ></PasswordBox>
-          <ToggleButton Name="Live" Width="80" Content="Live" Grid.Row="2" Margin="8,-4,0,-3" Click="Live_Click" ></ToggleButton>
-          <ToggleButton Name="Demo" Width="46" Content="Demo" Grid.Row="2" Margin="122,-4,0,-3" Click="Demo_Click" ></ToggleButton>
-          <ToggleButton Name="Beta" Width="80" Content="Beta" Grid.Row="2" Margin="236,-4,0,-3" Click="Beta_Click" />
-          <Button Name="logon" Content="Log in" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3"  Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Click="logon_Click" ></Button>
+        <Grid Grid.Row="1">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="350" Height="250" Background="{StaticResource FadedLogon}">
+                <Grid Name="LogonGrid" Margin="0,20,0,0" Height="210">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="0" />
+                        <RowDefinition Height="50" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Username" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Right" Margin="40,5,200,5" Grid.Row="0" ></TextBlock>
+                    <TextBox x:Name="Username" Height="30" Width="150" VerticalAlignment="Top" Margin="155,2,45,0" Grid.Row="0"  />
+                    <TextBlock Text="Password" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Right" Margin="40,5,200,5" Grid.Row="1" ></TextBlock>
+                    <PasswordBox Name="Password" Height="30" Width="150" Margin="155,2,45,0" Grid.Row="1" ></PasswordBox>
+                    <StackPanel Name="LiveOptions" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2">
+                        <ToggleButton Name="Live" Width="80" Content="Live" Margin="0,0,5,0" Click="Live_Click" ></ToggleButton>
+                        <ToggleButton Name="Demo" Width="46" Content="Demo" Margin="0,0,5,0" Click="Demo_Click" ></ToggleButton>
+                        <ToggleButton Name="Beta" Width="80" Content="Beta" Click="Beta_Click" />
+                    </StackPanel>
+                    <StackPanel Name="DEVoptions" Visibility="Collapsed" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" >
+                        <ToggleButton Name="UAT1" Width="80" Content="UAT 1" Margin="0,0,5,0" Click="UAT1_Click"></ToggleButton>
+                        <ToggleButton Name="UAT2" Width="80" Content="UAT 2" Margin="0,0,5,0" Click="UAT2_Click"></ToggleButton>
+                        <ToggleButton Name="DEV" Width="80" Content="DEV" Click="DEV_Click"></ToggleButton>
+                    </StackPanel>
+                    <Button Name="logon" Content="Log in" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4"  Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Click="logon_Click" ></Button>
+                </Grid>
+            </StackPanel>
         </Grid>
-      </StackPanel>
-    </Grid>
 
-    <!-- Back button and page title -->
+        <!-- Back button and page title -->
 
-    <Grid  >
-      <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}"  DoubleTapped="pageTitle_DoubleTapped"
+        <Grid  >
+            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}"  DoubleTapped="pageTitle_DoubleTapped"
                          TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="10,0,10,10" Height="80" />
-      <Border BorderBrush="{StaticResource LogonBorderBrush}" BorderThickness="0,0,0,2"></Border>
-      <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed"></ProgressBar>
-    </Grid>
+            <Border BorderBrush="{StaticResource LogonBorderBrush}" BorderThickness="0,0,0,2"></Border>
+            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed"></ProgressBar>
+        </Grid>
 
-  </Grid>
+    </Grid>
 </Page>
