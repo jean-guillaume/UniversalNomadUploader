@@ -112,7 +112,7 @@ namespace UniversalNomadUploader
                 String ErrorMessage = String.Empty;
                 try
                 {
-                    await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text, SessionID = Session });
+                    await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text, SessionID = Session }, Password.Password);
                     await SQLUtils.UserUtil.UpdateUser(await APIUtils.UserUtil.GetProfile());
                 }
                 catch (ApiException exception)
