@@ -26,16 +26,34 @@ namespace UniversalNomadUploader.SQLUtils
             }
         }
 
-        public async static Task InsertEvidenceAsync(Evidence evi)
+        public async static Task<int> InsertEvidenceAsync(Evidence evi)
         {
-            await Task.Run(() => InsertEvidence(evi));
+            return await Task.FromResult<int>(InsertEvidence(evi));
         }
 
-        public static void InsertEvidence(Evidence evi)
+        public static int InsertEvidence(Evidence evi)
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {
-                db.Insert(new DataModels.SQLModels.Evidence(evi));
+                return db.Insert(new DataModels.SQLModels.Evidence(evi));
+            }
+        }
+
+        public async static Task UpdateEvidenceAsync(Evidence evi)
+        {
+            await Task.Run(() => UpdateEvidence(evi));
+        }
+
+        public static void UpdateEvidence(Evidence evi)
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                DataModels.SQLModels.Evidence dbEvi = db.Table<DataModels.SQLModels.Evidence>().Where(ev => ev.FileName == evi.FileName).SingleOrDefault();
+                if (dbEvi != null)
+                {
+                    dbEvi.Name = evi.Name;
+                    db.Update(dbEvi);
+                }
             }
         }
     }

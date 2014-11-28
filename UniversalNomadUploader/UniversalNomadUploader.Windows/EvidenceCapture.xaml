@@ -43,8 +43,6 @@
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <!-- Test audio -->
         <Grid  Name="RecorderGrid" Grid.Row="1" Height="0" HorizontalAlignment="Center" >
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
                 <StackPanel Orientation="Horizontal">
@@ -70,7 +68,18 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <!-- Test audio -->
+
+        <Grid Name="NameGrid" Grid.Row="1" Visibility="Collapsed" >
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource NomadBlue70Percent}" >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
+                    <TextBox Name="NewName" Width="200" Height="50" FontSize="22" />
+                    <AppBarButton Name="SaveName" IsCompact="True" Click="SaveName_Click" >
+                        <SymbolIcon Symbol="Save" />
+                    </AppBarButton>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
 
         <!-- Back button and page title -->
         <Grid>
@@ -98,7 +107,7 @@
                     <SymbolIcon Symbol="Microphone" />
                 </AppBarButton>
             </StackPanel>
-            
+
         </Grid>
     </Grid>
 </Page>

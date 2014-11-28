@@ -36,6 +36,7 @@ namespace UniversalNomadUploader
 
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private Evidence CurrentEvidence = null;
 
         public enum RecordingMode
         {
@@ -222,7 +223,10 @@ namespace UniversalNomadUploader
             }
             evi.Size = Convert.ToDouble((await _file.GetBasicPropertiesAsync()).Size);
             evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-            await EvidenceUtil.InsertEvidenceAsync(evi);
+            evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+            CurrentEvidence = evi;
+            HideAudioControls();
+            ShowNewName();
         }
 
 
@@ -339,7 +343,9 @@ namespace UniversalNomadUploader
                 await newPhoto.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newPhoto.FileType, NameCollisionOption.ReplaceExisting);
                 evi.Size = Convert.ToDouble((await newPhoto.GetBasicPropertiesAsync()).Size);
                 evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-                await EvidenceUtil.InsertEvidenceAsync(evi);
+                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                CurrentEvidence = evi;
+                ShowNewName();
             }
         }
 
@@ -357,13 +363,54 @@ namespace UniversalNomadUploader
                 await newVideo.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newVideo.FileType, NameCollisionOption.ReplaceExisting);
                 evi.Size = Convert.ToDouble((await newVideo.GetBasicPropertiesAsync()).Size);
                 evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-                await EvidenceUtil.InsertEvidenceAsync(evi);
+                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                CurrentEvidence = evi;
+                ShowNewName();
             }
+        }
+
+        private void ShowNewName()
+        {
+            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+        }
+
+        private void HideNewName()
+        {
+            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+        }
+
+        private void HideAudioControls()
+        {
+            reduceRecorderAnimation.Begin();
+        }
+
+        private void ShowAudioControls()
+        {
+            expandRecorderAnimation.Begin();    
         }
 
         private void CaptureAudio_Click(object sender, RoutedEventArgs e)
         {
-            expandRecorderAnimation.Begin();
+            if (RecorderGrid.Height == 0)
+            {
+                ShowAudioControls();
+            }
+            else
+            {
+                HideAudioControls();
+            }
+            
+        }
+
+        private async void SaveName_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentEvidence != null)
+            {
+                CurrentEvidence.Name = NewName.Text;
+                await EvidenceUtil.UpdateEvidenceAsync(CurrentEvidence);
+                CurrentEvidence = null;
+                HideNewName();
+            }
         }
 
 
