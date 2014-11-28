@@ -22,6 +22,7 @@ using Windows.UI.Popups;
 using Windows.Storage;
 using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.SQLUtils;
+using Windows.UI.Xaml.Media.Imaging;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -147,11 +148,11 @@ namespace UniversalNomadUploader
             }
             catch (Exception)
             {
-                displayError("Please allow Nomad to access your microphone from the permissions charm.", "Microphone Access");
+                displayMessage("Please allow Nomad Uploader to access your microphone from the permissions charm.", "Microphone Access");
             }
         }
 
-        private async void displayError(string message, string title)
+        private async void displayMessage(string message, string title)
         {
             MessageDialog msg = new MessageDialog(message, title);
             await msg.ShowAsync();
@@ -323,5 +324,48 @@ namespace UniversalNomadUploader
         {
             InitTimer();
         }
+
+        private async void CapturePhoto_Click(object sender, RoutedEventArgs e)
+        {
+            CameraCaptureUI camera = new CameraCaptureUI();
+            StorageFile newPhoto = await camera.CaptureFileAsync(CameraCaptureUIMode.Photo);
+            if (newPhoto != null)
+            {
+                Evidence evi = new Evidence();
+                evi.FileName = Guid.NewGuid().ToString();
+                evi.Extension = newPhoto.DisplayType;
+                evi.CreatedDate = DateTime.Now;
+                evi.ServerID = (int)GlobalVariables.SelectedServer;
+                await newPhoto.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newPhoto.FileType, NameCollisionOption.ReplaceExisting);
+                evi.Size = Convert.ToDouble((await newPhoto.GetBasicPropertiesAsync()).Size);
+                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+                await EvidenceUtil.InsertEvidenceAsync(evi);
+            }
+        }
+
+        private async void CaptureVideo_Click(object sender, RoutedEventArgs e)
+        {
+            CameraCaptureUI video = new CameraCaptureUI();
+            StorageFile newVideo = await video.CaptureFileAsync(CameraCaptureUIMode.Video);
+            if (newVideo != null)
+            {
+                Evidence evi = new Evidence();
+                evi.FileName = Guid.NewGuid().ToString();
+                evi.Extension = newVideo.DisplayType;
+                evi.CreatedDate = DateTime.Now;
+                evi.ServerID = (int)GlobalVariables.SelectedServer;
+                await newVideo.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newVideo.FileType, NameCollisionOption.ReplaceExisting);
+                evi.Size = Convert.ToDouble((await newVideo.GetBasicPropertiesAsync()).Size);
+                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+                await EvidenceUtil.InsertEvidenceAsync(evi);
+            }
+        }
+
+        private void CaptureAudio_Click(object sender, RoutedEventArgs e)
+        {
+            expandRecorderAnimation.Begin();
+        }
+
+
     }
 }

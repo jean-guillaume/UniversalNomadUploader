@@ -126,30 +126,46 @@ namespace UniversalNomadUploader
                 HideProgress();
                 return;
             }
-            Guid Session = await AuthenticationUtil.Authenticate(Username.Text, Password.Password, GlobalVariables.SelectedServer);
-            if (Session != Guid.Empty)
+
+            Boolean HasAuthed = false;
+            if (GlobalVariables.HasInternetAccess())
             {
-                String ErrorMessage = String.Empty;
-                try
+                Guid Session = await AuthenticationUtil.Authenticate(Username.Text, Password.Password, GlobalVariables.SelectedServer);
+                if (Session != Guid.Empty)
                 {
-                    await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text, SessionID = Session }, Password.Password);
-                    await SQLUtils.UserUtil.UpdateUser(await APIUtils.UserUtil.GetProfile());
-                }
-                catch (ApiException exception)
-                {
-                    ErrorMessage = exception.Message;
-                }
-                HideProgress();
-                if (ErrorMessage != String.Empty)
-                {
-                    MessageDialog msg = new MessageDialog(ErrorMessage, "Access denied");
-                    await msg.ShowAsync();
+                    String ErrorMessage = String.Empty;
+                    try
+                    {
+                        await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text, SessionID = Session }, Password.Password);
+                        await SQLUtils.UserUtil.UpdateUser(await APIUtils.UserUtil.GetProfile());
+                    }
+                    catch (ApiException exception)
+                    {
+                        ErrorMessage = exception.Message;
+                    }
                     HideProgress();
-                    return;
+                    if (ErrorMessage != String.Empty)
+                    {
+                        MessageDialog msg = new MessageDialog(ErrorMessage, "Access denied");
+                        await msg.ShowAsync();
+                        HideProgress();
+                        return;
+                    }
+                    GlobalVariables.IsOffline = false;
+                    HasAuthed = true;
+                    this.Frame.Navigate(typeof(EvidenceView));
                 }
-                this.Frame.Navigate(typeof(EvidenceView));
             }
             else
+            {
+                if (SQLUtils.UserUtil.AuthenticateOffline(Username.Text, Password.Password))
+                {
+                    GlobalVariables.IsOffline = true;
+                    HasAuthed = true;
+                    this.Frame.Navigate(typeof(EvidenceView));
+                }
+            }
+            if (!HasAuthed)
             {
                 MessageDialog msg = new MessageDialog("Incorrect Username or Password", "Access denied");
                 await msg.ShowAsync();

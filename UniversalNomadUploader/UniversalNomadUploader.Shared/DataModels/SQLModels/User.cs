@@ -18,5 +18,6 @@ namespace UniversalNomadUploader.DataModels.SQLModels
     public Guid SessionID { get; set; }
     public String Password { get; set; }
     public String Username { get; set; }
+    public String Salt { get; set; }
   }
 }

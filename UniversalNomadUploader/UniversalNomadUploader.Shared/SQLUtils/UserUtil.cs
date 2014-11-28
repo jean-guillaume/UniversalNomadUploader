@@ -13,114 +13,137 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace UniversalNomadUploader.SQLUtils
 {
-  public class UserUtil
-  {
-    public static async Task<Guid> GetSessionID()
+    public class UserUtil
     {
-      return await Task.Run(
-        () => PrivateGetSessionID()
-      );
-    }
-
-    private static Guid PrivateGetSessionID()
-    {
-      using (var db = new SQLiteConnection(GlobalVariables.dbPath))
-      {
-        UniversalNomadUploader.DataModels.SQLModels.User user = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == GlobalVariables.LoggedInUser.LocalID).SingleOrDefault();
-        if (user != null)
+        public const int SALTLENGTH = 32;
+        public static async Task<Guid> GetSessionID()
         {
-          return user.SessionID;
+            return await Task.Run(
+              () => PrivateGetSessionID()
+            );
         }
-        return Guid.Empty;
-      }
-    }
 
-    public async static Task<String> GetFirstName()
-    {
-      return await Task.Run(() => PrivateGetFirstName());
-    }
-
-    private static string PrivateGetFirstName()
-    {
-      using (var db = new SQLiteConnection(GlobalVariables.dbPath))
-      {
-        UniversalNomadUploader.DataModels.SQLModels.User dbuser = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == GlobalVariables.LoggedInUser.LocalID).SingleOrDefault();
-        if (dbuser != null)
-          return dbuser.FirstName;
-        else
-          return "";
-      }
-    }
-
-    public static async Task UpdateUser(User user)
-    {
-      await Task.Run(() => PrivateUpdateUser(user));
-    }
-
-    private static void PrivateUpdateUser(User user)
-    {
-      using (var db = new SQLiteConnection(GlobalVariables.dbPath))
-      {
-        UniversalNomadUploader.DataModels.SQLModels.User dbuser = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == GlobalVariables.LoggedInUser.LocalID).SingleOrDefault();
-        if (dbuser != null)
+        private static Guid PrivateGetSessionID()
         {
-          dbuser.UserID = user.UserID;
-          dbuser.FirstName = user.FirstName;
-          dbuser.LastName = user.LastName;
-          dbuser.OrganisationID = user.OrganisationID;
-          int success = db.Update(dbuser);
-          GlobalVariables.LoggedInUser = new User(dbuser);
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                UniversalNomadUploader.DataModels.SQLModels.User user = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == GlobalVariables.LoggedInUser.LocalID).SingleOrDefault();
+                if (user != null)
+                {
+                    return user.SessionID;
+                }
+                return Guid.Empty;
+            }
         }
-      }
-    }
 
-    public static async Task InsertUser(User user, String Pass)
-    {
-      await Task.Run(() => PrivateInsertUser(user, Pass));
-    }
-
-    private static void PrivateInsertUser(User user, String Pass)
-    {
-      using (var db = new SQLiteConnection(GlobalVariables.dbPath))
-      {
-        // Use Password Based Key Derivation Function 2 (PBKDF2 or RFC2898)
-        KeyDerivationAlgorithmProvider pbkdf2 = KeyDerivationAlgorithmProvider.OpenAlgorithm(KeyDerivationAlgorithmNames.Pbkdf2Sha512);
-
-        // Do not store passwords in strings if you can avoid them. The
-        // password may be retained in memory until it is garbage collected.
-        // Crashing the application and looking at the memory dump may 
-        // reveal it.
-        IBuffer passwordBuffer = CryptographicBuffer.ConvertStringToBinary(Pass, BinaryStringEncoding.Utf8);
-        CryptographicKey key = pbkdf2.CreateKey(passwordBuffer);
-
-        // Use random salt and 10,000 iterations. Store the salt along with 
-        // the derviedBytes (see below).
-        IBuffer salt = CryptographicBuffer.GenerateRandom(32);
-        KeyDerivationParameters parameters = KeyDerivationParameters.BuildForPbkdf2(salt, 10000);
-
-        // Store the returned 32 bytes along with the salt for later verification
-        byte[] derviedBytes = CryptographicEngine.DeriveKeyMaterial(key, parameters, 32).ToArray();
-
-        UniversalNomadUploader.DataModels.SQLModels.User dbuser = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.Username == user.Username).SingleOrDefault();
-        if (dbuser == null)
+        public async static Task<String> GetFirstName()
         {
-          UniversalNomadUploader.DataModels.SQLModels.User newUser = new UniversalNomadUploader.DataModels.SQLModels.User()
-          {
-            Username = user.Username,
-            SessionID = user.SessionID,
-            ServerID = (int)GlobalVariables.SelectedServer
-          };
-          int success = db.Insert(newUser);
-          GlobalVariables.LoggedInUser = new User(newUser);
+            return await Task.Run(() => PrivateGetFirstName());
         }
-        else
-        {
-          dbuser.SessionID = user.SessionID;
-          int success = db.Update(dbuser);
-          GlobalVariables.LoggedInUser = new User(dbuser);
-        }
-      }
-    }
 
-  }
+        private static string PrivateGetFirstName()
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                UniversalNomadUploader.DataModels.SQLModels.User dbuser = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == GlobalVariables.LoggedInUser.LocalID).SingleOrDefault();
+                if (dbuser != null)
+                    return dbuser.FirstName;
+                else
+                    return "";
+            }
+        }
+
+        public static async Task UpdateUser(User user)
+        {
+            await Task.Run(() => PrivateUpdateUser(user));
+        }
+
+        private static void PrivateUpdateUser(User user)
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                UniversalNomadUploader.DataModels.SQLModels.User dbuser = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == GlobalVariables.LoggedInUser.LocalID).SingleOrDefault();
+                if (dbuser != null)
+                {
+                    dbuser.UserID = user.UserID;
+                    dbuser.FirstName = user.FirstName;
+                    dbuser.LastName = user.LastName;
+                    dbuser.OrganisationID = user.OrganisationID;
+                    int success = db.Update(dbuser);
+                    GlobalVariables.LoggedInUser = new User(dbuser);
+                }
+            }
+        }
+
+        public static async Task InsertUser(User user, String Pass)
+        {
+            await Task.Run(() => PrivateInsertUser(user, Pass));
+        }
+
+        private static void PrivateInsertUser(User user, String Pass)
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                HashAlgorithmProvider provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha512);
+                CryptographicHash hash = provider.CreateHash();
+
+                IBuffer salt = CryptographicBuffer.ConvertStringToBinary(Encoding.UTF8.GetString(CryptographicBuffer.GenerateRandom(32).ToArray(), 0, SALTLENGTH), BinaryStringEncoding.Utf8);
+                hash.Append(salt);
+                IBuffer password = CryptographicBuffer.ConvertStringToBinary(Pass, BinaryStringEncoding.Utf8);
+                hash.Append(password);
+                IBuffer hashedBuffer = hash.GetValueAndReset();
+
+
+
+                UniversalNomadUploader.DataModels.SQLModels.User dbuser = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.Username == user.Username && usr.ServerID == (int)GlobalVariables.SelectedServer).SingleOrDefault();
+                if (dbuser == null)
+                {
+                    UniversalNomadUploader.DataModels.SQLModels.User newUser = new UniversalNomadUploader.DataModels.SQLModels.User()
+                    {
+                        Username = user.Username,
+                        SessionID = user.SessionID,
+                        Password = CryptographicBuffer.EncodeToBase64String(hashedBuffer),
+                        Salt = CryptographicBuffer.EncodeToBase64String(salt),
+                        ServerID = (int)GlobalVariables.SelectedServer
+                    };
+                    int success = db.Insert(newUser);
+                    GlobalVariables.LoggedInUser = new User(newUser);
+                }
+                else
+                {
+                    dbuser.SessionID = user.SessionID;
+                    int success = db.Update(dbuser);
+                    GlobalVariables.LoggedInUser = new User(dbuser);
+                }
+            }
+        }
+
+        public static Boolean AuthenticateOffline(String Username, String Password)
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                DataModels.SQLModels.User u = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.Username == Username && usr.ServerID == (int)GlobalVariables.SelectedServer).SingleOrDefault();
+                if (u != null)
+                {
+                    HashAlgorithmProvider provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha512);
+
+                    CryptographicHash hash = provider.CreateHash();
+
+                    IBuffer salt = CryptographicBuffer.ConvertStringToBinary(Encoding.UTF8.GetString(Convert.FromBase64String(u.Salt), 0, Convert.FromBase64String(u.Salt).Length), BinaryStringEncoding.Utf8);
+                    hash.Append(salt);
+                    IBuffer password = CryptographicBuffer.ConvertStringToBinary(Password, BinaryStringEncoding.Utf8);
+                    hash.Append(password);
+                    IBuffer hashedBuffer = hash.GetValueAndReset();
+                    String EnteredPass = CryptographicBuffer.EncodeToBase64String(hashedBuffer);
+                    if (EnteredPass == u.Password)
+                    {
+                        GlobalVariables.LoggedInUser = new User(u);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+    }
 }

@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using UniversalNomadUploader.Common;
 using UniversalNomadUploader.SQLUtils;
+using Windows.Networking.Connectivity;
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
 
@@ -51,7 +52,6 @@ namespace UniversalNomadUploader
         {
             TableUtil.CreateTables();
             ServerUtil.SetServers();
-
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
