@@ -17,11 +17,11 @@ namespace UniversalNomadUploader.APIUtils
         public static async Task<User> GetProfile()
         {
             Guid SessionID = await SQLUtils.UserUtil.GetSessionID();
-            String WSUrl = ServerUtil.getServerWSUrl(GlobalVariables.SelectedServer);
+            String WSUrl = ServerUtil.getServerWSUrl();
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("X-SessionID", SessionID.ToString());
-                String url = ((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + WSUrl + "/User/GetProfile/";
+                String url = ((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + WSUrl + "/User/MobileGetProfile/";
                 using (var response = await client.GetAsync(url))
                 {
                     if (response.StatusCode != System.Net.HttpStatusCode.OK)

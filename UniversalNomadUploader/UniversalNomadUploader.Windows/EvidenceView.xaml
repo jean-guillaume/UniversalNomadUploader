@@ -49,16 +49,21 @@
             Grid.RowSpan="2"
             Padding="116,137,40,46"
             ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-            SelectionMode="None"
+            SelectionMode="Multiple"
+            SelectionChanged="itemGridView_SelectionChanged"
             IsSwipeEnabled="false">
             <GridView.ItemTemplate>
                 <DataTemplate>
-                    <Grid HorizontalAlignment="Left" Width="250" Height="250">
-                        <Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}">
-                            <Image Source="{Binding ImagePath}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Bottom" Background="{ThemeResource ListViewItemOverlayBackgroundThemeBrush}">
-                            <TextBlock Text="{Binding Name}" Foreground="{ThemeResource ListViewItemOverlayForegroundThemeBrush}" Style="{StaticResource TitleTextBlockStyle}" Height="60" Margin="15,0,15,0"/>
+                    <Grid HorizontalAlignment="Left" Width="150" Height="150">
+                        <StackPanel Orientation="Vertical" Background="{StaticResource NomadBlue20Percent}">
+                            <Border Height="20">
+                                <SymbolIcon Symbol="Accept" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="Green" Visibility="Collapsed" />
+                            </Border>
+                            <Image Source="{Binding ImagePath}" Height="48" Width="48" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,20" />
+                            <ProgressBar Name="Progress" Visibility="Collapsed" />
+                        </StackPanel>
+                        <StackPanel VerticalAlignment="Bottom" Background="{StaticResource NomadBlue70Percent}">
+                            <TextBlock Text="{Binding Name}" Style="{StaticResource TitleTextBlockStyle}" Height="30" Margin="15,0,15,0"/>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
@@ -77,7 +82,7 @@
                                     AutomationProperties.Name="Group Title"
                                     Style="{StaticResource TextBlockButtonStyle}" >
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding CreatedDate}" Margin="0,-11,10,10" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
+                                        <TextBlock Text="{Binding Key}" Margin="0,-11,10,10" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
                                     </StackPanel>
                                 </Button>
                             </Grid>
@@ -86,6 +91,21 @@
                 </GroupStyle>
             </GridView.GroupStyle>
         </GridView>
+
+        <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed" Background="{StaticResource NomadBlue20Percent}" >
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource NomadBlue70Percent}" >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
+                    <TextBox Name="NewName" MaxLength="255" Width="400" Height="50" FontSize="26" />
+                    <AppBarButton Name="SaveName" IsCompact="True" Click="SaveName_Click" >
+                        <SymbolIcon Symbol="Save" />
+                    </AppBarButton>
+                    <AppBarButton Name="CancelNameChange" IsCompact="True" Click="CancelNameChange_Click" >
+                        <SymbolIcon Symbol="Cancel" />
+                    </AppBarButton>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
 
         <!-- Back button and page title -->
         <Grid>
@@ -112,6 +132,18 @@
                     </AppBarButton.Icon>
                 </AppBarButton>
             </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Name="Upload" Label="Upload" Click="Upload_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Upload" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Name="Rename" Label="Rename" Click="Rename_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Rename" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
         </CommandBar>
     </Page.BottomAppBar>
 </Page>

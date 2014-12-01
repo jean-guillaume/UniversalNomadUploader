@@ -24,6 +24,12 @@
         <SolidColorBrush x:Key="NomadBlue20Percent" Color="#7CADD3" Opacity="0.2" ></SolidColorBrush>
         <SolidColorBrush x:Key="FadedLogon" Color="#7CADD3" Opacity="0.4" ></SolidColorBrush>
 
+        <SolidColorBrush x:Key="ProgressBarBackgroundThemeBrush" Color="#59FFFFFF" />
+        <SolidColorBrush x:Key="ProgressBarBorderThemeBrush" Color="Transparent" />
+        <SolidColorBrush x:Key="ProgressBarForegroundThemeBrush" Color="LimeGreen" />
+        <SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="LimeGreen" />
+
+
         <!-- Global Image brushes -->
         <ImageBrush x:Key="HubBackgroundImageBrush" ImageSource="Assets/HubBackground.png"/>
     </Application.Resources>

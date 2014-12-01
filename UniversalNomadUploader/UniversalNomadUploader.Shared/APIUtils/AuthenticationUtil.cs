@@ -12,7 +12,7 @@ namespace UniversalNomadUploader.APIUtils
     {
         public static async Task<Guid> Authenticate(String UserName, String Password, ServerEnum ServerID)
         {
-            String WSUrl = ServerUtil.getServerWSUrl(ServerID);
+            String WSUrl = ServerUtil.getServerWSUrl();
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("X-Username", UserName);

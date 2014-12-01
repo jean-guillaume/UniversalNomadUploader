@@ -72,8 +72,8 @@
         <Grid Name="NameGrid" Grid.Row="1" Visibility="Collapsed" >
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource NomadBlue70Percent}" >
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
-                    <TextBox Name="NewName" Width="200" Height="50" FontSize="22" />
+                    <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
+                    <TextBox Name="NewName" Width="400" MaxLength="255" Height="50" FontSize="26" />
                     <AppBarButton Name="SaveName" IsCompact="True" Click="SaveName_Click" >
                         <SymbolIcon Symbol="Save" />
                     </AppBarButton>

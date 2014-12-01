@@ -337,7 +337,7 @@ namespace UniversalNomadUploader
             {
                 Evidence evi = new Evidence();
                 evi.FileName = Guid.NewGuid().ToString();
-                evi.Extension = newPhoto.DisplayType;
+                evi.Extension = newPhoto.FileType.Replace(".","");
                 evi.CreatedDate = DateTime.Now;
                 evi.ServerID = (int)GlobalVariables.SelectedServer;
                 await newPhoto.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newPhoto.FileType, NameCollisionOption.ReplaceExisting);
@@ -357,7 +357,7 @@ namespace UniversalNomadUploader
             {
                 Evidence evi = new Evidence();
                 evi.FileName = Guid.NewGuid().ToString();
-                evi.Extension = newVideo.DisplayType;
+                evi.Extension = newVideo.FileType.Replace(".", "");
                 evi.CreatedDate = DateTime.Now;
                 evi.ServerID = (int)GlobalVariables.SelectedServer;
                 await newVideo.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newVideo.FileType, NameCollisionOption.ReplaceExisting);

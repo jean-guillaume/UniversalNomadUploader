@@ -32,6 +32,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\ServerUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\TableUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\UserUtil.cs" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\audio.scale-100.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\audio.scale-140.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\audio.scale-180.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\audio.scale-240.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\image.scale-100.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\image.scale-140.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\image.scale-180.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\image.scale-240.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\LightGray.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\MediumGray.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\DarkGray.png" />
@@ -39,6 +47,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\RelayCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\SuspensionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\ObservableDictionary.cs" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\video.scale-100.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\video.scale-140.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\video.scale-180.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\video.scale-240.png" />
     <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en-US\Resources.resw" />
   </ItemGroup>
 </Project>

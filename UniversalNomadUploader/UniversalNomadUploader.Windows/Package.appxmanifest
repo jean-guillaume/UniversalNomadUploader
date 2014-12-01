@@ -25,6 +25,7 @@
     <Capability Name="musicLibrary" />
     <Capability Name="picturesLibrary" />
     <Capability Name="videosLibrary" />
+    <Capability Name="privateNetworkClientServer" />
     <DeviceCapability Name="microphone" />
     <DeviceCapability Name="webcam" />
   </Capabilities>

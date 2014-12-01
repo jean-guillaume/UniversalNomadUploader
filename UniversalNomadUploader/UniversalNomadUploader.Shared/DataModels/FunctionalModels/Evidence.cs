@@ -31,5 +31,10 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
         public String Name { get; set; }
         public Double Size { get; set; }
         public DateTime CreatedDate { get; set; }
+        public Uri ImagePath
+        {
+            get { return (Extension != "mp3") ? ((Extension != "jpg") ? new System.Uri("ms-appx:///Assets/video.png") : new System.Uri("ms-appx:///Assets/image.png")) : new System.Uri("ms-appx:///Assets/audio.png"); }
+            set { }
+        }
     }
 }

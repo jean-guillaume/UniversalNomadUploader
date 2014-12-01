@@ -3,10 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using UniversalNomadUploader.Common;
+using UniversalNomadUploader.DataModels.Enums;
+using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.SQLUtils;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Networking.BackgroundTransfer;
+using Windows.Storage;
+using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -26,7 +34,7 @@ namespace UniversalNomadUploader
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
-
+        private CancellationTokenSource cts;
         /// <summary>
         /// This can be changed to a strongly typed view model.
         /// </summary>
@@ -49,6 +57,7 @@ namespace UniversalNomadUploader
 
         public EvidenceView()
         {
+            cts = new CancellationTokenSource();
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
@@ -65,11 +74,9 @@ namespace UniversalNomadUploader
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            var coll = await EvidenceUtil.GetEvidenceAsync();
-            var res  = from evi in coll group evi by evi.CreatedDate into grp orderby grp.Key select grp;
-            this.DefaultViewModel["Groups"] = res;
+            RebindItems();
         }
 
         #region NavigationHelper registration
@@ -95,9 +102,135 @@ namespace UniversalNomadUploader
 
         #endregion
 
+        private async void RebindItems()
+        {
+            var coll = await EvidenceUtil.GetEvidenceAsync();
+            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd/MM/yyy"));
+            this.DefaultViewModel["Groups"] = res;
+        }
+
         private void New_Click(object sender, RoutedEventArgs e)
         {
             this.Frame.Navigate(typeof(EvidenceCapture));
+        }
+
+        private async void Upload_Click(object sender, RoutedEventArgs e)
+        {
+            itemGridView.IsEnabled = false;
+            Upload.IsEnabled = false;
+            New.IsEnabled = false;
+            backButton.IsEnabled = false;
+            foreach (Evidence item in itemGridView.SelectedItems)
+            {
+                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                StorageFile file = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync(item.FileName + "." + item.Extension);
+                BackgroundUploader uploader = new BackgroundUploader();
+                uploader.SetRequestHeader("FileName", (item.Name == null) ? "" : item.Name);
+                uploader.SetRequestHeader("ContentType", file.ContentType);
+                uploader.SetRequestHeader("Extension", file.FileType.Replace(".", ""));
+                uploader.SetRequestHeader("X-SessionID", GlobalVariables.LoggedInUser.SessionID.ToString());
+                UploadOperation upload = uploader.CreateUpload(new Uri(((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + ServerUtil.getServerWSUrl() + "/User/MobileUploadEvidence"), file);
+                pbar.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                pbar.IsIndeterminate = true;
+                await HandleUploadAsync(upload, true, item);
+            }
+            itemGridView.SelectedItems.Clear();
+            itemGridView.IsEnabled = true;
+            Upload.IsEnabled = true;
+            New.IsEnabled = true;
+            backButton.IsEnabled = true;
+        }
+
+        private async Task HandleUploadAsync(UploadOperation upload, bool start, Evidence item)
+        {
+            try
+            {
+                Progress<UploadOperation> progressCallback = new Progress<UploadOperation>(UploadProgress);
+                if (start)
+                {
+                    // Start the upload and attach a progress handler.
+                    await upload.StartAsync().AsTask(cts.Token, progressCallback);
+                }
+                else
+                {
+                    // The upload was already running when the application started, re-attach the progress handler.
+                    await upload.AttachAsync().AsTask(cts.Token, progressCallback);
+                }
+                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                ((((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon).Visibility = Windows.UI.Xaml.Visibility.Visible;
+                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                pbar.IsIndeterminate = false;
+            }
+            catch (TaskCanceledException)
+            {
+                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
+                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                sym.Symbol = Symbol.Cancel;
+                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                pbar.IsIndeterminate = false;
+            }
+            catch (Exception)
+            {
+                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
+                sym.Foreground = new SolidColorBrush(Colors.Red);
+                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                sym.Symbol = Symbol.Cancel;
+                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                pbar.IsIndeterminate = false;
+            }
+        }
+
+        private void UploadProgress(UploadOperation obj)
+        {
+
+            //UploadGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            //UploadProgressBar.IsIndeterminate = false;
+            //UploadProgressBar.Value = obj.Progress.BytesSent / obj.Progress.TotalBytesToSend * 100.00;
+            //UploadProgressBar.Maximum = 100;
+        }
+
+        private async void displayMessage(string message, string title)
+        {
+            MessageDialog msg = new MessageDialog(message, title);
+            await msg.ShowAsync();
+        }
+
+        private void itemGridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.itemGridView.SelectedItems.Count > 0)
+            {
+                this.BottomAppBar.IsSticky = true;
+                this.BottomAppBar.IsOpen = true;
+            }
+            else
+            {
+                this.BottomAppBar.IsOpen = false;
+                this.BottomAppBar.IsSticky = false;
+            }
+            Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
+            Rename.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void Rename_Click(object sender, RoutedEventArgs e)
+        {
+            NewName.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name;
+            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+        }
+
+        private async void SaveName_Click(object sender, RoutedEventArgs e)
+        {
+            Evidence evi = ((Evidence)itemGridView.SelectedItem);
+            evi.Name = NewName.Text;
+            await EvidenceUtil.UpdateEvidenceAsync(evi);
+            RebindItems();
+            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+        }
+
+        private void CancelNameChange_Click(object sender, RoutedEventArgs e)
+        {
+            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
         }
     }
 }

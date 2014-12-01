@@ -56,5 +56,18 @@ namespace UniversalNomadUploader.SQLUtils
                 }
             }
         }
+
+        public static String GetFriendlyName(String LoacalFileName)
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                DataModels.SQLModels.Evidence dbEvi = db.Table<DataModels.SQLModels.Evidence>().Where(ev => ev.FileName == LoacalFileName).SingleOrDefault();
+                if (dbEvi != null)
+                {
+                    return dbEvi.Name;
+                }
+                return "";
+            }
+        }
     }
 }

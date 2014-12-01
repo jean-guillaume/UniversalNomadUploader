@@ -28,7 +28,7 @@ namespace UniversalNomadUploader.SQLUtils
         private const String LIVEHOST = "live.onefile.co.uk";
 
 
-        private const String DEVWS = "localhost:14689";
+        private const String DEVWS = "localhost:14688";
         private const String UAT1WS = "wsapiuat1.onefile.co.uk";
         private const String UAT2WS = "wsapiuat2.onefile.co.uk";
         private const String BETAWS = "wsapibeta.onefile.co.uk";
@@ -92,11 +92,11 @@ namespace UniversalNomadUploader.SQLUtils
             }
         }
 
-        public static String getServerWSUrl(ServerEnum ServerID)
+        public static String getServerWSUrl()
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {
-                return db.Table<Server>().Where(srv => srv.ServerID == (int)ServerID).SingleOrDefault().WsUrl;
+                return db.Table<Server>().Where(srv => srv.ServerID == (int)GlobalVariables.SelectedServer).SingleOrDefault().WsUrl;
             }
         }
 
