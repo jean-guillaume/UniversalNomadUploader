@@ -20,6 +20,9 @@ namespace UniversalNomadUploader.DataModels.SQLModels
             this.Extension = e.Extension;
             this.Size = e.Size;
             this.CreatedDate = e.CreatedDate;
+            this.UploadError = e.UploadError;
+            this.UploadedDate = e.UploadedDate;
+            this.HasUploaded = e.HasUploaded;
             this.Name = e.Name;
         }
 
@@ -33,5 +36,8 @@ namespace UniversalNomadUploader.DataModels.SQLModels
         public String Extension { get; set; }
         public Double Size { get; set; }
         public DateTime CreatedDate { get; set; }
+        public bool HasUploaded { get; set; }
+        public DateTime UploadedDate { get; set; }
+        public String UploadError { get; set; }
     }
 }

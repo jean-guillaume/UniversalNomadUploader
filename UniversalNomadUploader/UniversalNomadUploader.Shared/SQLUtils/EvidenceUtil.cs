@@ -35,16 +35,39 @@ namespace UniversalNomadUploader.SQLUtils
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {
-                return db.Insert(new DataModels.SQLModels.Evidence(evi));
+                return db.Insert(new DataModels.SQLModels.Evidence(evi) { HasUploaded = false });
             }
         }
 
-        public async static Task UpdateEvidenceAsync(Evidence evi)
+
+        public async static Task UpdateEvidenceSyncStatusAsync(Evidence evi)
         {
-            await Task.Run(() => UpdateEvidence(evi));
+            await Task.Run(() => UpdateEvidenceSyncStatus(evi));
         }
 
-        public static void UpdateEvidence(Evidence evi)
+        public static void UpdateEvidenceSyncStatus(Evidence evi)
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                DataModels.SQLModels.Evidence dbEvi = db.Table<DataModels.SQLModels.Evidence>().Where(ev => ev.FileName == evi.FileName).SingleOrDefault();
+                if (dbEvi != null)
+                {
+                    dbEvi.HasUploaded = evi.HasUploaded;
+                    if (evi.UploadedDate != null)
+                        dbEvi.UploadedDate = evi.UploadedDate;
+                    if (evi.UploadError != null)
+                        dbEvi.UploadError = evi.UploadError;
+                    db.Update(dbEvi);
+                }
+            }
+        }
+
+        public async static Task UpdateEvidenceNameAsync(Evidence evi)
+        {
+            await Task.Run(() => UpdateEvidenceName(evi));
+        }
+
+        public static void UpdateEvidenceName(Evidence evi)
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {

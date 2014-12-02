@@ -160,9 +160,15 @@ namespace UniversalNomadUploader
                 ((((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon).Visibility = Windows.UI.Xaml.Visibility.Visible;
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
+                item.HasUploaded = true;
+                item.UploadedDate = DateTime.Now;
+                EvidenceUtil.UpdateEvidenceSyncStatus(item);
             }
             catch (TaskCanceledException)
             {
+                item.HasUploaded = false;
+                item.UploadError = "Upload was cancelled (Task cancellation)";
+                EvidenceUtil.UpdateEvidenceSyncStatus(item);
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
                 SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
                 sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
@@ -170,8 +176,11 @@ namespace UniversalNomadUploader
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                item.HasUploaded = false;
+                item.UploadError = ex.Message;
+                EvidenceUtil.UpdateEvidenceSyncStatus(item);
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
                 SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
                 sym.Foreground = new SolidColorBrush(Colors.Red);
@@ -223,7 +232,7 @@ namespace UniversalNomadUploader
         {
             Evidence evi = ((Evidence)itemGridView.SelectedItem);
             evi.Name = NewName.Text;
-            await EvidenceUtil.UpdateEvidenceAsync(evi);
+            await EvidenceUtil.UpdateEvidenceNameAsync(evi);
             RebindItems();
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
         }

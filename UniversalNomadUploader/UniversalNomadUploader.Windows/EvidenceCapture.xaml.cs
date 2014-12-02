@@ -407,7 +407,7 @@ namespace UniversalNomadUploader
             if (CurrentEvidence != null)
             {
                 CurrentEvidence.Name = NewName.Text;
-                await EvidenceUtil.UpdateEvidenceAsync(CurrentEvidence);
+                await EvidenceUtil.UpdateEvidenceNameAsync(CurrentEvidence);
                 CurrentEvidence = null;
                 HideNewName();
             }

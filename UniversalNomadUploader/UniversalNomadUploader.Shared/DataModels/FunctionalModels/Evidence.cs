@@ -20,6 +20,9 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             this.Extension = e.Extension;
             this.Size = e.Size;
             this.CreatedDate = e.CreatedDate;
+            this.HasUploaded = e.HasUploaded;
+            this.UploadedDate = e.UploadedDate;
+            this.UploadError = e.UploadError;
             this.Name = e.Name;
         }
 
@@ -36,5 +39,8 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             get { return (Extension != "mp3") ? ((Extension != "jpg") ? new System.Uri("ms-appx:///Assets/video.png") : new System.Uri("ms-appx:///Assets/image.png")) : new System.Uri("ms-appx:///Assets/audio.png"); }
             set { }
         }
+        public bool HasUploaded { get; set; }
+        public DateTime UploadedDate { get; set; }
+        public String UploadError { get; set; }
     }
 }
