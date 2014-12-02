@@ -23,6 +23,21 @@
             IsSourceGrouped="true"
             />
 
+        <Storyboard x:Name="expandRecorderAnimation" >
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="RecorderGrid" Storyboard.TargetProperty="Height" From="0" To="200" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseIn"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Name="reduceRecorderAnimation">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="RecorderGrid" Storyboard.TargetProperty="Height" From="200" To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseOut"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
     </Page.Resources>
 
     <!--
@@ -40,6 +55,32 @@
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+        <Grid  Name="RecorderGrid" Grid.Row="1" Height="0" HorizontalAlignment="Center" >
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+                <StackPanel Orientation="Horizontal">
+                    <Button Name="RecordButton" Click="RecordButton_Click">
+                        <SymbolIcon Symbol="Microphone" />
+                    </Button>
+                    <Button Name="StpButton" Click="StpButton_Click">
+                        <SymbolIcon Symbol="Stop" />
+                    </Button>
+                    <Button Name="PauseButton" Click="PauseButton_Click">
+                        <SymbolIcon Symbol="Pause" />
+                    </Button>
+                    <Button Name="SvButton" Click="SvButton_Click">
+                        <SymbolIcon Symbol="Save" />
+                    </Button>
+                    <Button Name="CancelAudioButton" Click="CancelAudioButton_Click">
+                        <SymbolIcon Symbol="Cancel" />
+                    </Button>
+                </StackPanel>
+                <StackPanel  Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock>Duration</TextBlock>
+                    <TextBlock Name="Duration" Text="{Binding }"  Margin="10,0,0,0"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
 
         <!-- Horizontal scrolling grid -->
         <GridView
@@ -112,6 +153,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="400"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="backButton" Margin="39,59,39,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
                         Style="{StaticResource NavigationBackButtonNormalStyle}"
@@ -121,17 +163,21 @@
                         AutomationProperties.ItemType="Navigation Button"/>
             <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <AppBarButton Name="CapturePhoto" Label="Take photo" Click="CapturePhoto_Click">
+                    <SymbolIcon Symbol="Camera" />
+                </AppBarButton>
+                <AppBarButton Name="CaptureVideo" Label="Record video" Click="CaptureVideo_Click" >
+                    <SymbolIcon Symbol="Video" />
+                </AppBarButton>
+                <AppBarButton Name="CaptureAudio" Label="Record audio" Click="CaptureAudio_Click" >
+                    <SymbolIcon Symbol="Microphone" />
+                </AppBarButton>
+            </StackPanel>
         </Grid>
     </Grid>
     <Page.BottomAppBar>
         <CommandBar>
-            <CommandBar.PrimaryCommands>
-                <AppBarButton Name="New" Label="New Evidence" Click="New_Click">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="Add" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-            </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
                 <AppBarButton Name="Upload" Label="Upload" Click="Upload_Click" Visibility="Collapsed">
                     <AppBarButton.Icon>

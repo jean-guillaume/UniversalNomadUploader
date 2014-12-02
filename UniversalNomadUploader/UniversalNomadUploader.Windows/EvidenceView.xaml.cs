@@ -11,8 +11,11 @@ using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.SQLUtils;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media.Capture;
+using Windows.Media.MediaProperties;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
@@ -35,6 +38,23 @@ namespace UniversalNomadUploader
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
         private CancellationTokenSource cts;
+        private Evidence CurrentEvidence = null;
+        public enum RecordingMode
+        {
+            Initializing,
+            Recording,
+            Paused,
+            Stopped,
+        };
+        private RecordingMode CurrentMode;
+        private MediaCapture _mediaCapture;
+        private IRandomAccessStream _audioStream;
+        private DispatcherTimer _timer;
+        private TimeSpan _elapsedTime;
+        private AudioEncodingQuality _encodingQuality = AudioEncodingQuality.Auto;
+        private Byte[] _PausedBuffer;
+
+
         /// <summary>
         /// This can be changed to a strongly typed view model.
         /// </summary>
@@ -74,8 +94,12 @@ namespace UniversalNomadUploader
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
+            Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
+            await InitMediaCapture();
+            UpdateRecordingControls(RecordingMode.Initializing);
+            InitTimer();
             RebindItems();
         }
 
@@ -109,16 +133,13 @@ namespace UniversalNomadUploader
             this.DefaultViewModel["Groups"] = res;
         }
 
-        private void New_Click(object sender, RoutedEventArgs e)
-        {
-            this.Frame.Navigate(typeof(EvidenceCapture));
-        }
-
         private async void Upload_Click(object sender, RoutedEventArgs e)
         {
             itemGridView.IsEnabled = false;
             Upload.IsEnabled = false;
-            New.IsEnabled = false;
+            CaptureAudio.IsEnabled = false;
+            CaptureVideo.IsEnabled = false;
+            CapturePhoto.IsEnabled = false;
             backButton.IsEnabled = false;
             foreach (Evidence item in itemGridView.SelectedItems)
             {
@@ -137,7 +158,9 @@ namespace UniversalNomadUploader
             itemGridView.SelectedItems.Clear();
             itemGridView.IsEnabled = true;
             Upload.IsEnabled = true;
-            New.IsEnabled = true;
+            CaptureAudio.IsEnabled = true;
+            CaptureVideo.IsEnabled = true;
+            CapturePhoto.IsEnabled = true;
             backButton.IsEnabled = true;
         }
 
@@ -230,16 +253,290 @@ namespace UniversalNomadUploader
 
         private async void SaveName_Click(object sender, RoutedEventArgs e)
         {
-            Evidence evi = ((Evidence)itemGridView.SelectedItem);
-            evi.Name = NewName.Text;
-            await EvidenceUtil.UpdateEvidenceNameAsync(evi);
-            RebindItems();
-            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            if (CurrentEvidence != null)
+            {
+                CurrentEvidence.Name = NewName.Text;
+                await EvidenceUtil.UpdateEvidenceNameAsync(CurrentEvidence);
+                CurrentEvidence = null;
+                HideNewName();
+            }
+            else
+            {
+                Evidence evi = ((Evidence)itemGridView.SelectedItem);
+                evi.Name = NewName.Text;
+                await EvidenceUtil.UpdateEvidenceNameAsync(evi);
+                RebindItems();
+                NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            }
+            
         }
 
         private void CancelNameChange_Click(object sender, RoutedEventArgs e)
         {
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
         }
+
+        private async void RecordButton_Click(object sender, RoutedEventArgs e)
+        {
+            MediaEncodingProfile encodingProfile = MediaEncodingProfile.CreateMp3(_encodingQuality);
+            try
+            {
+                await InitMediaCapture();
+                _audioStream = new InMemoryRandomAccessStream();
+                await _mediaCapture.StartRecordToStreamAsync(encodingProfile, _audioStream);
+                UpdateRecordingControls(RecordingMode.Recording);
+                _timer.Start();
+            }
+            catch (Exception)
+            {
+                displayMessage("Please allow Nomad Uploader to access your microphone from the permissions charm.", "Microphone Access");
+            }
+        }
+
+        private async void StpButton_Click(object sender, RoutedEventArgs e)
+        {
+            await _mediaCapture.StopRecordAsync();
+            UpdateRecordingControls(RecordingMode.Stopped);
+            _timer.Stop();
+        }
+
+        private async void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            await _mediaCapture.StopRecordAsync();
+            _timer.Stop();
+            using (var dataReader = new DataReader(_audioStream.GetInputStreamAt(0)))
+            {
+                await dataReader.LoadAsync((uint)_audioStream.Size);
+                if (_PausedBuffer == null)
+                {
+                    _PausedBuffer = new byte[(int)_audioStream.Size];
+                    dataReader.ReadBytes(_PausedBuffer);
+                }
+                else
+                {
+                    int currlength = _PausedBuffer.Length;
+                    byte[] temp = new byte[(int)_audioStream.Size];
+                    dataReader.ReadBytes(temp);
+                    Array.Resize(ref _PausedBuffer, (int)_audioStream.Size + _PausedBuffer.Length);
+                    Array.Copy(temp, 0, _PausedBuffer, currlength, temp.Length);
+                }
+
+                UpdateRecordingControls(RecordingMode.Paused);
+            }
+        }
+
+        private async void SvButton_Click(object sender, RoutedEventArgs e)
+        {
+            Evidence evi = new Evidence();
+            evi.FileName = Guid.NewGuid().ToString();
+            evi.Extension = "mp3";
+            evi.CreatedDate = DateTime.Now;
+            evi.ServerID = (int)GlobalVariables.SelectedServer;
+            StorageFile _file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(evi.FileName + ".mp3", CreationCollisionOption.OpenIfExists);
+            using (var dataReader = new DataReader(_audioStream.GetInputStreamAt(0)))
+            {
+                await dataReader.LoadAsync((uint)_audioStream.Size);
+                byte[] buffer = new byte[(int)_audioStream.Size];
+                dataReader.ReadBytes(buffer);
+                if (_PausedBuffer != null && CurrentMode != RecordingMode.Paused)
+                {
+                    int currlength = _PausedBuffer.Length;
+                    Array.Resize(ref _PausedBuffer, buffer.Length + _PausedBuffer.Length);
+                    Array.Copy(buffer, 0, _PausedBuffer, currlength, buffer.Length);
+                    await FileIO.WriteBytesAsync(_file, _PausedBuffer);
+                }
+                else if (CurrentMode == RecordingMode.Paused)
+                {
+                    await FileIO.WriteBytesAsync(_file, _PausedBuffer);
+                }
+                else
+                {
+                    await FileIO.WriteBytesAsync(_file, buffer);
+                }
+                UpdateRecordingControls(RecordingMode.Initializing);
+            }
+            evi.Size = Convert.ToDouble((await _file.GetBasicPropertiesAsync()).Size);
+            evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+            evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+            CurrentEvidence = evi;
+            HideAudioControls();
+            ShowNewName();
+        }
+
+
+        private async Task InitMediaCapture()
+        {
+            _mediaCapture = new MediaCapture();
+            var captureInitSettings = new MediaCaptureInitializationSettings();
+            captureInitSettings.StreamingCaptureMode = StreamingCaptureMode.Audio;
+            await _mediaCapture.InitializeAsync(captureInitSettings);
+            _mediaCapture.Failed += MediaCaptureOnFailed;
+            _mediaCapture.RecordLimitationExceeded += MediaCaptureOnRecordLimitationExceeded;
+        }
+
+        private void UpdateRecordingControls(RecordingMode recordingMode)
+        {
+            CurrentMode = recordingMode;
+            switch (recordingMode)
+            {
+                case RecordingMode.Initializing:
+                    RecordButton.IsEnabled = true;
+                    StpButton.IsEnabled = false;
+                    SvButton.IsEnabled = false;
+                    PauseButton.IsEnabled = false;
+                    break;
+                case RecordingMode.Recording:
+                    RecordButton.IsEnabled = false;
+                    StpButton.IsEnabled = true;
+                    SvButton.IsEnabled = false;
+                    PauseButton.IsEnabled = true;
+                    break;
+                case RecordingMode.Stopped:
+                    RecordButton.IsEnabled = true;
+                    StpButton.IsEnabled = false;
+                    SvButton.IsEnabled = true;
+                    PauseButton.IsEnabled = false;
+                    break;
+                case RecordingMode.Paused:
+                    RecordButton.IsEnabled = true;
+                    StpButton.IsEnabled = false;
+                    SvButton.IsEnabled = true;
+                    PauseButton.IsEnabled = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("recordingMode");
+            }
+        }
+
+        private void InitTimer()
+        {
+            _elapsedTime = new TimeSpan();
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            _timer.Tick += TimerOnTick;
+        }
+
+        private void TimerOnTick(object sender, object o)
+        {
+            _elapsedTime = _elapsedTime.Add(_timer.Interval);
+            Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
+        }
+
+        private async void MediaCaptureOnRecordLimitationExceeded(MediaCapture sender)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                await sender.StopRecordAsync();
+                var warningMessage = new MessageDialog("The recording has stopped because you exceeded the maximum recording length.", "Recording Stopped");
+                await warningMessage.ShowAsync();
+            });
+        }
+
+        private async void MediaCaptureOnFailed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                var warningMessage = new MessageDialog(String.Format("The audio capture failed: {0}", errorEventArgs.Message), "Capture Failed");
+                await warningMessage.ShowAsync();
+            });
+        }
+
+        private async void CancelAudioButton_Click(object sender, RoutedEventArgs e)
+        {
+            _timer.Stop();
+            try
+            {
+                await _mediaCapture.StopRecordAsync();
+            }
+            catch (Exception)
+            {
+
+            }
+            ResetTimer();
+            Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
+            UpdateRecordingControls(RecordingMode.Initializing);
+        }
+
+
+        private void ResetTimer()
+        {
+            InitTimer();
+        }
+
+        private async void CapturePhoto_Click(object sender, RoutedEventArgs e)
+        {
+            CameraCaptureUI camera = new CameraCaptureUI();
+            StorageFile newPhoto = await camera.CaptureFileAsync(CameraCaptureUIMode.Photo);
+            if (newPhoto != null)
+            {
+                Evidence evi = new Evidence();
+                evi.FileName = Guid.NewGuid().ToString();
+                evi.Extension = newPhoto.FileType.Replace(".", "");
+                evi.CreatedDate = DateTime.Now;
+                evi.ServerID = (int)GlobalVariables.SelectedServer;
+                await newPhoto.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newPhoto.FileType, NameCollisionOption.ReplaceExisting);
+                evi.Size = Convert.ToDouble((await newPhoto.GetBasicPropertiesAsync()).Size);
+                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                CurrentEvidence = evi;
+                ShowNewName();
+            }
+        }
+
+        private async void CaptureVideo_Click(object sender, RoutedEventArgs e)
+        {
+            CameraCaptureUI video = new CameraCaptureUI();
+            StorageFile newVideo = await video.CaptureFileAsync(CameraCaptureUIMode.Video);
+            if (newVideo != null)
+            {
+                Evidence evi = new Evidence();
+                evi.FileName = Guid.NewGuid().ToString();
+                evi.Extension = newVideo.FileType.Replace(".", "");
+                evi.CreatedDate = DateTime.Now;
+                evi.ServerID = (int)GlobalVariables.SelectedServer;
+                await newVideo.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newVideo.FileType, NameCollisionOption.ReplaceExisting);
+                evi.Size = Convert.ToDouble((await newVideo.GetBasicPropertiesAsync()).Size);
+                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                CurrentEvidence = evi;
+                ShowNewName();
+            }
+        }
+
+        private void ShowNewName()
+        {
+            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+        }
+
+        private void HideNewName()
+        {
+            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+        }
+
+        private void HideAudioControls()
+        {
+            reduceRecorderAnimation.Begin();
+        }
+
+        private void ShowAudioControls()
+        {
+            expandRecorderAnimation.Begin();
+        }
+
+        private void CaptureAudio_Click(object sender, RoutedEventArgs e)
+        {
+            if (RecorderGrid.Height == 0)
+            {
+                ShowAudioControls();
+            }
+            else
+            {
+                HideAudioControls();
+            }
+
+        }
+
+       
+
     }
 }
