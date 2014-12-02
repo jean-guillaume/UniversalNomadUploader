@@ -103,9 +103,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="EvidenceCapture.xaml.cs">
-      <DependentUpon>EvidenceCapture.xaml</DependentUpon>
-    </Compile>
     <Compile Include="EvidenceView.xaml.cs">
       <DependentUpon>EvidenceView.xaml</DependentUpon>
     </Compile>
@@ -144,10 +141,6 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="EvidenceCapture.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="EvidenceView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
