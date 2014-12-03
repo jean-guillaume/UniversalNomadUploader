@@ -24,6 +24,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
@@ -243,6 +244,8 @@ namespace UniversalNomadUploader
             }
             Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
             Rename.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
+            Delete.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
+            Info.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void Rename_Click(object sender, RoutedEventArgs e)
@@ -257,18 +260,17 @@ namespace UniversalNomadUploader
             {
                 CurrentEvidence.Name = NewName.Text;
                 await EvidenceUtil.UpdateEvidenceNameAsync(CurrentEvidence);
-                CurrentEvidence = null;
-                HideNewName();
             }
             else
             {
                 Evidence evi = ((Evidence)itemGridView.SelectedItem);
                 evi.Name = NewName.Text;
                 await EvidenceUtil.UpdateEvidenceNameAsync(evi);
-                RebindItems();
-                NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             }
-            
+            CurrentEvidence = null;
+            HideNewName();
+            RebindItems();
+            NewName.Text = "";
         }
 
         private void CancelNameChange_Click(object sender, RoutedEventArgs e)
@@ -455,6 +457,8 @@ namespace UniversalNomadUploader
             ResetTimer();
             Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
             UpdateRecordingControls(RecordingMode.Initializing);
+            _PausedBuffer = null;
+            HideAudioControls();
         }
 
 
@@ -523,6 +527,7 @@ namespace UniversalNomadUploader
             expandRecorderAnimation.Begin();
         }
 
+
         private void CaptureAudio_Click(object sender, RoutedEventArgs e)
         {
             if (RecorderGrid.Height == 0)
@@ -536,7 +541,37 @@ namespace UniversalNomadUploader
 
         }
 
-       
+        private async void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            MessageDialog diag = new MessageDialog("Are you sure you want to delete: " + ((Evidence)itemGridView.SelectedItem).Name, "Confirm deletion!");
+            diag.Commands.Add(new UICommand("Confirm", new UICommandInvokedHandler(this.ConfirmDelete)));
+            diag.Commands.Add(new UICommand("Cancel", new UICommandInvokedHandler(this.ConfirmDelete)));
+            await diag.ShowAsync();
+            
+        }
+
+        private async void ConfirmDelete(IUICommand command)
+        {
+            if (command.Label == "Confirm")
+            {
+                await EvidenceUtil.DeleteAsync((Evidence)itemGridView.SelectedItem);
+                await (await StorageFile.GetFileFromPathAsync(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + ((Evidence)itemGridView.SelectedItem).FileName + "." + ((Evidence)itemGridView.SelectedItem).Extension)).DeleteAsync();
+                RebindItems();
+            }
+
+        }
+
+        private void SymbolIcon_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            
+            
+        }
+
+        private void Info_Click(object sender, RoutedEventArgs e)
+        {
+            SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(itemGridView.SelectedItem), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
+            FlyoutBase.ShowAttachedFlyout(sym);
+        }
 
     }
 }

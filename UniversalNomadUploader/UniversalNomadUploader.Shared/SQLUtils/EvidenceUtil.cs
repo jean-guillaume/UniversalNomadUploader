@@ -92,5 +92,19 @@ namespace UniversalNomadUploader.SQLUtils
                 return "";
             }
         }
+
+        public async static Task DeleteAsync(Evidence evidence)
+        {
+            await Task.Run(() => Delete(evidence));
+        }
+
+        public static void Delete(Evidence evidence)
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                DataModels.SQLModels.Evidence dbEvi = db.Table<DataModels.SQLModels.Evidence>().Where(ev => ev.LocalID == evidence.LocalID).SingleOrDefault();
+                db.Delete(dbEvi);
+            }
+        }
     }
 }

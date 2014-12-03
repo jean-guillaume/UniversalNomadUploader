@@ -19,6 +19,8 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\GlobalVariables.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadedColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\APIModels\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ApiResponseCodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ServerEnum.cs" />
