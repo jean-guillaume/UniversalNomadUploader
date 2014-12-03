@@ -130,13 +130,13 @@ namespace UniversalNomadUploader
             Boolean HasAuthed = false;
             if (GlobalVariables.HasInternetAccess())
             {
-                Guid Session = await AuthenticationUtil.Authenticate(Username.Text, Password.Password, GlobalVariables.SelectedServer);
+                Guid Session = await AuthenticationUtil.Authenticate(Username.Text.ToUpper(), Password.Password, GlobalVariables.SelectedServer);
                 if (Session != Guid.Empty)
                 {
                     String ErrorMessage = String.Empty;
                     try
                     {
-                        await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text, SessionID = Session }, Password.Password);
+                        await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text.ToUpper(), SessionID = Session }, Password.Password);
                         await SQLUtils.UserUtil.UpdateUser(await APIUtils.UserUtil.GetProfile());
                     }
                     catch (ApiException exception)
