@@ -34,6 +34,7 @@
         <common:UploadErrorMessageVisibilityConverter x:Key="UploadErrorMessageVisibilityConverter" />
         <common:UploadErrorMessageFlyoutMessageConverter x:Key="UploadErrorMessageFlyoutMessageConverter" />
         <common:UploadDateFlyoutConverter x:Key="UploadDateFlyoutConverter" />
+        <common:NameToNameInfoConverter x:Key="NameToNameInfoConverter" />
         
         <!-- Global Image brushes -->
         <ImageBrush x:Key="HubBackgroundImageBrush" ImageSource="Assets/HubBackground.png"/>

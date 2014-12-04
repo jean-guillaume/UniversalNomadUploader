@@ -91,6 +91,7 @@
                                     <FlyoutBase.AttachedFlyout>
                                         <Flyout Placement="Top">
                                             <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="{Binding Name, Converter={StaticResource NameToNameInfoConverter}}" FontSize="18" Width="250" TextWrapping="WrapWholeWords" />
                                                 <TextBlock Text="{Binding UploadedDate, Converter={StaticResource UploadDateFlyoutConverter}}" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadedDate, Converter={StaticResource UploadDateVisibilityConverter}}" />
                                                 <TextBlock Text="{Binding UploadError, Converter={StaticResource UploadErrorMessageFlyoutMessageConverter}}" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadError, Converter={StaticResource UploadErrorMessageVisibilityConverter}}" />
                                             </StackPanel>

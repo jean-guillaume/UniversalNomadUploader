@@ -19,6 +19,7 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\GlobalVariables.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\NameToNameInfoConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateFlyoutConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateSymbolConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateVisibilityConverter.cs" />

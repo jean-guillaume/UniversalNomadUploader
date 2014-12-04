@@ -680,7 +680,7 @@ namespace UniversalNomadUploader
         private void Info_Click(object sender, RoutedEventArgs e)
         {
             SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(itemGridView.SelectedItem), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-            FlyoutBase.ShowAttachedFlyout(sym);
+            FlyoutBase.ShowAttachedFlyout(sym);    
         }
 
         private async void Import_Click(object sender, RoutedEventArgs e)
