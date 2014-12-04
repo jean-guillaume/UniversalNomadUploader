@@ -35,7 +35,7 @@ namespace UniversalNomadUploader.SQLUtils
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {
-                return db.Insert(new DataModels.SQLModels.Evidence(evi) { HasUploaded = false });
+                return db.Insert(new DataModels.SQLModels.Evidence(evi) { TriedUpload = false });
             }
         }
 
@@ -52,7 +52,7 @@ namespace UniversalNomadUploader.SQLUtils
                 DataModels.SQLModels.Evidence dbEvi = db.Table<DataModels.SQLModels.Evidence>().Where(ev => ev.FileName == evi.FileName).SingleOrDefault();
                 if (dbEvi != null)
                 {
-                    dbEvi.HasUploaded = evi.HasUploaded;
+                    dbEvi.TriedUpload = evi.HasTryUploaded;
                     if (evi.UploadedDate != null)
                         dbEvi.UploadedDate = evi.UploadedDate;
                     if (evi.UploadError != null)

@@ -5,9 +5,11 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
+using UniversalNomadUploader.APIUtils;
 using UniversalNomadUploader.Common;
 using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.DataModels.FunctionalModels;
+using UniversalNomadUploader.Exceptions;
 using UniversalNomadUploader.SQLUtils;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -15,6 +17,8 @@ using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Search;
 using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Popups;
@@ -45,7 +49,7 @@ namespace UniversalNomadUploader
             Initializing,
             Recording,
             Paused,
-            Stopped,
+            Stopped
         };
         private RecordingMode CurrentMode;
         private MediaCapture _mediaCapture;
@@ -54,6 +58,15 @@ namespace UniversalNomadUploader
         private TimeSpan _elapsedTime;
         private AudioEncodingQuality _encodingQuality = AudioEncodingQuality.Auto;
         private Byte[] _PausedBuffer;
+
+        private enum PageState
+        {
+            Uploading,
+            Renaming,
+            Deleting,
+            RecordingAudio,
+            Default
+        }
 
 
         /// <summary>
@@ -130,18 +143,34 @@ namespace UniversalNomadUploader
         private async void RebindItems()
         {
             var coll = await EvidenceUtil.GetEvidenceAsync();
-            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd/MM/yyy"));
+            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd/MM/yyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
             this.DefaultViewModel["Groups"] = res;
         }
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
         {
+            if (GlobalVariables.IsOffline || await AuthenticationUtil.VerifySessionAsync())
+            {
+                expandLoginAnimation.Begin();
+                if (GlobalVariables.IsOffline)
+                {
+                    NewLoginReason.Text = "Your are currently offline please sign in to upload";
+                }
+                else
+                {
+                    NewLoginReason.Text = "Your session has expired please sign in again";
+                }
+            }
+            else
+            {
+                SetupUploads();
+            }
+        }
+
+        private async void SetupUploads()
+        {
             itemGridView.IsEnabled = false;
-            Upload.IsEnabled = false;
-            CaptureAudio.IsEnabled = false;
-            CaptureVideo.IsEnabled = false;
-            CapturePhoto.IsEnabled = false;
-            backButton.IsEnabled = false;
+            DisableButtons(PageState.Uploading);
             foreach (Evidence item in itemGridView.SelectedItems)
             {
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
@@ -158,11 +187,7 @@ namespace UniversalNomadUploader
             }
             itemGridView.SelectedItems.Clear();
             itemGridView.IsEnabled = true;
-            Upload.IsEnabled = true;
-            CaptureAudio.IsEnabled = true;
-            CaptureVideo.IsEnabled = true;
-            CapturePhoto.IsEnabled = true;
-            backButton.IsEnabled = true;
+            DisableButtons(PageState.Default);
         }
 
         private async Task HandleUploadAsync(UploadOperation upload, bool start, Evidence item)
@@ -181,28 +206,34 @@ namespace UniversalNomadUploader
                     await upload.AttachAsync().AsTask(cts.Token, progressCallback);
                 }
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
-                ((((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon).Visibility = Windows.UI.Xaml.Visibility.Visible;
+                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
+                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                sym.Symbol = Symbol.Accept;
+                sym.Foreground = new SolidColorBrush(Colors.Green);
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
-                item.HasUploaded = true;
+                item.HasTryUploaded = true;
                 item.UploadedDate = DateTime.Now;
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
+                await EventLogUtil.InsertEventAsync(item.Name + " uploaded successfully", LogType.Upload);
             }
             catch (TaskCanceledException)
             {
-                item.HasUploaded = false;
+                item.HasTryUploaded = true;
                 item.UploadError = "Upload was cancelled (Task cancellation)";
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
                 SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
                 sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                sym.Foreground = new SolidColorBrush(Colors.Red);
                 sym.Symbol = Symbol.Cancel;
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
+                EventLogUtil.InsertEvent(item.Name + " uploaded cancelled", LogType.Upload);
             }
             catch (Exception ex)
             {
-                item.HasUploaded = false;
+                item.HasTryUploaded = true;
                 item.UploadError = ex.Message;
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
@@ -212,16 +243,13 @@ namespace UniversalNomadUploader
                 sym.Symbol = Symbol.Cancel;
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
+                EventLogUtil.InsertEvent(item.Name + " uploaded failed, reason: " + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Upload);
             }
         }
 
         private void UploadProgress(UploadOperation obj)
         {
 
-            //UploadGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            //UploadProgressBar.IsIndeterminate = false;
-            //UploadProgressBar.Value = obj.Progress.BytesSent / obj.Progress.TotalBytesToSend * 100.00;
-            //UploadProgressBar.Maximum = 100;
         }
 
         private async void displayMessage(string message, string title)
@@ -250,6 +278,7 @@ namespace UniversalNomadUploader
 
         private void Rename_Click(object sender, RoutedEventArgs e)
         {
+            DisableButtons(PageState.Renaming);
             NewName.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name;
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
         }
@@ -271,11 +300,87 @@ namespace UniversalNomadUploader
             HideNewName();
             RebindItems();
             NewName.Text = "";
+            DisableButtons(PageState.Default);
         }
 
         private void CancelNameChange_Click(object sender, RoutedEventArgs e)
         {
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            DisableButtons(PageState.Default);
+        }
+
+        private void DisableButtons(PageState state)
+        {
+
+            switch (state)
+            {
+                case PageState.Uploading:
+                    Delete.IsEnabled = false;
+                    Upload.IsEnabled = false;
+                    Rename.IsEnabled = false;
+                    Info.IsEnabled = false;
+                    Import.IsEnabled = false;
+                    CaptureAudio.IsEnabled = false;
+                    CapturePhoto.IsEnabled = false;
+                    CaptureVideo.IsEnabled = false;
+                    backButton.IsEnabled = false;
+                    break;
+                case PageState.Renaming:
+                    Delete.IsEnabled = false;
+                    Upload.IsEnabled = false;
+                    Rename.IsEnabled = false;
+                    Info.IsEnabled = false;
+                    Import.IsEnabled = false;
+                    CaptureAudio.IsEnabled = false;
+                    CapturePhoto.IsEnabled = false;
+                    CaptureVideo.IsEnabled = false;
+                    backButton.IsEnabled = false;
+                    break;
+                case PageState.Deleting:
+                    Delete.IsEnabled = false;
+                    Upload.IsEnabled = false;
+                    Rename.IsEnabled = false;
+                    Info.IsEnabled = false;
+                    Import.IsEnabled = false;
+                    CaptureAudio.IsEnabled = false;
+                    CapturePhoto.IsEnabled = false;
+                    CaptureVideo.IsEnabled = false;
+                    backButton.IsEnabled = false;
+                    break;
+                case PageState.RecordingAudio:
+                    Delete.IsEnabled = false;
+                    Upload.IsEnabled = false;
+                    Rename.IsEnabled = false;
+                    Info.IsEnabled = false;
+                    Import.IsEnabled = false;
+                    CaptureAudio.IsEnabled = false;
+                    CapturePhoto.IsEnabled = false;
+                    CaptureVideo.IsEnabled = false;
+                    backButton.IsEnabled = false;
+                    break;
+                case PageState.Default:
+                    Delete.IsEnabled = true;
+                    Upload.IsEnabled = true;
+                    Rename.IsEnabled = true;
+                    Info.IsEnabled = true;
+                    Import.IsEnabled = true;
+                    CaptureAudio.IsEnabled = true;
+                    CapturePhoto.IsEnabled = true;
+                    CaptureVideo.IsEnabled = true;
+                    backButton.IsEnabled = true;
+                    break;
+                default:
+                    Delete.IsEnabled = true;
+                    Upload.IsEnabled = true;
+                    Rename.IsEnabled = true;
+                    Info.IsEnabled = true;
+                    Import.IsEnabled = true;
+                    CaptureAudio.IsEnabled = true;
+                    CapturePhoto.IsEnabled = true;
+                    CaptureVideo.IsEnabled = true;
+                    backButton.IsEnabled = true;
+                    break;
+            }
         }
 
         private async void RecordButton_Click(object sender, RoutedEventArgs e)
@@ -334,6 +439,7 @@ namespace UniversalNomadUploader
             evi.Extension = "mp3";
             evi.CreatedDate = DateTime.Now;
             evi.ServerID = (int)GlobalVariables.SelectedServer;
+            evi.Type = MimeTypes.Audio;
             StorageFile _file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(evi.FileName + ".mp3", CreationCollisionOption.OpenIfExists);
             using (var dataReader = new DataReader(_audioStream.GetInputStreamAt(0)))
             {
@@ -478,6 +584,7 @@ namespace UniversalNomadUploader
                 evi.Extension = newPhoto.FileType.Replace(".", "");
                 evi.CreatedDate = DateTime.Now;
                 evi.ServerID = (int)GlobalVariables.SelectedServer;
+                evi.Type = MimeTypes.Picture;
                 await newPhoto.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newPhoto.FileType, NameCollisionOption.ReplaceExisting);
                 evi.Size = Convert.ToDouble((await newPhoto.GetBasicPropertiesAsync()).Size);
                 evi.UserID = GlobalVariables.LoggedInUser.LocalID;
@@ -498,6 +605,7 @@ namespace UniversalNomadUploader
                 evi.Extension = newVideo.FileType.Replace(".", "");
                 evi.CreatedDate = DateTime.Now;
                 evi.ServerID = (int)GlobalVariables.SelectedServer;
+                evi.Type = MimeTypes.Movie;
                 await newVideo.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newVideo.FileType, NameCollisionOption.ReplaceExisting);
                 evi.Size = Convert.ToDouble((await newVideo.GetBasicPropertiesAsync()).Size);
                 evi.UserID = GlobalVariables.LoggedInUser.LocalID;
@@ -547,7 +655,7 @@ namespace UniversalNomadUploader
             diag.Commands.Add(new UICommand("Confirm", new UICommandInvokedHandler(this.ConfirmDelete)));
             diag.Commands.Add(new UICommand("Cancel", new UICommandInvokedHandler(this.ConfirmDelete)));
             await diag.ShowAsync();
-            
+
         }
 
         private async void ConfirmDelete(IUICommand command)
@@ -556,21 +664,124 @@ namespace UniversalNomadUploader
             {
                 await EvidenceUtil.DeleteAsync((Evidence)itemGridView.SelectedItem);
                 await (await StorageFile.GetFileFromPathAsync(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + ((Evidence)itemGridView.SelectedItem).FileName + "." + ((Evidence)itemGridView.SelectedItem).Extension)).DeleteAsync();
+                await EventLogUtil.InsertEventAsync(((Evidence)itemGridView.SelectedItem).Name + " Deleted on " + DateTime.Now.ToString(), LogType.Delete);
                 RebindItems();
+
             }
 
         }
 
         private void SymbolIcon_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            
-            
+
+
         }
 
         private void Info_Click(object sender, RoutedEventArgs e)
         {
             SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(itemGridView.SelectedItem), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
             FlyoutBase.ShowAttachedFlyout(sym);
+        }
+
+        private async void Import_Click(object sender, RoutedEventArgs e)
+        {
+            FileOpenPicker openPicker = new FileOpenPicker();
+            openPicker.ViewMode = PickerViewMode.Thumbnail;
+            openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            foreach (KeyValuePair<String, MimeTypes> extension in GlobalVariables.ValidExtensions())
+            {
+                openPicker.FileTypeFilter.Add(extension.Key);
+            }
+            StorageFile file = await openPicker.PickSingleFileAsync();
+            if (file != null)
+            {
+                Evidence evi = new Evidence();
+                evi.FileName = Guid.NewGuid().ToString();
+                evi.Extension = file.FileType.Replace(".", "");
+                evi.CreatedDate = DateTime.Now;
+                evi.Type = GlobalVariables.GetMimeTypeFromExtension(file.FileType);
+                evi.ServerID = (int)GlobalVariables.SelectedServer;
+                await file.CopyAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + file.FileType, NameCollisionOption.ReplaceExisting);
+                evi.Size = Convert.ToDouble((await file.GetBasicPropertiesAsync()).Size);
+                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                CurrentEvidence = evi;
+                ShowNewName();
+            }
+        }
+
+        private async void logon_Click(object sender, RoutedEventArgs e)
+        {
+            ShowProgress();
+            if (String.IsNullOrWhiteSpace(Username.Text))
+            {
+                MessageDialog msg = new MessageDialog("Please enter a Username", "Required");
+                await msg.ShowAsync();
+                HideProgress();
+                return;
+            }
+            if (String.IsNullOrWhiteSpace(Password.Password))
+            {
+                MessageDialog msg = new MessageDialog("Please enter a Password", "Required");
+                await msg.ShowAsync();
+                HideProgress();
+                return;
+            }
+
+            Boolean HasAuthed = false;
+            if (GlobalVariables.HasInternetAccess())
+            {
+                if (Username.Text.ToUpper() != GlobalVariables.LoggedInUser.Username)
+                {
+                    MessageDialog msg = new MessageDialog("You can only log in as the user that you are logged in as offline", "Username");
+                    await msg.ShowAsync();
+                    HideProgress();
+                    return;
+                }
+                Guid Session = await AuthenticationUtil.Authenticate(Username.Text.ToUpper(), Password.Password, GlobalVariables.SelectedServer);
+                if (Session != Guid.Empty)
+                {
+                    GlobalVariables.IsOffline = false;
+                    HasAuthed = true;
+                    HideProgress();
+                    reduceLoginAnimation.Begin();
+                    SetupUploads();
+                    return;
+                }
+            }
+            else
+            {
+                MessageDialog msg = new MessageDialog("Unable to to connect to the server, please check your internet connection", "Connection!");
+                await msg.ShowAsync();
+                HideProgress();
+                return;
+            }
+            if (!HasAuthed)
+            {
+                MessageDialog msg = new MessageDialog("Incorrect Username or Password", "Access denied");
+                await msg.ShowAsync();
+                HideProgress();
+                return;
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            reduceLoginAnimation.Begin();
+            HideProgress();
+        }
+
+
+        private void ShowProgress()
+        {
+            SyncProgress.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            SyncProgress.IsIndeterminate = true;
+        }
+
+        private void HideProgress()
+        {
+            SyncProgress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            SyncProgress.IsIndeterminate = false;
         }
 
     }

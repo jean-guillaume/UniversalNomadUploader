@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UniversalNomadUploader.DataModels.Enums;
 
 namespace UniversalNomadUploader.DataModels.SQLModels
 {
@@ -22,8 +23,9 @@ namespace UniversalNomadUploader.DataModels.SQLModels
             this.CreatedDate = e.CreatedDate;
             this.UploadError = e.UploadError;
             this.UploadedDate = e.UploadedDate;
-            this.HasUploaded = e.HasUploaded;
+            this.TriedUpload = e.HasTryUploaded;
             this.Name = e.Name;
+            this.Type = (int)e.Type;
         }
 
         [PrimaryKey]
@@ -36,8 +38,9 @@ namespace UniversalNomadUploader.DataModels.SQLModels
         public String Extension { get; set; }
         public Double Size { get; set; }
         public DateTime CreatedDate { get; set; }
-        public bool HasUploaded { get; set; }
+        public bool TriedUpload { get; set; }
         public DateTime UploadedDate { get; set; }
         public String UploadError { get; set; }
+        public int Type { get; set; }
     }
 }

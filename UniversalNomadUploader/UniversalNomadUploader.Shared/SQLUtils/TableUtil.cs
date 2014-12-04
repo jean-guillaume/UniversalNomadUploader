@@ -17,6 +17,7 @@ namespace UniversalNomadUploader.SQLUtils
                 db.CreateTable<Server>();
                 db.CreateTable<User>();
                 db.CreateTable<Evidence>();
+                db.CreateTable<EventLog>();
             }
         }
     }

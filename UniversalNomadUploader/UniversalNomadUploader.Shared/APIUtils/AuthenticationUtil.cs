@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using UniversalNomadUploader.Common;
 using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.SQLUtils;
 
@@ -31,6 +32,25 @@ namespace UniversalNomadUploader.APIUtils
                         }    
                     }
                     return Guid.Empty;
+                }
+            }
+        }
+
+        public async static Task<bool> VerifySessionAsync()
+        {
+            Guid SessionID = await SQLUtils.UserUtil.GetSessionID();
+            String WSUrl = ServerUtil.getServerWSUrl();
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("X-SessionID", SessionID.ToString());
+                String url = ((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + WSUrl + "/Authentication/VerifySession";
+                using (var response = await client.GetAsync(url))
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        return true;
+                    }
+                    return false;
                 }
             }
         }

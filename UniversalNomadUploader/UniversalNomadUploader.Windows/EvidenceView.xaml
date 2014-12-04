@@ -38,6 +38,21 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
+
+        <Storyboard x:Name="expandLoginAnimation" >
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="ReauthPopup" Storyboard.TargetProperty="Height" From="0" To="200" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseIn"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Name="reduceLoginAnimation">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="ReauthPopup" Storyboard.TargetProperty="Height" From="200" To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseOut"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
     </Page.Resources>
 
     <!--
@@ -72,10 +87,13 @@
                     <Grid HorizontalAlignment="Left" Width="150" Height="150">
                         <StackPanel Orientation="Vertical" Background="{StaticResource NomadBlue20Percent}">
                             <Border Height="20">
-                                <SymbolIcon Symbol="Accept" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="{Binding UploadedDate, Converter={StaticResource UploadColorConverter}}" Visibility="{Binding HasUploaded, Converter={StaticResource UploadVisibilityConverter}}" >
+                                <SymbolIcon Symbol="{Binding UploadedDate, Converter={StaticResource UploadDateSymbolConverter}}" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="{Binding UploadedDate, Converter={StaticResource UploadColorConverter}}" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" >
                                     <FlyoutBase.AttachedFlyout>
                                         <Flyout Placement="Top">
-                                            <TextBlock Text="{Binding UploadedDate}" />
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="{Binding UploadedDate, Converter={StaticResource UploadDateFlyoutConverter}}" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadedDate, Converter={StaticResource UploadDateVisibilityConverter}}" />
+                                                <TextBlock Text="{Binding UploadError, Converter={StaticResource UploadErrorMessageFlyoutMessageConverter}}" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadError, Converter={StaticResource UploadErrorMessageVisibilityConverter}}" />
+                                            </StackPanel>
                                         </Flyout>
                                     </FlyoutBase.AttachedFlyout>
                                 </SymbolIcon>
@@ -152,12 +170,39 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
+
+        <Grid Name="ReauthPopup" Grid.Row="1" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Height="200" Background="{StaticResource FadedLogon}">
+                <Grid Name="LogonGrid" Margin="0,20,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="50" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Name="NewLoginReason" Text="Please sign in to upload" FontSize="26" TextAlignment="Center" Grid.Row="0" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="1" >
+                        <TextBlock Text="Username" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
+                        <TextBox Name="Username" Height="30" Width="150" ></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="2" >
+                        <TextBlock Text="Password" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
+                        <PasswordBox Name="Password" Height="30" Width="150" ></PasswordBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="50" VerticalAlignment="Center" Grid.Row="3" >
+                        <Button Name="logon" Content="Log in" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Background="Transparent" BorderBrush="Black" BorderThickness="2" Click="logon_Click" ></Button>
+                        <Button Name="Cancel" Content="Cancel" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Background="Transparent" BorderBrush="Black" BorderThickness="2" Click="Cancel_Click" ></Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+        
         <!-- Back button and page title -->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="420"/>
             </Grid.ColumnDefinitions>
             <AppBarButton x:Name="backButton" Margin="39,59,39,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
                         Style="{StaticResource LogoutAppBarButtonStyle}"
@@ -168,6 +213,9 @@
             <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <AppBarButton Name="Import" Label="Import" Click="Import_Click">
+                    <SymbolIcon Symbol="Import" />
+                </AppBarButton>
                 <AppBarButton Name="CapturePhoto" Label="Take photo" Click="CapturePhoto_Click">
                     <SymbolIcon Symbol="Camera" />
                 </AppBarButton>
@@ -178,6 +226,7 @@
                     <SymbolIcon Symbol="Microphone" />
                 </AppBarButton>
             </StackPanel>
+            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
         </Grid>
     </Grid>
     <Page.BottomAppBar>

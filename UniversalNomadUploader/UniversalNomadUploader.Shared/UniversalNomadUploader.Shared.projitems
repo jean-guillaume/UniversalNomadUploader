@@ -19,17 +19,26 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\GlobalVariables.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateFlyoutConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateSymbolConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadedColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadErrorMessageFlyoutMessageConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadErrorMessageVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\APIModels\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ApiResponseCodes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\LogType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\MimeTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ServerEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\FunctionalModels\Evidence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\FunctionalModels\User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\EventLog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\Evidence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\Server.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\APIException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\EventLogUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\EvidenceUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\ServerUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\TableUtil.cs" />

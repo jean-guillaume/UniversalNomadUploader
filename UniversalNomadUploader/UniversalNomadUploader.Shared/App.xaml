@@ -29,6 +29,11 @@
     
         <common:UploadedColorConverter x:Key="UploadColorConverter" />
         <common:UploadVisibilityConverter x:Key="UploadVisibilityConverter" />
+        <common:UploadDateSymbolConverter x:Key="UploadDateSymbolConverter" />
+        <common:UploadDateVisibilityConverter x:Key="UploadDateVisibilityConverter" />
+        <common:UploadErrorMessageVisibilityConverter x:Key="UploadErrorMessageVisibilityConverter" />
+        <common:UploadErrorMessageFlyoutMessageConverter x:Key="UploadErrorMessageFlyoutMessageConverter" />
+        <common:UploadDateFlyoutConverter x:Key="UploadDateFlyoutConverter" />
         
         <!-- Global Image brushes -->
         <ImageBrush x:Key="HubBackgroundImageBrush" ImageSource="Assets/HubBackground.png"/>
