@@ -131,6 +131,12 @@
     <Content Include="Assets\WideLogo.scale-100.png" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="HockeyApp">
+      <HintPath>..\..\packages\HockeySDK.WINRT.2.2.0\lib\portable-win81\HockeyApp.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeyAppPCL">
+      <HintPath>..\..\packages\HockeySDK.Core.2.2.0\lib\portable-net45+win8+wp8+wpa81+win81\HockeyAppPCL.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.6\lib\netcore45\Newtonsoft.Json.dll</HintPath>
     </Reference>

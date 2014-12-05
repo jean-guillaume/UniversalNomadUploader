@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="7a6f4a4a-6ee1-4059-9784-cd42bb950356" Publisher="CN=Ben.Marshall" Version="1.0.0.3" />
+  <Identity Name="7a6f4a4a-6ee1-4059-9784-cd42bb950356" Publisher="CN=Ben.Marshall" Version="1.0.0.4" />
   <Properties>
     <DisplayName>UniversalNomadUploader.Windows</DisplayName>
     <PublisherDisplayName>Ben</PublisherDisplayName>

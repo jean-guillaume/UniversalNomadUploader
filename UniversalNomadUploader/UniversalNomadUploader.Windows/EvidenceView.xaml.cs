@@ -160,6 +160,7 @@ namespace UniversalNomadUploader
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
         {
+            throw new Exception("Test exception");
             if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess()  || await AuthenticationUtil.VerifySessionAsync())
             {
                 expandLoginAnimation.Begin();

@@ -19,6 +19,7 @@ using UniversalNomadUploader.Common;
 using UniversalNomadUploader.SQLUtils;
 using Windows.Networking.Connectivity;
 using Windows.Storage;
+using HockeyApp;
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
 
@@ -42,6 +43,7 @@ namespace UniversalNomadUploader
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
             InitHandlers();
+            HockeyClient.Current.Configure("8c14cfa45bbc5629e1ebc62ff9b0696b");
         }
 
         void InitHandlers()

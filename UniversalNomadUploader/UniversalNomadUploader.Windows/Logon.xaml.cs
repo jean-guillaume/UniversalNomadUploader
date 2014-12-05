@@ -19,6 +19,7 @@ using UniversalNomadUploader.APIUtils;
 using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.Exceptions;
 using Windows.Storage;
+using HockeyApp;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -60,7 +61,7 @@ namespace UniversalNomadUploader
             this.Loaded += Logon_Loaded;
         }
 
-        void Logon_Loaded(object sender, RoutedEventArgs e)
+        async void Logon_Loaded(object sender, RoutedEventArgs e)
         {
             ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
             if (roamingSettings.Values["Username"] != null)
@@ -69,6 +70,7 @@ namespace UniversalNomadUploader
                 Password.Focus(FocusState.Pointer);
             }
             Live.IsChecked = true;
+            await HockeyClient.Current.SendCrashesAsync();
         }
 
         /// <summary>

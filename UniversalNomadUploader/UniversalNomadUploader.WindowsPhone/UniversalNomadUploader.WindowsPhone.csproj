@@ -106,6 +106,12 @@
     <Content Include="Assets\HubBackground.theme-light.png" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="HockeyApp">
+      <HintPath>..\..\packages\HockeySDK.WINRT.2.2.0\lib\portable-wpa81\HockeyApp.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeyAppPCL">
+      <HintPath>..\..\packages\HockeySDK.Core.2.2.0\lib\portable-net45+win8+wp8+wpa81+win81\HockeyAppPCL.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.6\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
     </Reference>
