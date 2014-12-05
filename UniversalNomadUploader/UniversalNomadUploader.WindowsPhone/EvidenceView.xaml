@@ -1,35 +1,274 @@
 ﻿<Page
+    x:Name="pageRoot"
     x:Class="UniversalNomadUploader.EvidenceView"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:UniversalNomadUploader"
+    xmlns:common="using:UniversalNomadUploader.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    RequestedTheme="Light"
+    mc:Ignorable="d">
 
-    <Grid x:Name="LayoutRoot">
+    <Page.Resources>
+        <x:String x:Key="ChevronGlyph">&#xE26B;</x:String>
+        <!--
+            Collection of grouped items displayed by this page, bound to a subset
+            of the complete item list because items in groups cannot be virtualized
+        -->
+        <CollectionViewSource
+            x:Name="groupedItemsViewSource"
+            Source="{Binding Groups}"
+            IsSourceGrouped="true"
+            />
+        
 
+        <Storyboard x:Name="expandRecorderAnimation" >
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="RecorderGrid" Storyboard.TargetProperty="Height" From="0" To="200" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseIn"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Name="reduceRecorderAnimation">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="RecorderGrid" Storyboard.TargetProperty="Height" From="200" To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseOut"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Storyboard x:Name="expandLoginAnimation" >
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="ReauthPopup" Storyboard.TargetProperty="Height" From="0" To="200" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseIn"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Name="reduceLoginAnimation">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="ReauthPopup" Storyboard.TargetProperty="Height" From="200" To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseOut"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Page.Resources>
+
+    <!--
+        This grid acts as a root panel for the page that defines two rows:
+        * Row 0 contains the back button and page title
+        * Row 1 contains the rest of the page layout
+    -->
+    <Grid Name="ContainerGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
             </TransitionCollection>
         </Grid.ChildrenTransitions>
-
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="140" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Title Panel -->
-        <StackPanel Grid.Row="0" Margin="19,0,0,0">
-            <TextBlock Text="MY APPLICATION" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
-            <TextBlock Text="page title" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
-        </StackPanel>
+        <!-- Horizontal scrolling grid -->
+        <GridView
+            x:Name="itemGridView"
+            AutomationProperties.AutomationId="ItemGridView"
+            AutomationProperties.Name="Grouped Items"
+            Grid.Row="1"
+            Padding="116,0,40,46"
+            ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+            SelectionMode="Multiple"
+            SelectionChanged="itemGridView_SelectionChanged"
+            IsSwipeEnabled="false">
+            <GridView.ItemTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Left" Width="150" Height="150">
+                        <StackPanel Orientation="Vertical" Background="{StaticResource NomadBlue20Percent}">
+                            <Border Height="20">
+                                <SymbolIcon Symbol="{Binding UploadedDate, Converter={StaticResource UploadDateSymbolConverter}}" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="{Binding UploadedDate, Converter={StaticResource UploadColorConverter}}" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" >
+                                    <FlyoutBase.AttachedFlyout>
+                                        <Flyout Placement="Top">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="*" />               
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="File Name" FontWeight="Bold" Grid.Row="0" Grid.Column="0" FontSize="18" Margin="0,0,10,0" />
+                                                <TextBlock Text="{Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="1" TextWrapping="WrapWholeWords" />
+                                                <TextBlock Text="Upload status" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="18" Margin="0,0,10,0" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" />
+                                                <TextBlock Text="{Binding UploadedDate, Converter={StaticResource UploadDateFlyoutConverter}}" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadedDate, Converter={StaticResource UploadDateVisibilityConverter}}" />
+                                                <TextBlock Text="{Binding UploadError, Converter={StaticResource UploadErrorMessageFlyoutMessageConverter}}" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadError, Converter={StaticResource UploadErrorMessageVisibilityConverter}}" />
+                                            </Grid>
+                                        </Flyout>
+                                    </FlyoutBase.AttachedFlyout>
+                                </SymbolIcon>
+                            </Border>
+                            <Image Source="{Binding ImagePath}" Height="48" Width="48" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,20" />
+                            <ProgressBar Name="Progress" Visibility="Collapsed" />
+                        </StackPanel>
+                        <StackPanel VerticalAlignment="Bottom" Background="{StaticResource NomadBlue70Percent}">
+                            <TextBlock Text="{Binding Name}" Style="{StaticResource TitleTextBlockStyle}" Height="30" Margin="15,0,15,0"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid GroupPadding="0,0,70,0"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+            <GridView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,2">
+                                <Button Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
+                                    AutomationProperties.Name="Group Title"
+                                    >
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Key}" Margin="0,-11,10,10" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </GridView.GroupStyle>
+        </GridView>
 
-        <!--TODO: Content should be placed within the following grid-->
-        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+        <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed" Background="{StaticResource NomadBlue20Percent}" >
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource NomadBlue70Percent}" >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
+                    <TextBox Name="NewName" MaxLength="255" Width="400" Height="50" FontSize="26" />
+                    <AppBarButton Name="SaveName" IsCompact="True" Click="SaveName_Click" >
+                        <SymbolIcon Symbol="Save" />
+                    </AppBarButton>
+                    <AppBarButton Name="CancelNameChange" IsCompact="True" Click="CancelNameChange_Click" >
+                        <SymbolIcon Symbol="Cancel" />
+                    </AppBarButton>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid  Name="RecorderGrid" Grid.Row="1" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}" >
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+                <StackPanel Orientation="Horizontal">
+                    <Button Name="RecordButton" Click="RecordButton_Click">
+                        <SymbolIcon Symbol="Microphone" />
+                    </Button>
+                    <Button Name="StpButton" Click="StpButton_Click">
+                        <SymbolIcon Symbol="Stop" />
+                    </Button>
+                    <Button Name="PauseButton" Click="PauseButton_Click">
+                        <SymbolIcon Symbol="Pause" />
+                    </Button>
+                    <Button Name="SvButton" Click="SvButton_Click">
+                        <SymbolIcon Symbol="Save" />
+                    </Button>
+                    <Button Name="CancelAudioButton" Click="CancelAudioButton_Click">
+                        <SymbolIcon Symbol="Cancel" />
+                    </Button>
+                </StackPanel>
+                <StackPanel  Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock>Duration</TextBlock>
+                    <TextBlock Name="Duration" Text="{Binding }"  Margin="10,0,0,0"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
 
+        <Grid Name="ReauthPopup" Grid.Row="1" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Height="200" Background="{StaticResource FadedLogon}">
+                <Grid Name="LogonGrid" Margin="0,20,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="50" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Name="NewLoginReason" Text="Please sign in to upload" FontSize="26" TextAlignment="Center" Grid.Row="0" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="1" >
+                        <TextBlock Text="Username" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
+                        <TextBox Name="Username" Height="30" Width="150" TextChanged="Username_TextChanged" ></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="2" >
+                        <TextBlock Text="Password" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
+                        <PasswordBox Name="Password" Height="30" Width="150" ></PasswordBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="50" VerticalAlignment="Center" Grid.Row="3" >
+                        <Button Name="logon" Content="Log in" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Background="Transparent" BorderBrush="Black" BorderThickness="2" Click="logon_Click" ></Button>
+                        <Button Name="Cancel" Content="Cancel" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Background="Transparent" BorderBrush="Black" BorderThickness="2" Click="Cancel_Click" ></Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Back button and page title -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+            <AppBarButton x:Name="backButton" Margin="0,0,0,0" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+                        Style="{StaticResource LogoutAppBarButtonStyle}"
+                        AutomationProperties.Name="Back"
+                        AutomationProperties.AutomationId="BackButton"
+                        AutomationProperties.ItemType="Navigation Button"/>
+            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <AppBarButton Name="Import" Label="Import" IsCompact="True" Click="Import_Click">
+                    <SymbolIcon Symbol="Import" />
+                </AppBarButton>
+                <AppBarButton Name="CapturePhoto" Label="Take photo" IsCompact="True" Click="CapturePhoto_Click">
+                    <SymbolIcon Symbol="Camera" />
+                </AppBarButton>
+                <AppBarButton Name="CaptureVideo" Label="Record video" IsCompact="True" Click="CaptureVideo_Click" >
+                    <SymbolIcon Symbol="Video" />
+                </AppBarButton>
+                <AppBarButton Name="CaptureAudio" Label="Record audio" IsCompact="True" Click="CaptureAudio_Click" >
+                    <SymbolIcon Symbol="Microphone" />
+                </AppBarButton>
+            </StackPanel>
+            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
+        </Grid>
+        
+        <Grid Name="CaptureContainer" Grid.Row="1" Visibility="Collapsed">
+            <CaptureElement Name="Preview" />
         </Grid>
     </Grid>
+    <Page.BottomAppBar>
+        <CommandBar>
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Name="Upload" Label="Upload" Click="Upload_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Upload" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Name="Rename" Label="Rename" Click="Rename_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Rename" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Name="Delete" Label="Delete" Click="Delete_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Delete" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Name="Info" Label="Info" Click="Info_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Help" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar.PrimaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
 </Page>
+
+    

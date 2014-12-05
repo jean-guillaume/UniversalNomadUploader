@@ -87,27 +87,7 @@
                     <Grid HorizontalAlignment="Left" Width="150" Height="150">
                         <StackPanel Orientation="Vertical" Background="{StaticResource NomadBlue20Percent}">
                             <Border Height="20">
-                                <SymbolIcon Symbol="{Binding UploadedDate, Converter={StaticResource UploadDateSymbolConverter}}" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="{Binding UploadedDate, Converter={StaticResource UploadColorConverter}}" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" >
-                                    <FlyoutBase.AttachedFlyout>
-                                        <Flyout Placement="Top">
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*" />
-                                                    <RowDefinition Height="*" />               
-                                                </Grid.RowDefinitions>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="File Name" FontWeight="Bold" Grid.Row="0" Grid.Column="0" FontSize="18" Margin="0,0,10,0" />
-                                                <TextBlock Text="{Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="1" TextWrapping="WrapWholeWords" />
-                                                <TextBlock Text="Upload status" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="18" Margin="0,0,10,0" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" />
-                                                <TextBlock Text="{Binding UploadedDate, Converter={StaticResource UploadDateFlyoutConverter}}" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadedDate, Converter={StaticResource UploadDateVisibilityConverter}}" />
-                                                <TextBlock Text="{Binding UploadError, Converter={StaticResource UploadErrorMessageFlyoutMessageConverter}}" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadError, Converter={StaticResource UploadErrorMessageVisibilityConverter}}" />
-                                            </Grid>
-                                        </Flyout>
-                                    </FlyoutBase.AttachedFlyout>
-                                </SymbolIcon>
+                                <SymbolIcon Symbol="{Binding UploadedDate, Converter={StaticResource UploadDateSymbolConverter}}" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="{Binding UploadedDate, Converter={StaticResource UploadColorConverter}}" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" />
                             </Border>
                             <Image Source="{Binding ImagePath}" Height="48" Width="48" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,20" />
                             <ProgressBar Name="Progress" Visibility="Collapsed" />
@@ -212,8 +192,9 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="420"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="*" MinWidth="90" MaxWidth="100"/>
             </Grid.ColumnDefinitions>
             <AppBarButton x:Name="backButton" Margin="39,59,39,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
                         Style="{StaticResource LogoutAppBarButtonStyle}"
@@ -223,7 +204,45 @@
                         AutomationProperties.ItemType="Navigation Button"/>
             <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Grid Name="FileInfoGrid" Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Name="FileStatus" TextWrapping="NoWrap" FontSize="20" Grid.Row="1" Visibility="Collapsed" />
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="*" MinWidth="50" MaxWidth="60" />
+                        <ColumnDefinition Width="*" MinWidth="50" MaxWidth="60" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Name="FileDetails" TextWrapping="NoWrap" FontSize="20" Grid.Column="0" Visibility="Collapsed" />
+                    <AppBarButton Name="Rename" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Click="Rename_Click" Visibility="Collapsed">
+                        <AppBarButton.Icon>
+                            <SymbolIcon Symbol="Rename" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarButton Name="Delete" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2" Click="Delete_Click" Visibility="Collapsed">
+                        <AppBarButton.Icon>
+                            <SymbolIcon Symbol="Delete" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                </Grid>
+                
+            </Grid>
+            <StackPanel Name="FileActionsStack" Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <AppBarButton Name="Upload" Label="Upload" VerticalAlignment="Center" HorizontalAlignment="Center" Click="Upload_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Upload" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </StackPanel>
+            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
+        </Grid>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar IsSticky="True" IsOpen="True">
+            <CommandBar.PrimaryCommands>
                 <AppBarButton Name="Import" Label="Import" Click="Import_Click">
                     <SymbolIcon Symbol="Import" />
                 </AppBarButton>
@@ -236,31 +255,11 @@
                 <AppBarButton Name="CaptureAudio" Label="Record audio" Click="CaptureAudio_Click" >
                     <SymbolIcon Symbol="Microphone" />
                 </AppBarButton>
-            </StackPanel>
-            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
-        </Grid>
-    </Grid>
-    <Page.BottomAppBar>
-        <CommandBar>
+            </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
-                <AppBarButton Name="Upload" Label="Upload" Click="Upload_Click" Visibility="Collapsed">
+                <AppBarButton Name="Search" Label="Search"  Visibility="Visible">
                     <AppBarButton.Icon>
-                        <SymbolIcon Symbol="Upload" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton Name="Rename" Label="Rename" Click="Rename_Click" Visibility="Collapsed">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="Rename" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton Name="Delete" Label="Delete" Click="Delete_Click" Visibility="Collapsed">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="Delete" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton Name="Info" Label="Info" Click="Info_Click" Visibility="Collapsed">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="Help" />
+                        <SymbolIcon Symbol="Find" />
                     </AppBarButton.Icon>
                 </AppBarButton>
             </CommandBar.SecondaryCommands>

@@ -20,6 +20,8 @@ using UniversalNomadUploader.SQLUtils;
 using Windows.Networking.Connectivity;
 using Windows.Storage;
 using HockeyApp;
+using System.Threading.Tasks;
+using Windows.Media.Capture;
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
 
@@ -59,7 +61,7 @@ namespace UniversalNomadUploader
 
         private void DataChangeHandler(ApplicationData sender, object args)
         {
-            
+
         }
 
         /// <summary>
@@ -164,8 +166,43 @@ namespace UniversalNomadUploader
         private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
+#if WINDOWS_PHONE_APP
+            await CleanupCaptureResources();
+#endif
             await SuspensionManager.SaveAsync();
             deferral.Complete();
         }
+
+
+#if WINDOWS_PHONE_APP
+        public MediaCapture MediaCapture { get; set; }
+        public CaptureElement PreviewElement { get; set; }
+        public bool IsRecording { get; set; }
+        public bool IsPreviewing { get; set; }
+
+        public async Task CleanupCaptureResources()
+        {
+            if (IsRecording && MediaCapture != null)
+            {
+                await MediaCapture.StopRecordAsync();
+                IsRecording = false;
+            }
+            if (IsPreviewing && MediaCapture != null)
+            {
+                await MediaCapture.StopPreviewAsync();
+                IsPreviewing = false;
+            }
+
+            if (MediaCapture != null)
+            {
+                if (PreviewElement != null)
+                {
+                    PreviewElement.Source = null;
+                }
+                MediaCapture.Dispose();
+            }
+        }
+
+#endif
     }
 }

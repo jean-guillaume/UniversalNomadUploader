@@ -8,7 +8,8 @@
     <Application.Resources>
         <x:String x:Key="DatabaseName">db.sqlite</x:String>
         <x:String x:Key="AppName">Nomad Uploader</x:String>
-
+        
+        
 
         <!-- Global variables -->
         <x:String x:Key="BackGroundColour">#F2F2F2</x:String>

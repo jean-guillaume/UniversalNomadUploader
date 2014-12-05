@@ -277,15 +277,29 @@ namespace UniversalNomadUploader
                 this.BottomAppBar.IsSticky = true;
                 this.BottomAppBar.IsOpen = true;
             }
-            else
+
+            if (this.itemGridView.SelectedItems.Count == 1)
             {
-                this.BottomAppBar.IsOpen = false;
-                this.BottomAppBar.IsSticky = false;
+                FileDetails.Text = "some info";
+                if (((Evidence)itemGridView.SelectedItem).HasTryUploaded)
+                {
+                    if (((Evidence)itemGridView.SelectedItem).UploadError != null && ((Evidence)itemGridView.SelectedItem).UploadError != "")
+                    {
+                        FileStatus.Text = ((Evidence)itemGridView.SelectedItem).UploadError.ToString();
+                    }
+                    else
+                    {
+                        FileStatus.Text = ((Evidence)itemGridView.SelectedItem).UploadedDate.ToString();
+                    } 
+                }
             }
             Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
             Rename.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
             Delete.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
-            Info.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
+            FileDetails.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
+            FileStatus.Visibility = (itemGridView.SelectedItems.Count == 1 && ((Evidence)itemGridView.SelectedItem).HasTryUploaded) ? Visibility.Visible : Visibility.Collapsed;
+            FileActionsStack.Background = (itemGridView.SelectedItems.Count > 0) ? new SolidColorBrush(Colors.Gray) : new SolidColorBrush(Colors.White);
+            FileInfoGrid.Background = (itemGridView.SelectedItems.Count == 1) ? new SolidColorBrush(Colors.Gray) : new SolidColorBrush(Colors.White);
         }
 
         private void Rename_Click(object sender, RoutedEventArgs e)
@@ -330,7 +344,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -341,7 +354,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -352,7 +364,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -363,7 +374,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -374,7 +384,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = true;
                     Upload.IsEnabled = true;
                     Rename.IsEnabled = true;
-                    Info.IsEnabled = true;
                     Import.IsEnabled = true;
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;
@@ -385,7 +394,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = true;
                     Upload.IsEnabled = true;
                     Rename.IsEnabled = true;
-                    Info.IsEnabled = true;
                     Import.IsEnabled = true;
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;
@@ -687,12 +695,6 @@ namespace UniversalNomadUploader
         {
 
 
-        }
-
-        private void Info_Click(object sender, RoutedEventArgs e)
-        {
-            SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(itemGridView.SelectedItem), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-            FlyoutBase.ShowAttachedFlyout(sym);    
         }
 
         private async void Import_Click(object sender, RoutedEventArgs e)

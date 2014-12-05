@@ -6,8 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -16,42 +14,27 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Popups;
-using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.APIUtils;
+using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.Exceptions;
+using Windows.Storage;
+using HockeyApp;
 
-// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
+// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
 namespace UniversalNomadUploader
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// A basic page that provides characteristics common to most applications.
     /// </summary>
     public sealed partial class Logon : Page
     {
+
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        public Logon()
-        {
-            this.InitializeComponent();
-            DisplayInformation.AutoRotationPreferences = DisplayOrientations.None;
-            this.navigationHelper = new NavigationHelper(this);
-            this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
-            this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
-        }
-
         /// <summary>
-        /// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
-        /// </summary>
-        public NavigationHelper NavigationHelper
-        {
-            get { return this.navigationHelper; }
-        }
-
-        /// <summary>
-        /// Gets the view model for this <see cref="Page"/>.
         /// This can be changed to a strongly typed view model.
         /// </summary>
         public ObservableDictionary DefaultViewModel
@@ -60,7 +43,38 @@ namespace UniversalNomadUploader
         }
 
         /// <summary>
-        /// Populates the page with content passed during navigation.  Any saved state is also
+        /// NavigationHelper is used on each page to aid in navigation and 
+        /// process lifetime management
+        /// </summary>
+        public NavigationHelper NavigationHelper
+        {
+            get { return this.navigationHelper; }
+        }
+
+
+        public Logon()
+        {
+            this.InitializeComponent();
+            this.navigationHelper = new NavigationHelper(this);
+            this.navigationHelper.LoadState += navigationHelper_LoadState;
+            this.navigationHelper.SaveState += navigationHelper_SaveState;
+            this.Loaded += Logon_Loaded;
+        }
+
+        async void Logon_Loaded(object sender, RoutedEventArgs e)
+        {
+            ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
+            if (roamingSettings.Values["Username"] != null)
+            {
+                Username.Text = roamingSettings.Values["Username"].ToString();
+                Password.Focus(FocusState.Pointer);
+            }
+            Live.IsChecked = true;
+            await HockeyClient.Current.SendCrashesAsync();
+        }
+
+        /// <summary>
+        /// Populates the page with content passed during navigation. Any saved state is also
         /// provided when recreating a page from a prior session.
         /// </summary>
         /// <param name="sender">
@@ -69,12 +83,10 @@ namespace UniversalNomadUploader
         /// <param name="e">Event data that provides both the navigation parameter passed to
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
-        /// session.  The state will be null the first time a page is visited.</param>
-        private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        /// session. The state will be null the first time a page is visited.</param>
+        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            StatusBar statusBar = Windows.UI.ViewManagement.StatusBar.GetForCurrentView();
-            // Hide the status bar
-            await statusBar.HideAsync();
+            
         }
 
         /// <summary>
@@ -85,9 +97,35 @@ namespace UniversalNomadUploader
         /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
         /// <param name="e">Event data that provides an empty dictionary to be populated with
         /// serializable state.</param>
-        private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e)
+        private void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
         }
+
+        #region NavigationHelper registration
+
+        /// The methods provided in this section are simply used to allow
+        /// NavigationHelper to respond to the page's navigation methods.
+        /// 
+        /// Page specific logic should be placed in event handlers for the  
+        /// <see cref="GridCS.Common.NavigationHelper.LoadState"/>
+        /// and <see cref="GridCS.Common.NavigationHelper.SaveState"/>.
+        /// The navigation parameter is available in the LoadState method 
+        /// in addition to page state preserved during an earlier session.
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedTo(e);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            navigationHelper.OnNavigatedFrom(e);
+        }
+
+        #endregion
+
+
+        
 
         private async void logon_Click(object sender, RoutedEventArgs e)
         {
@@ -106,37 +144,53 @@ namespace UniversalNomadUploader
                 HideProgress();
                 return;
             }
-            Guid Session = await AuthenticationUtil.Authenticate(Username.Text, Password.Password, GlobalVariables.SelectedServer);
-            if (Session != Guid.Empty)
+            ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
+            roamingSettings.Values["Username"] = Username.Text;
+            Boolean HasAuthed = false;
+            if (GlobalVariables.HasInternetAccess())
             {
-                String ErrorMessage = String.Empty;
-                try
+                Guid Session = await AuthenticationUtil.Authenticate(Username.Text.ToUpper(), Password.Password, GlobalVariables.SelectedServer);
+                if (Session != Guid.Empty)
                 {
-                    await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text, SessionID = Session }, Password.Password);
-                    await SQLUtils.UserUtil.UpdateUser(await APIUtils.UserUtil.GetProfile());
-                }
-                catch (ApiException exception)
-                {
-                    ErrorMessage = exception.Message;
-                }
-                HideProgress();
-                if (ErrorMessage != String.Empty)
-                {
-                    MessageDialog msg = new MessageDialog(ErrorMessage, "Access denied");
-                    await msg.ShowAsync();
+                    String ErrorMessage = String.Empty;
+                    try
+                    {
+                        await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text.ToUpper(), SessionID = Session }, Password.Password);
+                        await SQLUtils.UserUtil.UpdateUser(await APIUtils.UserUtil.GetProfile());
+                    }
+                    catch (ApiException exception)
+                    {
+                        ErrorMessage = exception.Message;
+                    }
                     HideProgress();
-                    return;
+                    if (ErrorMessage != String.Empty)
+                    {
+                        MessageDialog msg = new MessageDialog(ErrorMessage, "Access denied");
+                        await msg.ShowAsync();
+                        HideProgress();
+                        return;
+                    }
+                    GlobalVariables.IsOffline = false;
+                    HasAuthed = true;
+                    this.Frame.Navigate(typeof(EvidenceView));
                 }
-                this.Frame.Navigate(typeof(EvidenceView));
             }
             else
+            {
+                if (SQLUtils.UserUtil.AuthenticateOffline(Username.Text, Password.Password))
+                {
+                    GlobalVariables.IsOffline = true;
+                    HasAuthed = true;
+                    this.Frame.Navigate(typeof(EvidenceView));
+                }
+            }
+            if (!HasAuthed)
             {
                 MessageDialog msg = new MessageDialog("Incorrect Username or Password", "Access denied");
                 await msg.ShowAsync();
                 HideProgress();
                 return;
             }
-
         }
 
         private void ShowProgress()
@@ -161,15 +215,15 @@ namespace UniversalNomadUploader
         private void Demo_Click(object sender, RoutedEventArgs e)
         {
             GlobalVariables.SelectedServer = ServerEnum.Demo;
-            Live.IsChecked = false;
             Beta.IsChecked = false;
+            Live.IsChecked = false;
         }
 
         private void Beta_Click(object sender, RoutedEventArgs e)
         {
             GlobalVariables.SelectedServer = ServerEnum.Beta;
-            Live.IsChecked = false;
             Demo.IsChecked = false;
+            Live.IsChecked = false;
         }
 
         private void pageTitle_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -204,33 +258,6 @@ namespace UniversalNomadUploader
             }
         }
 
-        #region NavigationHelper registration
-
-        /// <summary>
-        /// The methods provided in this section are simply used to allow
-        /// NavigationHelper to respond to the page's navigation methods.
-        /// <para>
-        /// Page specific logic should be placed in event handlers for the  
-        /// <see cref="NavigationHelper.LoadState"/>
-        /// and <see cref="NavigationHelper.SaveState"/>.
-        /// The navigation parameter is available in the LoadState method 
-        /// in addition to page state preserved during an earlier session.
-        /// </para>
-        /// </summary>
-        /// <param name="e">Provides data for navigation methods and event
-        /// handlers that cannot cancel the navigation request.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            this.navigationHelper.OnNavigatedTo(e);
-        }
-
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            this.navigationHelper.OnNavigatedFrom(e);
-        }
-
-        #endregion
-
         private void UAT1_Click(object sender, RoutedEventArgs e)
         {
             GlobalVariables.SelectedServer = ServerEnum.UAT1;
@@ -250,6 +277,12 @@ namespace UniversalNomadUploader
             GlobalVariables.SelectedServer = ServerEnum.DEV;
             UAT1.IsChecked = false;
             UAT2.IsChecked = false;
+        }
+
+        private void Username_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Username.Text = Username.Text.ToUpper();
+            Username.SelectionStart = Username.Text.Length;
         }
     }
 }

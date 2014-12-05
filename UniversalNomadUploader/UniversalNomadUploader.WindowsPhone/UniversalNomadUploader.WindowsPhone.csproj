@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UniversalNomadUploader</RootNamespace>
     <AssemblyName>UniversalNomadUploader.WindowsPhone</AssemblyName>
-    <DefaultLanguage>en-US</DefaultLanguage>
+    <DefaultLanguage>en-GB</DefaultLanguage>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -104,6 +104,7 @@
     <Content Include="Assets\WideLogo.scale-240.png" />
     <Content Include="Assets\HubBackground.theme-dark.png" />
     <Content Include="Assets\HubBackground.theme-light.png" />
+    <Content Include="StoreManifest.xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="HockeyApp">
@@ -129,12 +130,12 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="EvidenceView.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Logon.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
