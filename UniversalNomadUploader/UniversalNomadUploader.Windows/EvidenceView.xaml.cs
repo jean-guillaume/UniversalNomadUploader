@@ -280,7 +280,7 @@ namespace UniversalNomadUploader
 
             if (this.itemGridView.SelectedItems.Count == 1)
             {
-                FileDetails.Text = "some info";
+                FileDetails.Text = ((Evidence)itemGridView.SelectedItem).Name;
                 if (((Evidence)itemGridView.SelectedItem).HasTryUploaded)
                 {
                     if (((Evidence)itemGridView.SelectedItem).UploadError != null && ((Evidence)itemGridView.SelectedItem).UploadError != "")

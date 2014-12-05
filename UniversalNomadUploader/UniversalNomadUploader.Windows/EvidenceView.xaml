@@ -216,7 +216,7 @@
                         <ColumnDefinition Width="*" MinWidth="50" MaxWidth="60" />
                         <ColumnDefinition Width="*" MinWidth="50" MaxWidth="60" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Name="FileDetails" TextWrapping="NoWrap" FontSize="20" Grid.Column="0" Visibility="Collapsed" />
+                    <TextBlock Name="FileDetails" VerticalAlignment="Center" TextWrapping="NoWrap" FontSize="20" Grid.Column="0" Visibility="Collapsed" />
                     <AppBarButton Name="Rename" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Click="Rename_Click" Visibility="Collapsed">
                         <AppBarButton.Icon>
                             <SymbolIcon Symbol="Rename" />
