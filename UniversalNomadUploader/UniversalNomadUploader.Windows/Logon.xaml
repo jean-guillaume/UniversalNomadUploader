@@ -44,7 +44,7 @@
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="0" >
                         <TextBlock Text="Username" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
-                        <TextBox Name="Username" Height="30" Width="150" ></TextBox>
+                        <TextBox Name="Username" Height="30" Width="150" TextChanged="Username_TextChanged"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="1" >
                         <TextBlock Text="Password" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>

@@ -11,7 +11,7 @@ namespace UniversalNomadUploader.Common
         {
             if (value != null && (DateTime)value > DateTime.MinValue)
             {
-                return "File was uploaded on: " + Environment.NewLine + ((DateTime)value).ToString("dddd MMMM yyyy HH:mm tt");
+                return "Uploaded on: " + Environment.NewLine + ((DateTime)value).ToString("dddd MMMM yyyy HH:mm tt");
             }
             return "";
 

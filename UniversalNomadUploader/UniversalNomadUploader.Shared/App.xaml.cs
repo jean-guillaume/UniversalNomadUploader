@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Navigation;
 using UniversalNomadUploader.Common;
 using UniversalNomadUploader.SQLUtils;
 using Windows.Networking.Connectivity;
+using Windows.Storage;
 
 // The Universal Hub Application project template is documented at http://go.microsoft.com/fwlink/?LinkID=391955
 
@@ -40,6 +41,23 @@ namespace UniversalNomadUploader
         {
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
+            InitHandlers();
+        }
+
+        void InitHandlers()
+        {
+            ApplicationData.Current.DataChanged += new TypedEventHandler<ApplicationData, object>(DataChangeHandler);
+            NetworkInformation.NetworkStatusChanged += NetworkInformation_NetworkStatusChanged;
+        }
+
+        private void NetworkInformation_NetworkStatusChanged(object sender)
+        {
+            GlobalVariables.IsOffline = !GlobalVariables.HasInternetAccess();
+        }
+
+        private void DataChangeHandler(ApplicationData sender, object args)
+        {
+            
         }
 
         /// <summary>

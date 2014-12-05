@@ -90,11 +90,21 @@
                                 <SymbolIcon Symbol="{Binding UploadedDate, Converter={StaticResource UploadDateSymbolConverter}}" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="{Binding UploadedDate, Converter={StaticResource UploadColorConverter}}" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" >
                                     <FlyoutBase.AttachedFlyout>
                                         <Flyout Placement="Top">
-                                            <StackPanel Orientation="Vertical">
-                                                <TextBlock Text="{Binding Name, Converter={StaticResource NameToNameInfoConverter}}" FontSize="18" Width="250" TextWrapping="WrapWholeWords" />
-                                                <TextBlock Text="{Binding UploadedDate, Converter={StaticResource UploadDateFlyoutConverter}}" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadedDate, Converter={StaticResource UploadDateVisibilityConverter}}" />
-                                                <TextBlock Text="{Binding UploadError, Converter={StaticResource UploadErrorMessageFlyoutMessageConverter}}" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadError, Converter={StaticResource UploadErrorMessageVisibilityConverter}}" />
-                                            </StackPanel>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="*" />               
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="File Name" FontWeight="Bold" Grid.Row="0" Grid.Column="0" FontSize="18" Margin="0,0,10,0" />
+                                                <TextBlock Text="{Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="1" TextWrapping="WrapWholeWords" />
+                                                <TextBlock Text="Upload status" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="18" Margin="0,0,10,0" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" />
+                                                <TextBlock Text="{Binding UploadedDate, Converter={StaticResource UploadDateFlyoutConverter}}" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadedDate, Converter={StaticResource UploadDateVisibilityConverter}}" />
+                                                <TextBlock Text="{Binding UploadError, Converter={StaticResource UploadErrorMessageFlyoutMessageConverter}}" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadError, Converter={StaticResource UploadErrorMessageVisibilityConverter}}" />
+                                            </Grid>
                                         </Flyout>
                                     </FlyoutBase.AttachedFlyout>
                                 </SymbolIcon>
@@ -184,7 +194,7 @@
                     <TextBlock Name="NewLoginReason" Text="Please sign in to upload" FontSize="26" TextAlignment="Center" Grid.Row="0" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="1" >
                         <TextBlock Text="Username" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
-                        <TextBox Name="Username" Height="30" Width="150" ></TextBox>
+                        <TextBox Name="Username" Height="30" Width="150" TextChanged="Username_TextChanged" ></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="2" >
                         <TextBlock Text="Password" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>

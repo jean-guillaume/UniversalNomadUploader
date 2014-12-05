@@ -18,6 +18,7 @@ using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.APIUtils;
 using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.Exceptions;
+using Windows.Storage;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -56,6 +57,18 @@ namespace UniversalNomadUploader
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
+            this.Loaded += Logon_Loaded;
+        }
+
+        void Logon_Loaded(object sender, RoutedEventArgs e)
+        {
+            ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
+            if (roamingSettings.Values["Username"] != null)
+            {
+                Username.Text = roamingSettings.Values["Username"].ToString();
+                Password.Focus(FocusState.Pointer);
+            }
+            Live.IsChecked = true;
         }
 
         /// <summary>
@@ -71,6 +84,7 @@ namespace UniversalNomadUploader
         /// session. The state will be null the first time a page is visited.</param>
         private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
+            
         }
 
         /// <summary>
@@ -109,6 +123,8 @@ namespace UniversalNomadUploader
         #endregion
 
 
+        
+
         private async void logon_Click(object sender, RoutedEventArgs e)
         {
             ShowProgress();
@@ -126,7 +142,8 @@ namespace UniversalNomadUploader
                 HideProgress();
                 return;
             }
-
+            ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
+            roamingSettings.Values["Username"] = Username.Text;
             Boolean HasAuthed = false;
             if (GlobalVariables.HasInternetAccess())
             {
@@ -258,6 +275,12 @@ namespace UniversalNomadUploader
             GlobalVariables.SelectedServer = ServerEnum.DEV;
             UAT1.IsChecked = false;
             UAT2.IsChecked = false;
+        }
+
+        private void Username_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Username.Text = Username.Text.ToUpper();
+            Username.SelectionStart = Username.Text.Length;
         }
     }
 }

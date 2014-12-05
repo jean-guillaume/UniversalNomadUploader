@@ -26,6 +26,7 @@
     <Capability Name="picturesLibrary" />
     <Capability Name="videosLibrary" />
     <Capability Name="privateNetworkClientServer" />
+    <Capability Name="internetClientServer" />
     <DeviceCapability Name="microphone" />
     <DeviceCapability Name="webcam" />
   </Capabilities>

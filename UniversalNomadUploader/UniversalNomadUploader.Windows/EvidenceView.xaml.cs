@@ -95,6 +95,17 @@ namespace UniversalNomadUploader
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
+            this.Loaded += EvidenceView_Loaded;
+        }
+
+        void EvidenceView_Loaded(object sender, RoutedEventArgs e)
+        {
+            ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
+            if (roamingSettings.Values["Username"] != null)
+            {
+                Username.Text = roamingSettings.Values["Username"].ToString();
+                Password.Focus(FocusState.Pointer);
+            }
         }
 
         /// <summary>
@@ -149,9 +160,10 @@ namespace UniversalNomadUploader
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
         {
-            if (GlobalVariables.IsOffline || await AuthenticationUtil.VerifySessionAsync())
+            if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess()  || await AuthenticationUtil.VerifySessionAsync())
             {
                 expandLoginAnimation.Begin();
+                GlobalVariables.IsOffline = !GlobalVariables.HasInternetAccess();
                 if (GlobalVariables.IsOffline)
                 {
                     NewLoginReason.Text = "Your are currently offline please sign in to upload";
@@ -742,6 +754,8 @@ namespace UniversalNomadUploader
                 if (Session != Guid.Empty)
                 {
                     GlobalVariables.IsOffline = false;
+                    GlobalVariables.LoggedInUser.SessionID = Session;
+                    await UniversalNomadUploader.SQLUtils.UserUtil.UpdateUser(GlobalVariables.LoggedInUser);
                     HasAuthed = true;
                     HideProgress();
                     reduceLoginAnimation.Begin();
@@ -782,6 +796,12 @@ namespace UniversalNomadUploader
         {
             SyncProgress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             SyncProgress.IsIndeterminate = false;
+        }
+
+        private void Username_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Username.Text = Username.Text.ToUpper();
+            Username.SelectionStart = Username.Text.Length;
         }
 
     }
