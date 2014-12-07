@@ -27,57 +27,9 @@
         <SolidColorBrush x:Key="ProgressBarBorderThemeBrush" Color="Transparent" />
         <SolidColorBrush x:Key="ProgressBarForegroundThemeBrush" Color="LimeGreen" />
         <SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="LimeGreen" />
-    
-        <common:UploadedColorConverter x:Key="UploadColorConverter" />
-        <common:UploadVisibilityConverter x:Key="UploadVisibilityConverter" />
-        <common:UploadDateSymbolConverter x:Key="UploadDateSymbolConverter" />
-        <common:UploadDateVisibilityConverter x:Key="UploadDateVisibilityConverter" />
-        <common:UploadErrorMessageVisibilityConverter x:Key="UploadErrorMessageVisibilityConverter" />
-        <common:UploadErrorMessageFlyoutMessageConverter x:Key="UploadErrorMessageFlyoutMessageConverter" />
-        <common:UploadDateFlyoutConverter x:Key="UploadDateFlyoutConverter" />
-        <common:NameToNameInfoConverter x:Key="NameToNameInfoConverter" />
-        
+
         <!-- Global Image brushes -->
         <ImageBrush x:Key="HubBackgroundImageBrush" ImageSource="Assets/HubBackground.png"/>
-
-        <Style x:Key="LogoutAppBarButtonStyle" TargetType="Button" BasedOn="{StaticResource NavigationBackButtonNormalStyle}">
-            <Setter Property="AutomationProperties.AutomationId" Value="LogoutAppBarButton" />
-            <Setter Property="AutomationProperties.Name" Value="Logout" />
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <Grid>
-                            <Viewbox RenderTransformOrigin="0.49,0.51">
-                                <Viewbox.RenderTransform>
-                                    <TransformGroup>
-                                        <CompositeTransform Rotation="270" ScaleX="0.6" ScaleY="0.6" />
-                                    </TransformGroup>
-                                </Viewbox.RenderTransform>
-                                <Path Stretch="Uniform"
-                              Fill="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=TemplatedParent}}"
-                              Data="F1  M 0,0
-                                        L 15,0
-                                        L 15,65
-                                        L 90,65
-                                        L 90,0
-                                        L 105,0
-                                        L 105,78
-                                        L 0,78
-                                        Z 
-                                        M 45, 42.5
-                                        L 60, 42.5
-                                        L 60, -20
-                                        L 70,-20
-                                        L 52.5,-39
-                                        L 35,-20
-                                        L 45, -20
-                                        Z " />
-                            </Viewbox>
-                        </Grid>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
     </Application.Resources>
 </Application>

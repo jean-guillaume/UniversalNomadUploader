@@ -210,19 +210,18 @@
         
         <!-- Back button and page title -->
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="300"/>
-            </Grid.ColumnDefinitions>
-            <AppBarButton x:Name="backButton" Margin="0,0,0,0" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
-                        Style="{StaticResource LogoutAppBarButtonStyle}"
-                        AutomationProperties.Name="Back"
-                        AutomationProperties.AutomationId="BackButton"
-                        AutomationProperties.ItemType="Navigation Button"/>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" 
                         IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" ></ProgressBar>
+        </Grid>
+        
+        <Grid Name="CaptureContainer" Grid.Row="1" Visibility="Collapsed">
+            <CaptureElement Name="Preview" />
+        </Grid>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar IsSticky="True" >
+            <CommandBar.PrimaryCommands>
                 <AppBarButton Name="Import" Label="Import" IsCompact="True" Click="Import_Click">
                     <SymbolIcon Symbol="Import" />
                 </AppBarButton>
@@ -235,22 +234,13 @@
                 <AppBarButton Name="CaptureAudio" Label="Record audio" IsCompact="True" Click="CaptureAudio_Click" >
                     <SymbolIcon Symbol="Microphone" />
                 </AppBarButton>
-            </StackPanel>
-            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
-        </Grid>
-        
-        <Grid Name="CaptureContainer" Grid.Row="1" Visibility="Collapsed">
-            <CaptureElement Name="Preview" />
-        </Grid>
-    </Grid>
-    <Page.BottomAppBar>
-        <CommandBar>
-            <CommandBar.PrimaryCommands>
                 <AppBarButton Name="Upload" Label="Upload" Click="Upload_Click" Visibility="Collapsed">
                     <AppBarButton.Icon>
                         <SymbolIcon Symbol="Upload" />
                     </AppBarButton.Icon>
                 </AppBarButton>
+            </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
                 <AppBarButton Name="Rename" Label="Rename" Click="Rename_Click" Visibility="Collapsed">
                     <AppBarButton.Icon>
                         <SymbolIcon Symbol="Rename" />
@@ -266,7 +256,9 @@
                         <SymbolIcon Symbol="Help" />
                     </AppBarButton.Icon>
                 </AppBarButton>
-            </CommandBar.PrimaryCommands>
+                <AppBarButton Name="Logout" Label="Logout" Click="Logout_Click" Visibility="Collapsed">
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
         </CommandBar>
     </Page.BottomAppBar>
 </Page>

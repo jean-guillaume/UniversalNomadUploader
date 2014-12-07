@@ -27,37 +27,37 @@
             </TransitionCollection>
         </Grid.ChildrenTransitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="140"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
 
         <Grid Grid.Row="1">
-            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" Height="250" Background="{StaticResource FadedLogon}">
-                <Grid Name="LogonGrid" Margin="0,40,0,0">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="350" Height="250" Background="{StaticResource FadedLogon}">
+                <Grid Name="LogonGrid" Margin="0,30,0,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="35" />
-                        <RowDefinition Height="35" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
                         <RowDefinition Height="50" />
                         <RowDefinition Height="0" />
                         <RowDefinition Height="50" />
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="0" >
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" >
                         <TextBlock Text="Username" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
-                        <TextBox Name="Username" Height="30" Width="150" TextChanged="Username_TextChanged"></TextBox>
+                        <TextBox Name="Username" Height="40" Width="150" TextChanged="Username_TextChanged"></TextBox>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="1" >
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" >
                         <TextBlock Text="Password" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
-                        <PasswordBox Name="Password" Height="30" Width="150" ></PasswordBox>
+                        <PasswordBox Name="Password" Height="40" Width="150" ></PasswordBox>
                     </StackPanel>
                     <StackPanel Name="LiveOptions" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" >
-                        <ToggleButton Name="Live" Width="80" Content="Live" Click="Live_Click"></ToggleButton>
-                        <ToggleButton Name="Demo" Width="80" Content="Demo" Click="Demo_Click"></ToggleButton>
+                        <ToggleButton Name="Live" Width="80" Margin="0,0,5,0" Content="Live" Click="Live_Click"></ToggleButton>
+                        <ToggleButton Name="Demo" Width="80" Margin="0,0,5,0" Content="Demo" Click="Demo_Click"></ToggleButton>
                         <ToggleButton Name="Beta" Width="80" Content="Beta" Click="Beta_Click"></ToggleButton>
                     </StackPanel>
                     <StackPanel Name="DEVoptions" Visibility="Collapsed" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" >
-                        <ToggleButton Name="UAT1" Width="80" Content="UAT 1" Click="UAT1_Click"></ToggleButton>
-                        <ToggleButton Name="UAT2" Width="80" Content="UAT 2" Click="UAT2_Click"></ToggleButton>
+                        <ToggleButton Name="UAT1" Width="80" Margin="0,0,5,0" Content="UAT 1" Click="UAT1_Click"></ToggleButton>
+                        <ToggleButton Name="UAT2" Width="80" Margin="0,0,5,0" Content="UAT 2" Click="UAT2_Click"></ToggleButton>
                         <ToggleButton Name="DEV" Width="80" Content="DEV" Click="DEV_Click"></ToggleButton>
                     </StackPanel>
                     <Button Name="logon" Content="Log in" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4"  Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Background="Transparent" BorderBrush="Black" BorderThickness="2" Click="logon_Click" ></Button>
@@ -67,16 +67,11 @@
 
         <!-- Back button and page title -->
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="500"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" DoubleTapped="pageTitle_DoubleTapped"
-                        TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
+        <Grid >
+            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" FontSize="50"  DoubleTapped="pageTitle_DoubleTapped"
+                        VerticalAlignment="Bottom" Margin="0,10,0,0"/>
             <Border Grid.ColumnSpan="2"  BorderBrush="{StaticResource LogonBorderBrush}" BorderThickness="0,0,0,2"></Border>
-            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
+            <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" ></ProgressBar>
         </Grid>
 
     </Grid>

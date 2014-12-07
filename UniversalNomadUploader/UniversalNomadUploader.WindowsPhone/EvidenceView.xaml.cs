@@ -420,7 +420,6 @@ namespace UniversalNomadUploader
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
                     CaptureVideo.IsEnabled = false;
-                    backButton.IsEnabled = false;
                     break;
                 case PageState.Renaming:
                     Delete.IsEnabled = false;
@@ -431,7 +430,6 @@ namespace UniversalNomadUploader
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
                     CaptureVideo.IsEnabled = false;
-                    backButton.IsEnabled = false;
                     break;
                 case PageState.Deleting:
                     Delete.IsEnabled = false;
@@ -442,7 +440,6 @@ namespace UniversalNomadUploader
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
                     CaptureVideo.IsEnabled = false;
-                    backButton.IsEnabled = false;
                     break;
                 case PageState.RecordingAudio:
                     Delete.IsEnabled = false;
@@ -453,7 +450,6 @@ namespace UniversalNomadUploader
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
                     CaptureVideo.IsEnabled = false;
-                    backButton.IsEnabled = false;
                     break;
                 case PageState.Default:
                     Delete.IsEnabled = true;
@@ -464,7 +460,6 @@ namespace UniversalNomadUploader
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;
                     CaptureVideo.IsEnabled = true;
-                    backButton.IsEnabled = true;
                     break;
                 default:
                     Delete.IsEnabled = true;
@@ -475,7 +470,6 @@ namespace UniversalNomadUploader
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;
                     CaptureVideo.IsEnabled = true;
-                    backButton.IsEnabled = true;
                     break;
             }
         }
@@ -896,6 +890,11 @@ namespace UniversalNomadUploader
         {
             Username.Text = Username.Text.ToUpper();
             Username.SelectionStart = Username.Text.Length;
+        }
+
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
     }
