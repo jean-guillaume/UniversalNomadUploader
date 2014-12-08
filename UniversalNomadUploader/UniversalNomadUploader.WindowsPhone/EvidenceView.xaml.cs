@@ -17,6 +17,7 @@ using Windows.Graphics.Display;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Networking.BackgroundTransfer;
+using Windows.Phone.UI.Input;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Search;
@@ -60,12 +61,14 @@ namespace UniversalNomadUploader
         private AudioEncodingQuality _encodingQuality = AudioEncodingQuality.Auto;
         private Byte[] _PausedBuffer;
 
+        private String CurrentVideoName;
         MediaCaptureInitializationSettings _captureInitSettings;
         List<Windows.Devices.Enumeration.DeviceInformation> _deviceList;
         MediaEncodingProfile _profile;
         MediaCapture _CameraMediaCapture;
         bool _recording = false;
         bool _previewing = false;
+        private PageState _CurrentPageState = PageState.Default;
 
         private enum PageState
         {
@@ -73,6 +76,8 @@ namespace UniversalNomadUploader
             Renaming,
             Deleting,
             RecordingAudio,
+            RecordingVideo,
+            CapturingPhoto,
             Default
         }
 
@@ -100,15 +105,14 @@ namespace UniversalNomadUploader
             }
         }
 
-        private void InitCaptureSettings()
+        private async void InitCaptureSettings()
         {
             _captureInitSettings = null;
             _captureInitSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
-            _captureInitSettings.AudioDeviceId = "";
+            _captureInitSettings.AudioDeviceId = (await Windows.Devices.Enumeration.DeviceInformation.FindAllAsync(Windows.Devices.Enumeration.DeviceClass.AudioCapture)).FirstOrDefault().Id;
             _captureInitSettings.VideoDeviceId = "";
             _captureInitSettings.StreamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.AudioAndVideo;
             _captureInitSettings.PhotoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.VideoPreview;
-
             if (_deviceList.Count > 0)
                 _captureInitSettings.VideoDeviceId = _deviceList[0].Id;
         }
@@ -130,16 +134,15 @@ namespace UniversalNomadUploader
         // Create a profile.
         private void CreateProfile()
         {
-            _profile = Windows.Media.MediaProperties.MediaEncodingProfile.CreateMp4(
-            Windows.Media.MediaProperties.VideoEncodingQuality.Auto);
+            _profile = Windows.Media.MediaProperties.MediaEncodingProfile.CreateMp4(Windows.Media.MediaProperties.VideoEncodingQuality.Auto);
         }
-
         // Start the video capture.
         private async void StartMediaCaptureSession()
         {
-            String NewFileName = Guid.NewGuid().ToString();
-            var storageFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(NewFileName + ".mp4", CreationCollisionOption.ReplaceExisting);
-            await _CameraMediaCapture.StartRecordToStorageFileAsync(_profile, storageFile);
+            CurrentVideoName = Guid.NewGuid().ToString();
+            StorageFile CurrentVideoFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(CurrentVideoName + ".mp4", CreationCollisionOption.ReplaceExisting);
+            await _CameraMediaCapture.StartRecordToStorageFileAsync(_profile, CurrentVideoFile);
+            //await _CameraMediaCapture.StopPreviewAsync();
             _recording = true;
             (App.Current as App).IsRecording = true;
         }
@@ -147,9 +150,38 @@ namespace UniversalNomadUploader
         // Stop the video capture.
         private async void StopMediaCaptureSession()
         {
-            await _CameraMediaCapture.StopRecordAsync();
-            _recording = false;
-            (App.Current as App).IsRecording = false;
+            try
+            {
+                StorageFile CurrentVideoFile = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync(CurrentVideoName + ".mp4");
+                Evidence evi = new Evidence();
+                evi.FileName = CurrentVideoName;
+                evi.CreatedDate = DateTime.Now;
+                evi.ServerID = (int)GlobalVariables.SelectedServer;
+                evi.Type = MimeTypes.Movie;
+                evi.Size = Convert.ToDouble((await CurrentVideoFile.GetBasicPropertiesAsync()).Size);
+                await _CameraMediaCapture.StopRecordAsync();
+                _recording = false;
+                (App.Current as App).IsRecording = false;
+                if (CurrentVideoFile != null)
+                {
+                    evi.Extension = CurrentVideoFile.FileType.Replace(".", "");
+                    
+                    evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+                    evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                    CurrentEvidence = evi;
+                    CaptureContainer.Visibility = Visibility.Collapsed;
+                    DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
+                    ShowNewName();
+                }
+                DisplayInformation.AutoRotationPreferences = DisplayOrientations.None;
+                CurrentVideoFile = null;
+                CurrentVideoName = "";
+                await (App.Current as App).CleanupCaptureResources();
+            }
+            catch (Exception er)
+            {
+                displayMessage(er.Message, "error");
+            }
         }
 
         /// <summary>
@@ -179,7 +211,20 @@ namespace UniversalNomadUploader
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.Loaded += EvidenceView_Loaded;
+            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+
         }
+
+        async void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            if (_CameraMediaCapture != null)
+            {
+                await (App.Current as App).CleanupCaptureResources();
+                e.Handled = true;
+            }
+        }
+
+
 
         void EvidenceView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -208,7 +253,7 @@ namespace UniversalNomadUploader
             Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
             await InitAudioMediaCapture();
             UpdateRecordingControls(RecordingMode.Initializing);
-            InitTimer(); 
+            InitTimer();
             EnumerateCameras();
             RebindItems();
         }
@@ -245,7 +290,7 @@ namespace UniversalNomadUploader
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
         {
-            if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess()  || await AuthenticationUtil.VerifySessionAsync())
+            if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess() || await AuthenticationUtil.VerifySessionAsync())
             {
                 expandLoginAnimation.Begin();
                 GlobalVariables.IsOffline = !GlobalVariables.HasInternetAccess();
@@ -270,7 +315,7 @@ namespace UniversalNomadUploader
             DisableButtons(PageState.Uploading);
             foreach (Evidence item in itemGridView.SelectedItems)
             {
-                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                //ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
                 StorageFile file = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync(item.FileName + "." + item.Extension);
                 BackgroundUploader uploader = new BackgroundUploader();
                 uploader.SetRequestHeader("FileName", (item.Name == null) ? "" : item.Name);
@@ -278,8 +323,8 @@ namespace UniversalNomadUploader
                 uploader.SetRequestHeader("Extension", file.FileType.Replace(".", ""));
                 uploader.SetRequestHeader("X-SessionID", GlobalVariables.LoggedInUser.SessionID.ToString());
                 UploadOperation upload = uploader.CreateUpload(new Uri(((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + ServerUtil.getServerWSUrl() + "/User/MobileUploadEvidence"), file);
-                pbar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                pbar.IsIndeterminate = true;
+                //pbar.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                //pbar.IsIndeterminate = true;
                 await HandleUploadAsync(upload, true, item);
             }
             itemGridView.SelectedItems.Clear();
@@ -302,13 +347,13 @@ namespace UniversalNomadUploader
                     // The upload was already running when the application started, re-attach the progress handler.
                     await upload.AttachAsync().AsTask(cts.Token, progressCallback);
                 }
-                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
-                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                sym.Symbol = Symbol.Accept;
-                sym.Foreground = new SolidColorBrush(Colors.Green);
-                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                pbar.IsIndeterminate = false;
+                //ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                //SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
+                //sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                //sym.Symbol = Symbol.Accept;
+                //sym.Foreground = new SolidColorBrush(Colors.Green);
+                //pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                //pbar.IsIndeterminate = false;
                 item.HasTryUploaded = true;
                 item.UploadedDate = DateTime.Now;
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
@@ -319,13 +364,13 @@ namespace UniversalNomadUploader
                 item.HasTryUploaded = true;
                 item.UploadError = "Upload was cancelled (Task cancellation)";
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
-                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                sym.Foreground = new SolidColorBrush(Colors.Red);
-                sym.Symbol = Symbol.Cancel;
-                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                pbar.IsIndeterminate = false;
+                //ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                //SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
+                //sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                //sym.Foreground = new SolidColorBrush(Colors.Red);
+                //sym.Symbol = Symbol.Cancel;
+                //pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                //pbar.IsIndeterminate = false;
                 EventLogUtil.InsertEvent(item.Name + " uploaded cancelled", LogType.Upload);
             }
             catch (Exception ex)
@@ -333,13 +378,13 @@ namespace UniversalNomadUploader
                 item.HasTryUploaded = true;
                 item.UploadError = ex.Message;
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
-                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-                sym.Foreground = new SolidColorBrush(Colors.Red);
-                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                sym.Symbol = Symbol.Cancel;
-                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                pbar.IsIndeterminate = false;
+                //ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                //SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0)), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
+                //sym.Foreground = new SolidColorBrush(Colors.Red);
+                //sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                //sym.Symbol = Symbol.Cancel;
+                //pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                //pbar.IsIndeterminate = false;
                 EventLogUtil.InsertEvent(item.Name + " uploaded failed, reason: " + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Upload);
             }
         }
@@ -460,6 +505,26 @@ namespace UniversalNomadUploader
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;
                     CaptureVideo.IsEnabled = true;
+                    break;
+                case PageState.CapturingPhoto:
+                    Delete.IsEnabled = false;
+                    Upload.IsEnabled = false;
+                    Rename.IsEnabled = false;
+                    Info.IsEnabled = false;
+                    Import.IsEnabled = false;
+                    CaptureAudio.IsEnabled = false;
+                    CapturePhoto.IsEnabled = false;
+                    CaptureVideo.IsEnabled = false;
+                    break;
+                case PageState.RecordingVideo:
+                    Delete.IsEnabled = false;
+                    Upload.IsEnabled = false;
+                    Rename.IsEnabled = false;
+                    Info.IsEnabled = false;
+                    Import.IsEnabled = false;
+                    CaptureAudio.IsEnabled = false;
+                    CapturePhoto.IsEnabled = false;
+                    CaptureVideo.IsEnabled = false;
                     break;
                 default:
                     Delete.IsEnabled = true;
@@ -666,53 +731,35 @@ namespace UniversalNomadUploader
 
         private async void CapturePhoto_Click(object sender, RoutedEventArgs e)
         {
-            String NewFileName = Guid.NewGuid().ToString();
+            EnumerateCameras();
             Preview.Source = _CameraMediaCapture;
             await _CameraMediaCapture.StartPreviewAsync();
-            DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-            //StorageFile newPhoto = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(NewFileName, CreationCollisionOption.ReplaceExisting);
-            //await camera.CapturePhotoToStorageFileAsync(ImageEncodingProperties.CreateJpeg(),newPhoto);
-            //if (newPhoto != null)
-            //{
-            //    Evidence evi = new Evidence();
-            //    evi.FileName = NewFileName;
-            //    evi.Extension = newPhoto.FileType.Replace(".", "");
-            //    evi.CreatedDate = DateTime.Now;
-            //    evi.ServerID = (int)GlobalVariables.SelectedServer;
-            //    evi.Type = MimeTypes.Picture;
-            //    await newPhoto.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newPhoto.FileType, NameCollisionOption.ReplaceExisting);
-            //    evi.Size = Convert.ToDouble((await newPhoto.GetBasicPropertiesAsync()).Size);
-            //    evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-            //    evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
-            //    CurrentEvidence = evi;
-            //    ShowNewName();
-            //}
+            DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape;
+            CaptureContainer.Visibility = Visibility.Visible;
+            Appbar.IsOpen = false;
+            Appbar.IsSticky = false;
+            _CurrentPageState = PageState.CapturingPhoto;
+            //DisableButtons(PageState.CapturingPhoto);
         }
 
         private async void CaptureVideo_Click(object sender, RoutedEventArgs e)
         {
-            String NewFileName = Guid.NewGuid().ToString();
-            Preview.Source = _CameraMediaCapture;
-            await _CameraMediaCapture.StartPreviewAsync();
-            //DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-            //MediaCapture video = new MediaCapture();
-            //StorageFile newVideo = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(NewFileName, CreationCollisionOption.ReplaceExisting);
-            //await video.vi
-            //if (newVideo != null)
-            //{
-            //    Evidence evi = new Evidence();
-            //    evi.FileName = NewFileName;
-            //    evi.Extension = newVideo.FileType.Replace(".", "");
-            //    evi.CreatedDate = DateTime.Now;
-            //    evi.ServerID = (int)GlobalVariables.SelectedServer;
-            //    evi.Type = MimeTypes.Movie;
-            //    await newVideo.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newVideo.FileType, NameCollisionOption.ReplaceExisting);
-            //    evi.Size = Convert.ToDouble((await newVideo.GetBasicPropertiesAsync()).Size);
-            //    evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-            //    evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
-            //    CurrentEvidence = evi;
-            //    ShowNewName();
-            //}
+            try
+            {
+                EnumerateCameras();
+                //Preview.Source = _CameraMediaCapture;
+                //await _CameraMediaCapture.StartPreviewAsync();
+                CaptureContainer.Visibility = Visibility.Visible;
+                Appbar.IsOpen = false;
+                Appbar.IsSticky = false;
+                _CurrentPageState = PageState.RecordingVideo;
+                DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape;
+                //DisableButtons(PageState.RecordingVideo);
+            }
+            catch (Exception er)
+            {
+                Appbar.IsSticky = false;
+            }
         }
 
         private void ShowNewName()
@@ -780,7 +827,7 @@ namespace UniversalNomadUploader
         private void Info_Click(object sender, RoutedEventArgs e)
         {
             SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(itemGridView.SelectedItem), 0)), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-            FlyoutBase.ShowAttachedFlyout(sym);    
+            FlyoutBase.ShowAttachedFlyout(sym);
         }
 
         private async void Import_Click(object sender, RoutedEventArgs e)
@@ -895,6 +942,50 @@ namespace UniversalNomadUploader
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private async void StartCapture_Click(object sender, RoutedEventArgs e)
+        {
+            String NewFileName = Guid.NewGuid().ToString();
+            StorageFile newFile;
+            Evidence evi = new Evidence();
+            evi.FileName = NewFileName;
+            evi.CreatedDate = DateTime.Now;
+            evi.ServerID = (int)GlobalVariables.SelectedServer;
+
+            if (_CurrentPageState == PageState.CapturingPhoto)
+            {
+                newFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(NewFileName + ".jpg", CreationCollisionOption.ReplaceExisting);
+                evi.Type = MimeTypes.Picture;
+                await _CameraMediaCapture.CapturePhotoToStorageFileAsync(ImageEncodingProperties.CreateJpeg(), newFile);
+            }
+            else
+            {
+                StartMediaCaptureSession();
+                StopRecording.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                StartCapture.IsEnabled = false;
+                return;
+            }
+
+            if (newFile != null)
+            {
+                evi.Extension = newFile.FileType.Replace(".", "");
+                evi.Size = Convert.ToDouble((await newFile.GetBasicPropertiesAsync()).Size);
+                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                CurrentEvidence = evi;
+                CaptureContainer.Visibility = Visibility.Collapsed;
+                DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
+                ShowNewName();
+            }
+            DisplayInformation.AutoRotationPreferences = DisplayOrientations.None;
+            await (App.Current as App).CleanupCaptureResources();
+        }
+
+        private void StopRecording_Click(object sender, RoutedEventArgs e)
+        {
+            StopMediaCaptureSession();
+            StopRecording.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
         }
 
     }

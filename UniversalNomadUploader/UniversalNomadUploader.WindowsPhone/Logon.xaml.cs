@@ -20,6 +20,7 @@ using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.Exceptions;
 using Windows.Storage;
 using HockeyApp;
+using Windows.UI.ViewManagement;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -59,10 +60,14 @@ namespace UniversalNomadUploader
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
             this.Loaded += Logon_Loaded;
+            
         }
 
         async void Logon_Loaded(object sender, RoutedEventArgs e)
         {
+            StatusBar statusBar = Windows.UI.ViewManagement.StatusBar.GetForCurrentView();
+            // Hide the status bar
+            await statusBar.HideAsync();
             ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
             if (roamingSettings.Values["Username"] != null)
             {

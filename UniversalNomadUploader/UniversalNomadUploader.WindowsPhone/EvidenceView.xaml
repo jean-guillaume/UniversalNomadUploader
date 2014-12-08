@@ -67,80 +67,61 @@
             </TransitionCollection>
         </Grid.ChildrenTransitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="140" />
+            <RowDefinition Height="90" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Horizontal scrolling grid -->
-        <GridView
+        <ScrollViewer HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Hidden" VerticalScrollMode="Disabled" Grid.Row="1">
+            <GridView
             x:Name="itemGridView"
             AutomationProperties.AutomationId="ItemGridView"
             AutomationProperties.Name="Grouped Items"
-            Grid.Row="1"
             Padding="116,0,40,46"
             ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
             SelectionMode="Multiple"
             SelectionChanged="itemGridView_SelectionChanged"
             IsSwipeEnabled="false">
-            <GridView.ItemTemplate>
-                <DataTemplate>
-                    <Grid HorizontalAlignment="Left" Width="150" Height="150">
-                        <StackPanel Orientation="Vertical" Background="{StaticResource NomadBlue20Percent}">
-                            <Border Height="20">
-                                <SymbolIcon Symbol="{Binding UploadedDate, Converter={StaticResource UploadDateSymbolConverter}}" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="{Binding UploadedDate, Converter={StaticResource UploadColorConverter}}" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" >
-                                    <FlyoutBase.AttachedFlyout>
-                                        <Flyout Placement="Top">
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*" />
-                                                    <RowDefinition Height="*" />               
-                                                </Grid.RowDefinitions>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="File Name" FontWeight="Bold" Grid.Row="0" Grid.Column="0" FontSize="18" Margin="0,0,10,0" />
-                                                <TextBlock Text="{Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="1" TextWrapping="WrapWholeWords" />
-                                                <TextBlock Text="Upload status" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="18" Margin="0,0,10,0" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" />
-                                                <TextBlock Text="{Binding UploadedDate, Converter={StaticResource UploadDateFlyoutConverter}}" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadedDate, Converter={StaticResource UploadDateVisibilityConverter}}" />
-                                                <TextBlock Text="{Binding UploadError, Converter={StaticResource UploadErrorMessageFlyoutMessageConverter}}" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="{Binding UploadError, Converter={StaticResource UploadErrorMessageVisibilityConverter}}" />
-                                            </Grid>
-                                        </Flyout>
-                                    </FlyoutBase.AttachedFlyout>
-                                </SymbolIcon>
-                            </Border>
-                            <Image Source="{Binding ImagePath}" Height="48" Width="48" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,20" />
-                            <ProgressBar Name="Progress" Visibility="Collapsed" />
-                        </StackPanel>
-                        <StackPanel VerticalAlignment="Bottom" Background="{StaticResource NomadBlue70Percent}">
-                            <TextBlock Text="{Binding Name}" Style="{StaticResource TitleTextBlockStyle}" Height="30" Margin="15,0,15,0"/>
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-            <GridView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid GroupPadding="0,0,70,0"/>
-                </ItemsPanelTemplate>
-            </GridView.ItemsPanel>
-            <GridView.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.HeaderTemplate>
-                        <DataTemplate>
-                            <Grid Margin="0,0,0,2">
-                                <Button Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid HorizontalAlignment="Left" Width="150" Height="150">
+                            <StackPanel Orientation="Vertical" Background="{StaticResource NomadBlue20Percent}">
+                                <Border Height="20">
+                                    <SymbolIcon Symbol="Accept" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" />
+                                </Border>
+                                <Image Source="{Binding ImagePath}" Height="48" Width="48" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,20" />
+                                <ProgressBar Name="Progress" Visibility="Collapsed" />
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Bottom" Background="{StaticResource NomadBlue70Percent}">
+                                <TextBlock Text="{Binding Name}" Style="{StaticResource TitleTextBlockStyle}" Height="30" Margin="15,0,15,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" GroupPadding="0,0,70,0"/>
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,2">
+                                    <Button Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
                                     AutomationProperties.Name="Group Title"
                                     >
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Key}" Margin="0,-11,10,10" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
-                                    </StackPanel>
-                                </Button>
-                            </Grid>
-                        </DataTemplate>
-                    </GroupStyle.HeaderTemplate>
-                </GroupStyle>
-            </GridView.GroupStyle>
-        </GridView>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Key}" Margin="0,-11,10,10" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </GridView.GroupStyle>
+            </GridView>
+        </ScrollViewer>
 
         <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed" Background="{StaticResource NomadBlue20Percent}" >
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource NomadBlue70Percent}" >
@@ -210,18 +191,39 @@
         
         <!-- Back button and page title -->
         <Grid>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" 
-                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
+            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" FontSize="50" 
+                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Top" Margin="10,10,10,20"/>
             <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" ></ProgressBar>
         </Grid>
-        
-        <Grid Name="CaptureContainer" Grid.Row="1" Visibility="Collapsed">
-            <CaptureElement Name="Preview" />
+        <TextBlock Text="File Name" FontWeight="Bold" Grid.Row="0" Grid.Column="0" FontSize="18" Margin="0,0,10,0" Visibility="Collapsed" />
+        <TextBlock Text="{Binding Name}" FontSize="18" Grid.Row="0" Grid.Column="1" TextWrapping="WrapWholeWords" Visibility="Collapsed" />
+        <TextBlock Text="Upload status" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="18" Margin="0,0,10,0" Visibility="Collapsed" />
+        <TextBlock Text="" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="Collapsed" />
+        <TextBlock Text="" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="Collapsed" />
+        <Grid Name="CaptureContainer" Grid.RowSpan="2" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <CaptureElement Name="Preview" Grid.RowSpan="3"  >
+            </CaptureElement>
+            <AppBarButton Name="StartCapture" Icon="Camera" HorizontalAlignment="Right" Foreground="White" Click="StartCapture_Click" Grid.Row="0" IsCompact="True" >
+                
+            </AppBarButton>
+            <AppBarButton Name="StopRecording" Click="StopRecording_Click" Foreground="White" Icon="Cancel" HorizontalAlignment="Right" Grid.Row="1" IsCompact="True" Visibility="Collapsed" >
+
+            </AppBarButton>
         </Grid>
     </Grid>
     <Page.BottomAppBar>
-        <CommandBar IsSticky="True" >
+        <CommandBar Name="Appbar" IsSticky="True" >
             <CommandBar.PrimaryCommands>
+                <AppBarButton Name="Upload" Label="Upload" Click="Upload_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Upload" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
                 <AppBarButton Name="Import" Label="Import" IsCompact="True" Click="Import_Click">
                     <SymbolIcon Symbol="Import" />
                 </AppBarButton>
@@ -233,11 +235,6 @@
                 </AppBarButton>
                 <AppBarButton Name="CaptureAudio" Label="Record audio" IsCompact="True" Click="CaptureAudio_Click" >
                     <SymbolIcon Symbol="Microphone" />
-                </AppBarButton>
-                <AppBarButton Name="Upload" Label="Upload" Click="Upload_Click" Visibility="Collapsed">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="Upload" />
-                    </AppBarButton.Icon>
                 </AppBarButton>
             </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
