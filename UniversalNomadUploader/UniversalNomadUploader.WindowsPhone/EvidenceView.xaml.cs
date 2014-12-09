@@ -113,6 +113,7 @@ namespace UniversalNomadUploader
             _captureInitSettings.VideoDeviceId = "";
             _captureInitSettings.StreamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.AudioAndVideo;
             _captureInitSettings.PhotoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.VideoPreview;
+            //_captureInitSettings. = true;
             if (_deviceList.Count > 0)
                 _captureInitSettings.VideoDeviceId = _deviceList[0].Id;
         }
@@ -126,9 +127,21 @@ namespace UniversalNomadUploader
             // Set the MediaCapture to a variable in App.xaml.cs to handle suspension.
             (App.Current as App).MediaCapture = _CameraMediaCapture;
 
+            _CameraMediaCapture.Failed += _CameraMediaCapture_Failed;
+            _CameraMediaCapture.RecordLimitationExceeded += _CameraMediaCapture_RecordLimitationExceeded;
             await _CameraMediaCapture.InitializeAsync(_captureInitSettings);
 
             CreateProfile();
+        }
+
+        void _CameraMediaCapture_RecordLimitationExceeded(MediaCapture sender)
+        {
+            throw new NotImplementedException();
+        }
+
+        void _CameraMediaCapture_Failed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)
+        {
+            throw new NotImplementedException();
         }
 
         // Create a profile.
@@ -139,12 +152,19 @@ namespace UniversalNomadUploader
         // Start the video capture.
         private async void StartMediaCaptureSession()
         {
-            CurrentVideoName = Guid.NewGuid().ToString();
-            StorageFile CurrentVideoFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(CurrentVideoName + ".mp4", CreationCollisionOption.ReplaceExisting);
-            await _CameraMediaCapture.StartRecordToStorageFileAsync(_profile, CurrentVideoFile);
-            //await _CameraMediaCapture.StopPreviewAsync();
-            _recording = true;
-            (App.Current as App).IsRecording = true;
+            try
+            {
+                CurrentVideoName = Guid.NewGuid().ToString();
+                StorageFile CurrentVideoFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(CurrentVideoName + ".mp4", CreationCollisionOption.ReplaceExisting);
+                await _CameraMediaCapture.StartRecordToStorageFileAsync(_profile, CurrentVideoFile);
+                _recording = true;
+                (App.Current as App).IsRecording = true;
+            }
+            catch (Exception er)
+            {
+                
+                throw;
+            }
         }
 
         // Stop the video capture.
@@ -734,7 +754,7 @@ namespace UniversalNomadUploader
             EnumerateCameras();
             Preview.Source = _CameraMediaCapture;
             await _CameraMediaCapture.StartPreviewAsync();
-            DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape;
+            DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
             CaptureContainer.Visibility = Visibility.Visible;
             Appbar.IsOpen = false;
             Appbar.IsSticky = false;
@@ -747,13 +767,13 @@ namespace UniversalNomadUploader
             try
             {
                 EnumerateCameras();
-                //Preview.Source = _CameraMediaCapture;
-                //await _CameraMediaCapture.StartPreviewAsync();
+                Preview.Source = _CameraMediaCapture;
+                await _CameraMediaCapture.StartPreviewAsync();
                 CaptureContainer.Visibility = Visibility.Visible;
                 Appbar.IsOpen = false;
                 Appbar.IsSticky = false;
                 _CurrentPageState = PageState.RecordingVideo;
-                DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape;
+                DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
                 //DisableButtons(PageState.RecordingVideo);
             }
             catch (Exception er)
