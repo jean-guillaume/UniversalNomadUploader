@@ -218,10 +218,6 @@ namespace UniversalNomadUploader
                     await upload.AttachAsync().AsTask(cts.Token, progressCallback);
                 }
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
-                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                sym.Symbol = Symbol.Accept;
-                sym.Foreground = new SolidColorBrush(Colors.Green);
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
                 item.HasTryUploaded = true;
@@ -235,10 +231,6 @@ namespace UniversalNomadUploader
                 item.UploadError = "Upload was cancelled (Task cancellation)";
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
-                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                sym.Foreground = new SolidColorBrush(Colors.Red);
-                sym.Symbol = Symbol.Cancel;
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
                 EventLogUtil.InsertEvent(item.Name + " uploaded cancelled", LogType.Upload);
@@ -249,10 +241,6 @@ namespace UniversalNomadUploader
                 item.UploadError = ex.Message;
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
                 ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
-                SymbolIcon sym = (((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[0] as Border).Child as SymbolIcon;
-                sym.Foreground = new SolidColorBrush(Colors.Red);
-                sym.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                sym.Symbol = Symbol.Cancel;
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
                 EventLogUtil.InsertEvent(item.Name + " uploaded failed, reason: " + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Upload);
@@ -295,11 +283,17 @@ namespace UniversalNomadUploader
             }
             Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
             Rename.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
-            Delete.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
-            FileDetails.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
-            FileStatus.Visibility = (itemGridView.SelectedItems.Count == 1 && ((Evidence)itemGridView.SelectedItem).HasTryUploaded) ? Visibility.Visible : Visibility.Collapsed;
-            FileActionsStack.Background = (itemGridView.SelectedItems.Count > 0) ? new SolidColorBrush(Colors.Gray) : new SolidColorBrush(Colors.White);
-            FileInfoGrid.Background = (itemGridView.SelectedItems.Count == 1) ? new SolidColorBrush(Colors.Gray) : new SolidColorBrush(Colors.White);
+            Delete.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
+            if (FileInfoGrid.Height == 0 && itemGridView.SelectedItems.Count > 0)
+            {
+                expandInfoAnimation.Begin();
+                ContainerGrid.RowDefinitions[1].Height = new GridLength(150.0);
+            }
+            else if (itemGridView.SelectedItems.Count == 0)
+            {
+                reduceInfoAnimation.Begin();
+                ContainerGrid.RowDefinitions[1].Height = new GridLength(0.0);
+            }
         }
 
         private void Rename_Click(object sender, RoutedEventArgs e)
@@ -671,30 +665,25 @@ namespace UniversalNomadUploader
 
         private async void Delete_Click(object sender, RoutedEventArgs e)
         {
-            MessageDialog diag = new MessageDialog("Are you sure you want to delete: " + ((Evidence)itemGridView.SelectedItem).Name, "Confirm deletion!");
+            MessageDialog diag = new MessageDialog("Are you sure you want to delete the selected file(s)?", "Confirm deletion!");
             diag.Commands.Add(new UICommand("Confirm", new UICommandInvokedHandler(this.ConfirmDelete)));
             diag.Commands.Add(new UICommand("Cancel", new UICommandInvokedHandler(this.ConfirmDelete)));
             await diag.ShowAsync();
-
         }
 
         private async void ConfirmDelete(IUICommand command)
         {
             if (command.Label == "Confirm")
             {
-                await EvidenceUtil.DeleteAsync((Evidence)itemGridView.SelectedItem);
-                await (await StorageFile.GetFileFromPathAsync(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + ((Evidence)itemGridView.SelectedItem).FileName + "." + ((Evidence)itemGridView.SelectedItem).Extension)).DeleteAsync();
-                await EventLogUtil.InsertEventAsync(((Evidence)itemGridView.SelectedItem).Name + " Deleted on " + DateTime.Now.ToString(), LogType.Delete);
+                foreach (var item in itemGridView.SelectedItems)
+                {
+                    Evidence evi = (Evidence)item;
+                    await EvidenceUtil.DeleteAsync(evi);
+                    await (await StorageFile.GetFileFromPathAsync(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + evi.FileName + "." + evi.Extension)).DeleteAsync();
+                    await EventLogUtil.InsertEventAsync(evi.Name + " Deleted on " + DateTime.Now.ToString(), LogType.Delete);    
+                }
                 RebindItems();
-
             }
-
-        }
-
-        private void SymbolIcon_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-
-
         }
 
         private async void Import_Click(object sender, RoutedEventArgs e)
@@ -804,6 +793,12 @@ namespace UniversalNomadUploader
         {
             Username.Text = Username.Text.ToUpper();
             Username.SelectionStart = Username.Text.Length;
+        }
+
+        private void InfoCancel_Click(object sender, RoutedEventArgs e)
+        {
+            reduceInfoAnimation.Begin();
+            ContainerGrid.RowDefinitions[1].Height = new GridLength(0.0);
         }
 
     }

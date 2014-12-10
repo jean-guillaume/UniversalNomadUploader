@@ -53,6 +53,21 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
+
+        <Storyboard x:Name="expandInfoAnimation" >
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="0" To="150" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseIn"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Name="reduceInfoAnimation">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="150" To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseOut"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
     </Page.Resources>
 
     <!--
@@ -68,6 +83,7 @@
         </Grid.ChildrenTransitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="140" />
+            <RowDefinition Height="0" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -76,7 +92,7 @@
             x:Name="itemGridView"
             AutomationProperties.AutomationId="ItemGridView"
             AutomationProperties.Name="Grouped Items"
-            Grid.Row="1"
+            Grid.Row="2"
             Padding="116,0,40,46"
             ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
             SelectionMode="Multiple"
@@ -86,9 +102,6 @@
                 <DataTemplate>
                     <Grid HorizontalAlignment="Left" Width="150" Height="150">
                         <StackPanel Orientation="Vertical" Background="{StaticResource NomadBlue20Percent}">
-                            <Border Height="20">
-                                <SymbolIcon Symbol="{Binding UploadedDate, Converter={StaticResource UploadDateSymbolConverter}}" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Foreground="{Binding UploadedDate, Converter={StaticResource UploadColorConverter}}" Visibility="{Binding HasTryUploaded, Converter={StaticResource UploadVisibilityConverter}}" />
-                            </Border>
                             <Image Source="{Binding ImagePath}" Height="48" Width="48" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,20" />
                             <ProgressBar Name="Progress" Visibility="Collapsed" />
                         </StackPanel>
@@ -122,7 +135,7 @@
             </GridView.GroupStyle>
         </GridView>
 
-        <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed" Background="{StaticResource NomadBlue20Percent}" >
+        <Grid Name="NameGrid" Grid.RowSpan="3" Visibility="Collapsed" Background="{StaticResource NomadBlue20Percent}" >
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource NomadBlue70Percent}" >
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
@@ -136,7 +149,8 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <Grid  Name="RecorderGrid" Grid.Row="1" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}" >
+        
+        <Grid  Name="RecorderGrid" Grid.Row="2" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}" >
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
                 <StackPanel Orientation="Horizontal">
                     <Button Name="RecordButton" Click="RecordButton_Click">
@@ -162,7 +176,7 @@
             </StackPanel>
         </Grid>
 
-        <Grid Name="ReauthPopup" Grid.Row="1" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}">
+        <Grid Name="ReauthPopup" Grid.Row="2" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}">
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Height="200" Background="{StaticResource FadedLogon}">
                 <Grid Name="LogonGrid" Margin="0,20,0,0">
                     <Grid.RowDefinitions>
@@ -187,40 +201,39 @@
                 </Grid>
             </StackPanel>
         </Grid>
-        
-        <!-- Back button and page title -->
-        <Grid>
+
+        <Grid Name="FileInfoGrid" Grid.Row="1" Height="0" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="*" MinWidth="90" MaxWidth="100"/>
+                <ColumnDefinition Width="11*" />
+                <ColumnDefinition Width="*" MinWidth="40" MaxWidth="50" />
             </Grid.ColumnDefinitions>
-            <AppBarButton x:Name="backButton" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
-                        VerticalAlignment="Center"
-                        IsCompact="True"
-                        HorizontalAlignment="Center"
-                        AutomationProperties.Name="Back"
-                        AutomationProperties.AutomationId="BackButton"
-                        AutomationProperties.ItemType="Navigation Button"/>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
-                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
-            <Grid Name="FileInfoGrid" Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock Name="FileStatus" TextWrapping="NoWrap" FontSize="20" Grid.Row="1" Visibility="Collapsed" />
-                <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10*" />
+                    <ColumnDefinition Width="*" MinWidth="40" MaxWidth="50" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Name="FileDetails" VerticalAlignment="Center" TextWrapping="NoWrap" FontSize="20" Grid.Column="0" Visibility="Collapsed" />
+                <AppBarButton Name="Rename" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Click="Rename_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Rename" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </Grid>
+            <Border Grid.Row="1" BorderBrush="LightGray" Margin="40,0,0,0" BorderThickness="0,1,0,0">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10*" />
-                        <ColumnDefinition Width="*" MinWidth="50" MaxWidth="60" />
-                        <ColumnDefinition Width="*" MinWidth="50" MaxWidth="60" />
+                        <ColumnDefinition Width="*" MinWidth="40" MaxWidth="50" />
+                        <ColumnDefinition Width="*" MinWidth="40" MaxWidth="50" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Name="FileDetails" VerticalAlignment="Center" TextWrapping="NoWrap" FontSize="20" Grid.Column="0" Visibility="Collapsed" />
-                    <AppBarButton Name="Rename" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Click="Rename_Click" Visibility="Collapsed">
+                    <TextBlock Name="FileStatus" TextWrapping="NoWrap" FontSize="20" Grid.Row="1" Visibility="Collapsed" />
+                    <AppBarButton Name="Upload" Label="Upload" VerticalAlignment="Center" Grid.Column="1" IsCompact="True" HorizontalAlignment="Right" Click="Upload_Click" Visibility="Collapsed">
                         <AppBarButton.Icon>
-                            <SymbolIcon Symbol="Rename" />
+                            <SymbolIcon Symbol="Upload" />
                         </AppBarButton.Icon>
                     </AppBarButton>
                     <AppBarButton Name="Delete" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2" Click="Delete_Click" Visibility="Collapsed">
@@ -229,15 +242,31 @@
                         </AppBarButton.Icon>
                     </AppBarButton>
                 </Grid>
-                
-            </Grid>
-            <StackPanel Name="FileActionsStack" Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                <AppBarButton Name="Upload" Label="Upload" VerticalAlignment="Center" HorizontalAlignment="Center" Click="Upload_Click" Visibility="Collapsed">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="Upload" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-            </StackPanel>
+            </Border>
+            <AppBarButton Name="InfoCancel" IsCompact="True" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" Click="InfoCancel_Click" Visibility="Visible" >
+                <AppBarButton.Icon>
+                    <SymbolIcon Symbol="Cancel" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+        </Grid>
+
+        <!-- Back button and page title -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="*" MinWidth="90" MaxWidth="100"/>
+            </Grid.ColumnDefinitions>
+            <AppBarButton x:Name="backButton" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+                        VerticalAlignment="Center"
+                        IsCompact="True"
+                        HorizontalAlignment="Center"
+                          Grid.Column="3"
+                        AutomationProperties.Name="Back"
+                        AutomationProperties.AutomationId="BackButton"
+                        AutomationProperties.ItemType="Navigation Button"/>
+            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
             <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
         </Grid>
     </Grid>
