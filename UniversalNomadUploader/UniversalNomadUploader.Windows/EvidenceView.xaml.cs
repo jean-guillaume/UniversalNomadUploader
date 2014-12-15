@@ -160,7 +160,7 @@ namespace UniversalNomadUploader
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
         {
-            if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess()  || await AuthenticationUtil.VerifySessionAsync())
+            if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess() || await AuthenticationUtil.VerifySessionAsync())
             {
                 expandLoginAnimation.Begin();
                 GlobalVariables.IsOffline = !GlobalVariables.HasInternetAccess();
@@ -278,11 +278,10 @@ namespace UniversalNomadUploader
                     else
                     {
                         FileStatus.Text = ((Evidence)itemGridView.SelectedItem).UploadedDate.ToString();
-                    } 
+                    }
                 }
             }
             Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
-            Rename.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
             Delete.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
             if (FileInfoGrid.Height == 0 && itemGridView.SelectedItems.Count > 0)
             {
@@ -294,6 +293,15 @@ namespace UniversalNomadUploader
                 reduceInfoAnimation.Begin();
                 ContainerGrid.RowDefinitions[1].Height = new GridLength(0.0);
             }
+            else if(FileInfoGrid.Height > 0 && itemGridView.SelectedItems.Count > 1)
+            {
+                reduceSingleInfoAnimation.Begin();
+            }
+            else if (FileInfoGrid.Height > 0 && itemGridView.SelectedItems.Count == 1)
+            {
+                expandSingleInfoAnimation.Begin();
+            }
+            FileInfoGrid.RowDefinitions[0].Height = (itemGridView.SelectedItems.Count == 1) ? new GridLength(1, GridUnitType.Star) : new GridLength(0.0);
         }
 
         private void Rename_Click(object sender, RoutedEventArgs e)
@@ -680,7 +688,7 @@ namespace UniversalNomadUploader
                     Evidence evi = (Evidence)item;
                     await EvidenceUtil.DeleteAsync(evi);
                     await (await StorageFile.GetFileFromPathAsync(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + evi.FileName + "." + evi.Extension)).DeleteAsync();
-                    await EventLogUtil.InsertEventAsync(evi.Name + " Deleted on " + DateTime.Now.ToString(), LogType.Delete);    
+                    await EventLogUtil.InsertEventAsync(evi.Name + " Deleted on " + DateTime.Now.ToString(), LogType.Delete);
                 }
                 RebindItems();
             }

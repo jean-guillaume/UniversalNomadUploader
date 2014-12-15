@@ -8,13 +8,27 @@
     <Application.Resources>
         <x:String x:Key="DatabaseName">db.sqlite</x:String>
         <x:String x:Key="AppName">Nomad Uploader</x:String>
-        
-        
+
+
 
         <!-- Global variables -->
         <x:String x:Key="BackGroundColour">#F2F2F2</x:String>
+        <x:String x:Key="NomadTitleLogo">/Assets/TitleLogo.png</x:String>
+        <x:String x:Key="LogoutImagePath">/Assets/Logout.png</x:String>
+        <x:String x:Key="CloseImagePath">/Assets/Close.png</x:String>
+        <x:String x:Key="AudioImagePath">/Assets/Audio.png</x:String>
+        <x:String x:Key="DeleteImagePath">/Assets/Delete.png</x:String>
+        <x:String x:Key="EditImagePath">/Assets/Edit.png</x:String>
+        <x:String x:Key="PhotoImagePath">/Assets/Photo.png</x:String>
+        <x:String x:Key="SearchImagePath">/Assets/Search.png</x:String>
+        <x:String x:Key="ImportImagePath">/Assets/Search.png</x:String>
+        <x:String x:Key="SelectedTickImagePath">/Assets/SelectedTick.png</x:String>
+        <x:String x:Key="UploadImagePath">/Assets/Upload.png</x:String>
+        <x:String x:Key="VideoImagePath">/Assets/Video.png</x:String>
         <x:Double x:Key="LargeFontSize">22</x:Double>
         <x:Double x:Key="ExtraLargeFontSize">40</x:Double>
+        <x:Double x:Key="SmallFontSize">12</x:Double>
+        <x:Double x:Key="InfoFontSize">24</x:Double>
 
         <!-- Global solid colour brushes -->
         <SolidColorBrush x:Key="LogonBorderBrush" Color="#7CADD3"></SolidColorBrush>
@@ -22,14 +36,376 @@
         <SolidColorBrush x:Key="NomadBlue70Percent" Color="#7CADD3" Opacity="0.7" ></SolidColorBrush>
         <SolidColorBrush x:Key="NomadBlue20Percent" Color="#7CADD3" Opacity="0.2" ></SolidColorBrush>
         <SolidColorBrush x:Key="FadedLogon" Color="#7CADD3" Opacity="0.4" ></SolidColorBrush>
+        <SolidColorBrush x:Key="FileInfoBackground" Color="#ECF0F1" ></SolidColorBrush>
+        <SolidColorBrush x:Key="BorderColour" Color="#BEC3C7" ></SolidColorBrush>
+        <SolidColorBrush x:Key="InfoFontColour" Color="#555555" ></SolidColorBrush>
+
 
         <SolidColorBrush x:Key="ProgressBarBackgroundThemeBrush" Color="#59FFFFFF" />
         <SolidColorBrush x:Key="ProgressBarBorderThemeBrush" Color="Transparent" />
         <SolidColorBrush x:Key="ProgressBarForegroundThemeBrush" Color="LimeGreen" />
         <SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="LimeGreen" />
 
+
+
+
         <!-- Global Image brushes -->
         <ImageBrush x:Key="HubBackgroundImageBrush" ImageSource="Assets/HubBackground.png"/>
 
+        <Style x:Key="LogoutButtonStyle" TargetType="Button" >
+            <Setter Property="Width" Value="50" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <StackPanel Orientation="Vertical">
+                                <Grid>
+                                    <Ellipse x:Name="ButtonEllipse" Height="40" Width="40" Fill="Transparent" HorizontalAlignment="Center"
+                                          Stroke="Black" StrokeThickness="2" VerticalAlignment="Center"/>
+                                    <Image x:Name="ButtonImage" Source="{Binding Source={StaticResource LogoutImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CloseButtonStyle" TargetType="Button" >
+            <Setter Property="Width" Value="50" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <StackPanel Orientation="Vertical">
+                                <Grid>
+                                    <Ellipse x:Name="ButtonEllipse" Height="40" Width="40" Fill="Transparent" HorizontalAlignment="Center"
+                                          Stroke="Black" StrokeThickness="2" VerticalAlignment="Center"/>
+                                    <Image x:Name="ButtonImage" Source="{Binding Source={StaticResource CloseImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="UploadButtonStyle" TargetType="Button" >
+            <Setter Property="Width" Value="60" />
+            <Setter Property="Height" Value="55" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Rectangle x:Name="ButtonEllipse" Height="60" Width="55" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0">
+                            </Rectangle>
+                            <StackPanel Orientation="Vertical" Margin="1.25,2.5,1.25,2.5" >
+                                <Image x:Name="ButtonImage" Height="30" Width="30" Source="{Binding Source={StaticResource UploadImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock FontSize="{StaticResource SmallFontSize}" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{TemplateBinding Content}" />
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DeleteButtonStyle" TargetType="Button" >
+            <Setter Property="Width" Value="60" />
+            <Setter Property="Height" Value="55" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Rectangle x:Name="ButtonEllipse" Height="60" Width="55" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0">
+                            </Rectangle>
+                            <StackPanel Orientation="Vertical" Margin="1.25,2.5,1.25,2.5" >
+                                <Image x:Name="ButtonImage" Height="30" Width="30" Source="{Binding Source={StaticResource DeleteImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock FontSize="{StaticResource SmallFontSize}" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{TemplateBinding Content}" />
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="EditButtonStyle" TargetType="Button" >
+            <Setter Property="Width" Value="60" />
+            <Setter Property="Height" Value="55" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Rectangle x:Name="ButtonEllipse" Height="60" Width="55" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0">
+                            </Rectangle>
+                            <StackPanel Orientation="Vertical" Margin="1.25,2.5,1.25,2.5" >
+                                <Image x:Name="ButtonImage" Height="30" Width="30" Source="{Binding Source={StaticResource EditImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock FontSize="{StaticResource SmallFontSize}" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{TemplateBinding Content}" />
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        
+        <Style x:Key="SearchButtonStyle" TargetType="AppBarButton" >
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="88" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <StackPanel Orientation="Vertical" Margin="0,22,0,0">
+                                <Grid>
+                                    <Ellipse x:Name="ButtonEllipse" Height="40" Width="40" Fill="Transparent" HorizontalAlignment="Center"
+                                          Stroke="Black" StrokeThickness="2" VerticalAlignment="Center"/>
+                                    <Image x:Name="ButtonImage" Height="40" Width="40" Source="{Binding Source={StaticResource SearchImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="VideoButtonStyle" TargetType="AppBarButton">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="88" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Rectangle x:Name="ButtonEllipse" Height="60" Width="55" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0" >
+                            </Rectangle>
+                            <Border BorderBrush="{StaticResource BorderColour}" BorderThickness="1,0,1,0" Margin="0,10">
+                                <StackPanel Orientation="Vertical" Margin="0,7,0,0" >
+                                    <Image x:Name="ButtonImage" Height="30" Width="30" Source="{Binding Source={StaticResource VideoImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <TextBlock FontSize="{StaticResource SmallFontSize}" Margin="0,12,0,0" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{TemplateBinding Content}" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="PictureButtonStyle" TargetType="AppBarButton">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="88" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Rectangle x:Name="ButtonEllipse" Height="60" Width="55" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0">
+                            </Rectangle>
+                            <StackPanel Orientation="Vertical" Margin="0,17,0,10" >
+                                <Image x:Name="ButtonImage" Height="30" Width="30" Source="{Binding Source={StaticResource PhotoImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock FontSize="{StaticResource SmallFontSize}" Margin="0,12,0,0" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{TemplateBinding Content}" />
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="AudioButtonStyle" TargetType="AppBarButton">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="88" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Rectangle x:Name="ButtonEllipse" Height="60" Width="55" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0">
+                            </Rectangle>
+                            <StackPanel Orientation="Vertical" Margin="0,17,0,10" >
+                                <Image x:Name="ButtonImage" Height="30" Width="30" Source="{Binding Source={StaticResource AudioImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock FontSize="{StaticResource SmallFontSize}" Margin="0,12,0,0" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{TemplateBinding Content}" />
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ImportButtonStyle" TargetType="AppBarButton">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="88" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" From="Transparent" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="0" To="LightGray" Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="ButtonEllipse" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Rectangle x:Name="ButtonEllipse" Height="60" Width="55" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0">
+                            </Rectangle>
+                            <Border BorderBrush="{StaticResource BorderColour}" BorderThickness="1,0" Margin="0,10">
+                                <StackPanel Orientation="Vertical" Margin="0,7,0,0" >
+                                    <Image x:Name="ButtonImage" Height="30" Width="30" Source="{Binding Source={StaticResource ImportImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <TextBlock FontSize="{StaticResource SmallFontSize}" Margin="0,12,0,0" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{TemplateBinding Content}" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
     </Application.Resources>
 </Application>
