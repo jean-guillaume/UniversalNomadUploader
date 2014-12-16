@@ -73,9 +73,10 @@
                 <ColumnDefinition Width="500"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" DoubleTapped="pageTitle_DoubleTapped"
-                        TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
-            <Border Grid.ColumnSpan="2"  BorderBrush="{StaticResource LogonBorderBrush}" BorderThickness="0,0,0,2"></Border>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Image Name="Logo" Source="{Binding Source={StaticResource NomadTitleLogo}}" Width="217" Height="63" VerticalAlignment="Center" DoubleTapped="pageTitle_DoubleTapped" HorizontalAlignment="Left" />
+                <TextBlock Text="Uploader" Style="{ThemeResource HeaderTextBlockStyle}" VerticalAlignment="Center" Margin="10,20,0,0" />
+            </StackPanel>
             <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
         </Grid>
 

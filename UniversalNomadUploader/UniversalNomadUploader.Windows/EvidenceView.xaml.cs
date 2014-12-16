@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -58,6 +59,7 @@ namespace UniversalNomadUploader
         private TimeSpan _elapsedTime;
         private AudioEncodingQuality _encodingQuality = AudioEncodingQuality.Auto;
         private Byte[] _PausedBuffer;
+        private object[] selectedItems;
 
         private enum PageState
         {
@@ -96,6 +98,7 @@ namespace UniversalNomadUploader
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.Loaded += EvidenceView_Loaded;
+            this.itemGridView.MaxHeight = Window.Current.Bounds.Height - 140.0;
         }
 
         void EvidenceView_Loaded(object sender, RoutedEventArgs e)
@@ -185,7 +188,7 @@ namespace UniversalNomadUploader
             DisableButtons(PageState.Uploading);
             foreach (Evidence item in itemGridView.SelectedItems)
             {
-                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                ProgressBar pbar = GetUploadingItemProgressbar(item);
                 StorageFile file = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync(item.FileName + "." + item.Extension);
                 BackgroundUploader uploader = new BackgroundUploader();
                 uploader.SetRequestHeader("FileName", (item.Name == null) ? "" : item.Name);
@@ -217,7 +220,7 @@ namespace UniversalNomadUploader
                     // The upload was already running when the application started, re-attach the progress handler.
                     await upload.AttachAsync().AsTask(cts.Token, progressCallback);
                 }
-                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                ProgressBar pbar = GetUploadingItemProgressbar(item);
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
                 item.HasTryUploaded = true;
@@ -230,7 +233,7 @@ namespace UniversalNomadUploader
                 item.HasTryUploaded = true;
                 item.UploadError = "Upload was cancelled (Task cancellation)";
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                ProgressBar pbar = GetUploadingItemProgressbar(item);
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
                 EventLogUtil.InsertEvent(item.Name + " uploaded cancelled", LogType.Upload);
@@ -240,11 +243,16 @@ namespace UniversalNomadUploader
                 item.HasTryUploaded = true;
                 item.UploadError = ex.Message;
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                ProgressBar pbar = ((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[2] as ProgressBar;
+                ProgressBar pbar = GetUploadingItemProgressbar(item);
                 pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 pbar.IsIndeterminate = false;
                 EventLogUtil.InsertEvent(item.Name + " uploaded failed, reason: " + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Upload);
             }
+        }
+
+        private ProgressBar GetUploadingItemProgressbar(Evidence item)
+        {
+            return VisualTreeHelper.GetChild(((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[1] as Grid, 0) as ProgressBar;
         }
 
         private void UploadProgress(UploadOperation obj)
@@ -286,14 +294,15 @@ namespace UniversalNomadUploader
             if (FileInfoGrid.Height == 0 && itemGridView.SelectedItems.Count > 0)
             {
                 expandInfoAnimation.Begin();
-                ContainerGrid.RowDefinitions[1].Height = new GridLength(150.0);
             }
             else if (itemGridView.SelectedItems.Count == 0)
             {
-                reduceInfoAnimation.Begin();
-                ContainerGrid.RowDefinitions[1].Height = new GridLength(0.0);
+                if (FileInfoGrid.Height == 75.0)
+                    hideSingleInfoAnimation.Begin();
+                else
+                    reduceInfoAnimation.Begin();
             }
-            else if(FileInfoGrid.Height > 0 && itemGridView.SelectedItems.Count > 1)
+            else if (FileInfoGrid.Height != 75.0 && FileInfoGrid.Height > 0 && itemGridView.SelectedItems.Count > 1)
             {
                 reduceSingleInfoAnimation.Begin();
             }
@@ -301,7 +310,7 @@ namespace UniversalNomadUploader
             {
                 expandSingleInfoAnimation.Begin();
             }
-            FileInfoGrid.RowDefinitions[0].Height = (itemGridView.SelectedItems.Count == 1) ? new GridLength(1, GridUnitType.Star) : new GridLength(0.0);
+            FileInfoGrid.RowDefinitions[0].Height = (itemGridView.SelectedItems.Count <= 1) ? new GridLength(1, GridUnitType.Star) : new GridLength(0.0);
         }
 
         private void Rename_Click(object sender, RoutedEventArgs e)
@@ -620,6 +629,7 @@ namespace UniversalNomadUploader
         {
             CameraCaptureUI video = new CameraCaptureUI();
             StorageFile newVideo = await video.CaptureFileAsync(CameraCaptureUIMode.Video);
+            StorageFolder VideoThumbs = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFolderAsync("_VidThumbs", CreationCollisionOption.OpenIfExists);
             if (newVideo != null)
             {
                 Evidence evi = new Evidence();
@@ -632,6 +642,8 @@ namespace UniversalNomadUploader
                 evi.Size = Convert.ToDouble((await newVideo.GetBasicPropertiesAsync()).Size);
                 evi.UserID = GlobalVariables.LoggedInUser.LocalID;
                 evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                StorageFile VideoThumb = await VideoThumbs.CreateFileAsync(evi.FileName + ".jpg", CreationCollisionOption.ReplaceExisting);
+                (await newVideo.GetThumbnailAsync(Windows.Storage.FileProperties.ThumbnailMode.VideosView)).AsStream().CopyTo(await VideoThumb.OpenStreamForWriteAsync());
                 CurrentEvidence = evi;
                 ShowNewName();
             }
@@ -650,11 +662,43 @@ namespace UniversalNomadUploader
         private void HideAudioControls()
         {
             reduceRecorderAnimation.Begin();
+            if (itemGridView.SelectedItems.Count > 0)
+            {
+                ShowInfoGrid();
+            }
+        }
+
+        private void ShowInfoGrid()
+        {
+            if (itemGridView.SelectedItems.Count == 1)
+            {
+                expandInfoAnimation.Begin();
+            }
+            else
+            {
+                showSingleInfoAnimation.Begin();
+            }
         }
 
         private void ShowAudioControls()
         {
             expandRecorderAnimation.Begin();
+            if (FileInfoGrid.Height > 0)
+            {
+                HideInfoGrid();
+            }
+        }
+
+        private void HideInfoGrid()
+        {
+            if (FileInfoGrid.Height == 75.0)
+            {
+                hideSingleInfoAnimation.Begin();
+            }
+            else
+            {
+                reduceInfoAnimation.Begin();
+            }
         }
 
 
@@ -805,8 +849,31 @@ namespace UniversalNomadUploader
 
         private void InfoCancel_Click(object sender, RoutedEventArgs e)
         {
-            reduceInfoAnimation.Begin();
-            ContainerGrid.RowDefinitions[1].Height = new GridLength(0.0);
+            itemGridView.SelectedItems.Clear();
+        }
+
+        private void SearchTerm_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            selectedItems = new object[itemGridView.SelectedItems.Count];
+            itemGridView.SelectedItems.CopyTo(selectedItems, 0);
+            if (SearchTerm.Text.Length >= 3)
+            {
+                var searchRes = (itemGridView.Items.OfType<Evidence>()).Where(x => x.Name.Contains(SearchTerm.Text));
+                foreach (var item in itemGridView.Items)
+                {
+                    if (!searchRes.Contains(item))
+                    {
+                        (itemGridView.ContainerFromItem(item) as GridViewItem).Visibility = Visibility.Collapsed;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in itemGridView.Items)
+                {
+                    (itemGridView.ContainerFromItem(item) as GridViewItem).Visibility = Visibility.Visible;
+                }
+            }
         }
 
     }

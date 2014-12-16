@@ -81,6 +81,15 @@
     <Content Include="$(MSBuildThisFileDirectory)Assets\SelectedTick.Scale-100.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\SelectedTick.Scale-140.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\SelectedTick.Scale-180.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Offline.Scale-100.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Offline.Scale-140.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Offline.Scale-180.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Online.Scale-100.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Online.Scale-140.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Online.Scale-180.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Warning.Scale-100.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Warning.Scale-140.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\Warning.Scale-180.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Audio.Scale-100.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Audio.Scale-140.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Audio.Scale-180.png" />

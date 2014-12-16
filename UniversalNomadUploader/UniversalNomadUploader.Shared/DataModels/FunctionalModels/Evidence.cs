@@ -51,11 +51,11 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                     case MimeTypes.Database:
                         return new System.Uri("ms-appx:///Assets/DatabasePreview.png");
                     case MimeTypes.Movie:
-                        return new System.Uri("ms-appx:///Assets/VideoPreview.png");
+                        return new System.Uri(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "/_VidThumbs/" + FileName + ".jpg");
                     case MimeTypes.PDF:
                         return new System.Uri("ms-appx:///Assets/PDFPreview.png");
                     case MimeTypes.Picture:
-                        return new System.Uri("ms-appx:///Assets/ImagePreview.png");
+                        return new System.Uri(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "/" + FileName + "." + Extension );
                     case MimeTypes.PowerPoint:
                         return new System.Uri("ms-appx:///Assets/GeneralPreview.png");
                     case MimeTypes.Publisher:
@@ -73,7 +73,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                 }
             }
         }
-        public Uri UploadSymbol
+        public Uri TinyIcon
         {
             get
             {
@@ -107,6 +107,24 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                         return new System.Uri("ms-appx:///Assets/TinyIcons/Generic.png");
                     default:
                         return new System.Uri("ms-appx:///Assets/TinyIcons/Generic.png");
+                }
+            }
+        }
+        public Uri UploadStatus
+        {
+            get
+            {
+                switch (HasTryUploaded)
+                {
+                    case true:
+                        if (UploadedDate > DateTime.MinValue && String.IsNullOrWhiteSpace(UploadError))
+                            return new System.Uri("ms-appx:///Assets/StatusIcons/Online.png");
+                        else
+                            return new System.Uri("ms-appx:///Assets/StatusIcons/Warning.png");
+                    case false:
+                        return new System.Uri("ms-appx:///Assets/StatusIcons/Offline.png");
+                    default:
+                        return new System.Uri("ms-appx:///Assets/StatusIcons/Offline.png");
                 }
             }
         }
