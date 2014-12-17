@@ -54,8 +54,11 @@ namespace UniversalNomadUploader.SQLUtils
                 {
                     dbEvi.TriedUpload = evi.HasTryUploaded;
                     if (evi.UploadedDate != null)
+                    {
                         dbEvi.UploadedDate = evi.UploadedDate;
-                    if (evi.UploadError != null)
+                        dbEvi.UploadError = "";
+                    }
+                    else if (evi.UploadError != null)
                         dbEvi.UploadError = evi.UploadError;
                     db.Update(dbEvi);
                 }

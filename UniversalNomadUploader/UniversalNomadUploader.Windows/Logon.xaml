@@ -33,7 +33,7 @@
 
 
         <Grid Grid.Row="1">
-            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" Height="250" Background="{StaticResource FadedLogon}">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" Height="250" Background="{StaticResource FileInfoBackground}">
                 <Grid Name="LogonGrid" Margin="0,40,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="35" />

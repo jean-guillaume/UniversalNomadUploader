@@ -98,7 +98,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                     case MimeTypes.Publisher:
                         return new System.Uri("ms-appx:///Assets/TinyIcons/Publisher.png");
                     case MimeTypes.Spreadsheet:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Spreadsheet.png");
+                        return new System.Uri("ms-appx:///Assets/TinyIcons/Excel.png");
                     case MimeTypes.Text:
                         return new System.Uri("ms-appx:///Assets/TinyIcons/Text.png");
                     case MimeTypes.Word:
@@ -117,7 +117,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                 switch (HasTryUploaded)
                 {
                     case true:
-                        if (UploadedDate > DateTime.MinValue && String.IsNullOrWhiteSpace(UploadError))
+                        if (UploadedDate > DateTime.MinValue)
                             return new System.Uri("ms-appx:///Assets/StatusIcons/Online.png");
                         else
                             return new System.Uri("ms-appx:///Assets/StatusIcons/Warning.png");
@@ -133,5 +133,6 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
         public DateTime UploadedDate { get; set; }
         public String UploadError { get; set; }
         public MimeTypes Type { get; set; }
+        public bool IsUploading { get; set; }
     }
 }

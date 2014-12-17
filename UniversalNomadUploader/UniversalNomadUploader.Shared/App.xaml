@@ -29,18 +29,15 @@
         <x:Double x:Key="ExtraLargeFontSize">40</x:Double>
         <x:Double x:Key="SmallFontSize">12</x:Double>
         <x:Double x:Key="InfoFontSize">24</x:Double>
-
+        
         <!-- Global solid colour brushes -->
-        <SolidColorBrush x:Key="LogonBorderBrush" Color="#7CADD3"></SolidColorBrush>
-        <SolidColorBrush x:Key="NomadBlue" Color="#7CADD3" ></SolidColorBrush>
-        <SolidColorBrush x:Key="NomadBlue70Percent" Color="#7CADD3" Opacity="0.7" ></SolidColorBrush>
-        <SolidColorBrush x:Key="NomadBlue20Percent" Color="#7CADD3" Opacity="0.2" ></SolidColorBrush>
-        <SolidColorBrush x:Key="FadedLogon" Color="#7CADD3" Opacity="0.4" ></SolidColorBrush>
         <SolidColorBrush x:Key="FileInfoBackground" Color="#ECF0F1" ></SolidColorBrush>
         <SolidColorBrush x:Key="BorderColour" Color="#BEC3C7" ></SolidColorBrush>
         <SolidColorBrush x:Key="InfoFontColour" Color="#555555" ></SolidColorBrush>
         <SolidColorBrush x:Key="NomadOrange" Color="#FCBF00" ></SolidColorBrush>
-        <SolidColorBrush x:Key="FadedGrey" Color="#F0ECF0F1" ></SolidColorBrush>
+        <SolidColorBrush x:Key="FadedGreyBrush" Color="#ECF0F1" Opacity="0.6" ></SolidColorBrush>
+        <SolidColorBrush x:Key="FadedGreyBrush20Percent" Color="#ECF0F1" Opacity="0.2" ></SolidColorBrush>
+        <SolidColorBrush x:Key="FadedWhiteBrush" Color="#FFFFFF" Opacity="0.6" ></SolidColorBrush>
 
         <SolidColorBrush x:Key="ProgressBarBackgroundThemeBrush" Color="#59FFFFFF" />
         <SolidColorBrush x:Key="ProgressBarBorderThemeBrush" Color="Transparent" />
@@ -51,7 +48,7 @@
         <SolidColorBrush x:Key="ListViewItemSelectedBackgroundThemeBrush" Color="#FFECF0F1" />
         <SolidColorBrush x:Key="ListViewItemSelectedForegroundThemeBrush" Color="#FF000000" />
         <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBackgroundThemeBrush" Color="#FF5F37BE" />
-        <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBorderThemeBrush" Color="#FFECF0F1" />
+        <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBorderThemeBrush" Color="#FF444444" />
 
 
 
@@ -236,8 +233,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
-        
+
+
         <Style x:Key="SearchButtonStyle" TargetType="AppBarButton" >
             <Setter Property="Width" Value="100" />
             <Setter Property="Height" Value="88" />
@@ -555,6 +552,10 @@
                                                                    Storyboard.TargetProperty="Foreground">
                                                 <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListViewItemSelectedForegroundThemeBrush}" />
                                             </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="SelectedBorder"
+                                                                    Storyboard.TargetProperty="Stroke">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListViewItemSelectedPointerOverBorderThemeBrush}" />
+                                            </ObjectAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </VisualState>
                                     <VisualState x:Name="UnselectedSwiping">
@@ -603,14 +604,9 @@
                                                      Storyboard.TargetProperty="Opacity"
                                                      Duration="0"
                                                      To="1" />
-                                            <DoubleAnimation Storyboard.TargetName="SelectedCheckMarkOuter"
-                                                     Storyboard.TargetProperty="Background.Opacity"
-                                                     Duration="0"
-                                                     To="0.25" />
-                                            <ColorAnimation Storyboard.TargetName="SelectedCheckMarkOuter"
-                                                     Storyboard.TargetProperty="Background.Color"
-                                                     Duration="0"
-                                                     To="#ECF0F1" />
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="SelectedBorder" Storyboard.TargetProperty="Fill">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource FadedWhiteBrush}" />
+                                            </ObjectAnimationUsingKeyFrames>
                                             <DoubleAnimation Storyboard.TargetName="SelectedCheckMark"
                                                      Storyboard.TargetProperty="Opacity"
                                                      Duration="0"
@@ -655,6 +651,9 @@
                                                      Storyboard.TargetProperty="Opacity"
                                                      Duration="0"
                                                      To="1" />
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="SelectedBorder" Storyboard.TargetProperty="Fill">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource FadedWhiteBrush}" />
+                                            </ObjectAnimationUsingKeyFrames>
                                             <ObjectAnimationUsingKeyFrames Storyboard.TargetName="contentPresenter"
                                                                    Storyboard.TargetProperty="Foreground">
                                                 <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ListViewItemSelectedForegroundThemeBrush}" />
@@ -828,13 +827,13 @@
                                         <Rectangle x:Name="SelectedBorder"
                                            IsHitTestVisible="False"
                                            Opacity="0"
-                                           Stroke="DarkGray"
+                                           Stroke="#444444"
                                            StrokeThickness="4"
-                                           Margin="4"/>
+                                           Margin="0"/>
                                         <Border x:Name="SelectedCheckMarkOuter"
                                         IsHitTestVisible="False"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Stretch"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
                                         Margin="4">
                                             <Grid x:Name="SelectedCheckMark" Opacity="0" Height="40" Width="40">
                                                 <Path x:Name="SelectedEarmark" Data="M0,0 L40,0 L40,40 z" Visibility="Collapsed" Fill="{ThemeResource ListViewItemSelectedBackgroundThemeBrush}" Stretch="Fill"/>
@@ -860,6 +859,5 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
     </Application.Resources>
 </Application>

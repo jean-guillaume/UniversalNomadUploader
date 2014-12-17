@@ -114,7 +114,7 @@
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Photo.Scale-100.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Photo.Scale-140.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Photo.Scale-180.png" />
-    <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Poerpoint.Scale-140.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Powerpoint.Scale-140.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Powerpoint.Scale-100.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Powerpoint.Scale-180.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Publisher.Scale-100.png" />

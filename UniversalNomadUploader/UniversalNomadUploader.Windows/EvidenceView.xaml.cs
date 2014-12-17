@@ -99,6 +99,7 @@ namespace UniversalNomadUploader
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.Loaded += EvidenceView_Loaded;
             this.itemGridView.MaxHeight = Window.Current.Bounds.Height - 140.0;
+            this.itemGridView.MinHeight = Window.Current.Bounds.Height - 140.0;
         }
 
         void EvidenceView_Loaded(object sender, RoutedEventArgs e)
@@ -157,7 +158,7 @@ namespace UniversalNomadUploader
         private async void RebindItems()
         {
             var coll = await EvidenceUtil.GetEvidenceAsync();
-            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd/MM/yyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
+            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd MMM yyyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
             this.DefaultViewModel["Groups"] = res;
         }
 
@@ -186,9 +187,10 @@ namespace UniversalNomadUploader
         {
             itemGridView.IsEnabled = false;
             DisableButtons(PageState.Uploading);
+            SyncProgress.IsIndeterminate = true;
+            SyncProgress.Visibility = Visibility.Visible;
             foreach (Evidence item in itemGridView.SelectedItems)
             {
-                ProgressBar pbar = GetUploadingItemProgressbar(item);
                 StorageFile file = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync(item.FileName + "." + item.Extension);
                 BackgroundUploader uploader = new BackgroundUploader();
                 uploader.SetRequestHeader("FileName", (item.Name == null) ? "" : item.Name);
@@ -196,11 +198,11 @@ namespace UniversalNomadUploader
                 uploader.SetRequestHeader("Extension", file.FileType.Replace(".", ""));
                 uploader.SetRequestHeader("X-SessionID", GlobalVariables.LoggedInUser.SessionID.ToString());
                 UploadOperation upload = uploader.CreateUpload(new Uri(((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + ServerUtil.getServerWSUrl() + "/User/MobileUploadEvidence"), file);
-                pbar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                pbar.IsIndeterminate = true;
                 await HandleUploadAsync(upload, true, item);
             }
-            itemGridView.SelectedItems.Clear();
+            SyncProgress.IsIndeterminate = false;
+            SyncProgress.Visibility = Visibility.Collapsed;
+            RebindItems();
             itemGridView.IsEnabled = true;
             DisableButtons(PageState.Default);
         }
@@ -220,9 +222,6 @@ namespace UniversalNomadUploader
                     // The upload was already running when the application started, re-attach the progress handler.
                     await upload.AttachAsync().AsTask(cts.Token, progressCallback);
                 }
-                ProgressBar pbar = GetUploadingItemProgressbar(item);
-                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                pbar.IsIndeterminate = false;
                 item.HasTryUploaded = true;
                 item.UploadedDate = DateTime.Now;
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
@@ -233,9 +232,6 @@ namespace UniversalNomadUploader
                 item.HasTryUploaded = true;
                 item.UploadError = "Upload was cancelled (Task cancellation)";
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                ProgressBar pbar = GetUploadingItemProgressbar(item);
-                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                pbar.IsIndeterminate = false;
                 EventLogUtil.InsertEvent(item.Name + " uploaded cancelled", LogType.Upload);
             }
             catch (Exception ex)
@@ -243,16 +239,8 @@ namespace UniversalNomadUploader
                 item.HasTryUploaded = true;
                 item.UploadError = ex.Message;
                 EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                ProgressBar pbar = GetUploadingItemProgressbar(item);
-                pbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                pbar.IsIndeterminate = false;
                 EventLogUtil.InsertEvent(item.Name + " uploaded failed, reason: " + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Upload);
             }
-        }
-
-        private ProgressBar GetUploadingItemProgressbar(Evidence item)
-        {
-            return VisualTreeHelper.GetChild(((VisualTreeHelper.GetChild((VisualTreeHelper.GetChild(itemGridView.ContainerFromItem(item), 0) as GridViewItemPresenter), 0) as Grid).Children[0] as StackPanel).Children[1] as Grid, 0) as ProgressBar;
         }
 
         private void UploadProgress(UploadOperation obj)
@@ -276,22 +264,40 @@ namespace UniversalNomadUploader
 
             if (this.itemGridView.SelectedItems.Count == 1)
             {
+                FileStatusTitle.Text = "File status:";
+                FileStatus.Text = "";
                 FileDetails.Text = ((Evidence)itemGridView.SelectedItem).Name;
                 if (((Evidence)itemGridView.SelectedItem).HasTryUploaded)
                 {
                     if (((Evidence)itemGridView.SelectedItem).UploadError != null && ((Evidence)itemGridView.SelectedItem).UploadError != "")
                     {
-                        FileStatus.Text = ((Evidence)itemGridView.SelectedItem).UploadError.ToString();
+                        FileStatus.Text += "Error uploading: " + ((Evidence)itemGridView.SelectedItem).UploadError.ToString();
                     }
                     else
                     {
-                        FileStatus.Text = ((Evidence)itemGridView.SelectedItem).UploadedDate.ToString();
+                        FileStatus.Text += "Date uploaded: " + ((Evidence)itemGridView.SelectedItem).UploadedDate.ToString("dd MMM yyyy");
                     }
+
                 }
+                else
+                {
+                    FileStatus.Text += "Not uploaded";
+                }
+            }
+            else if (this.itemGridView.SelectedItems.Count > 1)
+            {
+                FileStatusTitle.Text = "Info:";
+                FileStatus.Text =  this.itemGridView.SelectedItems.Count.ToString() + " selected items";
+            }
+            else
+            {
+                FileStatusTitle.Text = "File status:";
+                FileStatus.Text = "";
             }
             Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
             Delete.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
-            if (FileInfoGrid.Height == 0 && itemGridView.SelectedItems.Count > 0)
+            
+            if (FileInfoGrid.Height == 0 && RecorderGrid.Height == 0 && itemGridView.SelectedItems.Count > 0)
             {
                 expandInfoAnimation.Begin();
             }
@@ -309,6 +315,15 @@ namespace UniversalNomadUploader
             else if (FileInfoGrid.Height > 0 && itemGridView.SelectedItems.Count == 1)
             {
                 expandSingleInfoAnimation.Begin();
+            }
+            if (RecorderGrid.Height > 0)
+            {
+                if (itemGridView.SelectedItems.Count == 1)
+                    expandInfoAnimation.Begin();
+                else if (itemGridView.SelectedItems.Count > 1)
+                    showSingleInfoAnimation.Begin();
+
+                reduceRecorderAnimation.Begin();
             }
             FileInfoGrid.RowDefinitions[0].Height = (itemGridView.SelectedItems.Count <= 1) ? new GridLength(1, GridUnitType.Star) : new GridLength(0.0);
         }
@@ -343,6 +358,7 @@ namespace UniversalNomadUploader
         private void CancelNameChange_Click(object sender, RoutedEventArgs e)
         {
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            NewName.Text = "";
             DisableButtons(PageState.Default);
         }
 
@@ -858,12 +874,16 @@ namespace UniversalNomadUploader
             itemGridView.SelectedItems.CopyTo(selectedItems, 0);
             if (SearchTerm.Text.Length >= 3)
             {
-                var searchRes = (itemGridView.Items.OfType<Evidence>()).Where(x => x.Name.Contains(SearchTerm.Text));
+                var searchRes = (itemGridView.Items.OfType<Evidence>()).Where(x => x.Name.ToUpper().Contains(SearchTerm.Text.ToUpper()));
                 foreach (var item in itemGridView.Items)
                 {
                     if (!searchRes.Contains(item))
                     {
-                        (itemGridView.ContainerFromItem(item) as GridViewItem).Visibility = Visibility.Collapsed;
+                        (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 0.10;
+                    }
+                    else
+                    {
+                        (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 1.0;
                     }
                 }
             }
@@ -871,7 +891,7 @@ namespace UniversalNomadUploader
             {
                 foreach (var item in itemGridView.Items)
                 {
-                    (itemGridView.ContainerFromItem(item) as GridViewItem).Visibility = Visibility.Visible;
+                    (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 1.0;
                 }
             }
         }

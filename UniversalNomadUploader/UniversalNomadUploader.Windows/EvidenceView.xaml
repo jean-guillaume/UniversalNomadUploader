@@ -116,7 +116,7 @@
 
 
         <StackPanel Name="ContentStack" Orientation="Vertical" Grid.Row="2" >
-            <Grid  Name="RecorderGrid" Grid.Row="2" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}" >
+            <Grid  Name="RecorderGrid" Grid.Row="2" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource FileInfoBackground}" >
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
                     <StackPanel Orientation="Horizontal">
                         <Button Name="RecordButton" Click="RecordButton_Click">
@@ -142,8 +142,8 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Name="ReauthPopup" Grid.Row="2" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource NomadBlue}">
-                <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Height="200" Background="{StaticResource FadedLogon}">
+            <Grid Name="ReauthPopup" Grid.Row="2" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource FileInfoBackground}">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch"  Height="200" >
                     <Grid Name="LogonGrid" Margin="0,20,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="35" />
@@ -234,7 +234,6 @@
                                     <Image Source="{Binding UploadStatus}" HorizontalAlignment="Right" VerticalAlignment="Top" Width="15" Height="15" Margin="0,2,2,0"  />
                                 </Grid>
                                 <Grid Height="30" >
-                                    <ProgressBar Name="Progress" Visibility="Collapsed" />
                                     <TextBlock Text="{Binding Name}" Style="{StaticResource TitleTextBlockStyle}" Margin="15,0,15,0" MaxLines="1" />
                                     <Image Source="{Binding TinyIcon}" HorizontalAlignment="Right" VerticalAlignment="Center" Width="20" Height="20" Margin="0,0,5,0"  />
                                 </Grid>
@@ -244,14 +243,14 @@
                 </GridView.ItemTemplate>
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <ItemsWrapGrid  GroupPadding="0,0,70,0"/>
+                        <VirtualizingStackPanel Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
                 <GridView.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,0,0,2">
+                                <Grid Margin="10,0,10,2">
                                     <Button Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
                                     AutomationProperties.Name="Group Title"
                                     Style="{StaticResource TextBlockButtonStyle}" >
@@ -262,13 +261,18 @@
                                 </Grid>
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <VariableSizedWrapGrid Orientation="Vertical" Margin="10,0,10,0" />
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
                     </GroupStyle>
                 </GridView.GroupStyle>
             </GridView>
         </StackPanel>
 
-        <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed" Background="{StaticResource NomadBlue20Percent}" >
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource NomadBlue70Percent}" >
+        <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed" Background="{StaticResource FadedGreyBrush20Percent}" >
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource FileInfoBackground}" >
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
                     <TextBox Name="NewName" MaxLength="255" Width="400" Height="50" FontSize="26" />
@@ -289,7 +293,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*" MinWidth="250"/>
                 <ColumnDefinition Width="*" MinWidth="90" MaxWidth="100"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="backButton" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
