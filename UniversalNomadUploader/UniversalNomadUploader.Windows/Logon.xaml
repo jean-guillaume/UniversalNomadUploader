@@ -20,50 +20,46 @@
         * Row 0 contains the back button and page title
         * Row 1 contains the rest of the page layout
     -->
-    <Grid Background="{Binding Source={StaticResource BackGroundColour}}">
+    <Grid Background="{Binding Source={StaticResource NomadOrangeBrush}}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
             </TransitionCollection>
         </Grid.ChildrenTransitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="140"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
 
-        <Grid Grid.Row="1">
-            <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" Height="250" Background="{StaticResource FileInfoBackground}">
-                <Grid Name="LogonGrid" Margin="0,40,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="35" />
-                        <RowDefinition Height="35" />
-                        <RowDefinition Height="50" />
-                        <RowDefinition Height="0" />
-                        <RowDefinition Height="50" />
-                    </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="0" >
-                        <TextBlock Text="Username" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
-                        <TextBox Name="Username" Height="30" Width="150" TextChanged="Username_TextChanged"></TextBox>
+        <Border VerticalAlignment="Center" HorizontalAlignment="Center"  CornerRadius="10" Background="White" >
+            <Grid>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="60" >
+                    <StackPanel Orientation="Vertical">
+                        <Image Name="Logo" Source="{Binding Source={StaticResource NomadTitleLogo}}" Width="217" Height="63" VerticalAlignment="Center" DoubleTapped="pageTitle_DoubleTapped" HorizontalAlignment="Left" />
+                        <TextBlock Text="Uploader" Style="{ThemeResource SubheaderTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,0,40,0" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="35" VerticalAlignment="Center" Grid.Row="1" >
-                        <TextBlock Text="Password" Height="30" Width="110" FontSize="{StaticResource LargeFontSize}" TextAlignment="Center" ></TextBlock>
-                        <PasswordBox Name="Password" Height="30" Width="150" ></PasswordBox>
-                    </StackPanel>
-                    <StackPanel Name="LiveOptions" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" >
-                        <ToggleButton Name="Live" Width="80" Content="Live" Click="Live_Click"></ToggleButton>
-                        <ToggleButton Name="Demo" Width="80" Content="Demo" Click="Demo_Click"></ToggleButton>
-                        <ToggleButton Name="Beta" Width="80" Content="Beta" Click="Beta_Click"></ToggleButton>
-                    </StackPanel>
-                    <StackPanel Name="DEVoptions" Visibility="Collapsed" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" >
-                        <ToggleButton Name="UAT1" Width="80" Content="UAT 1" Click="UAT1_Click"></ToggleButton>
-                        <ToggleButton Name="UAT2" Width="80" Content="UAT 2" Click="UAT2_Click"></ToggleButton>
-                        <ToggleButton Name="DEV" Width="80" Content="DEV" Click="DEV_Click"></ToggleButton>
-                    </StackPanel>
-                    <Button Name="logon" Content="Log in" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4"  Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Background="Transparent" BorderBrush="Black" BorderThickness="2" Click="logon_Click" ></Button>
-                </Grid>
-            </StackPanel>
-        </Grid>
+                    <Grid Name="LogonGrid" Margin="0,40,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="60" />
+                            <RowDefinition Height="60" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="0" />
+                            <RowDefinition Height="50" />
+                        </Grid.RowDefinitions>
+                        <TextBox Name="Username" PlaceholderText="Username" Height="30"  TextChanged="Username_TextChanged"></TextBox>
+                        <PasswordBox Grid.Row="1" PlaceholderText="Password" Name="Password" Height="30" ></PasswordBox>
+                        <StackPanel Name="LiveOptions" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" >
+                            <ToggleButton Name="Live" Width="80" Content="Live" Click="Live_Click"></ToggleButton>
+                            <ToggleButton Name="Demo" Width="80" Content="Demo" Click="Demo_Click"></ToggleButton>
+                            <ToggleButton Name="Beta" Width="80" Content="Beta" Click="Beta_Click"></ToggleButton>
+                        </StackPanel>
+                        <StackPanel Name="DEVoptions" Visibility="Collapsed" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" >
+                            <ToggleButton Name="UAT1" Width="80" Content="UAT 1" Click="UAT1_Click"></ToggleButton>
+                            <ToggleButton Name="UAT2" Width="80" Content="UAT 2" Click="UAT2_Click"></ToggleButton>
+                            <ToggleButton Name="DEV" Width="80" Content="DEV" Click="DEV_Click"></ToggleButton>
+                        </StackPanel>
+                        <Button Name="logon" Content="Log in" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4"  Width="150" Height="50" FontSize="{StaticResource LargeFontSize}" Background="Transparent" BorderBrush="Black" BorderThickness="2" Click="logon_Click" ></Button>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Border>
 
         <!-- Back button and page title -->
 
@@ -73,10 +69,7 @@
                 <ColumnDefinition Width="500"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Image Name="Logo" Source="{Binding Source={StaticResource NomadTitleLogo}}" Width="217" Height="63" VerticalAlignment="Center" DoubleTapped="pageTitle_DoubleTapped" HorizontalAlignment="Left" />
-                <TextBlock Text="Uploader" Style="{ThemeResource HeaderTextBlockStyle}" VerticalAlignment="Center" Margin="10,20,0,0" />
-            </StackPanel>
+            
             <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
         </Grid>
 

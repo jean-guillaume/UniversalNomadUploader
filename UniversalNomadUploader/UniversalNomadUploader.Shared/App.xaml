@@ -38,6 +38,9 @@
         <SolidColorBrush x:Key="FadedGreyBrush" Color="#ECF0F1" Opacity="0.6" ></SolidColorBrush>
         <SolidColorBrush x:Key="FadedGreyBrush20Percent" Color="#ECF0F1" Opacity="0.2" ></SolidColorBrush>
         <SolidColorBrush x:Key="FadedWhiteBrush" Color="#FFFFFF" Opacity="0.6" ></SolidColorBrush>
+        <SolidColorBrush x:Key="NomadOrangeBrush" Color="#FCBF00" Opacity="1.0" />
+        <SolidColorBrush x:Key="NomadDarkGreyBrush" Color="#3B444D" Opacity="1.0" />
+
 
         <SolidColorBrush x:Key="ProgressBarBackgroundThemeBrush" Color="#59FFFFFF" />
         <SolidColorBrush x:Key="ProgressBarBorderThemeBrush" Color="Transparent" />
