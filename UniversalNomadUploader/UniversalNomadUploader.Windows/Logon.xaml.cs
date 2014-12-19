@@ -234,7 +234,7 @@ namespace UniversalNomadUploader
                 LiveOptions.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 DEVoptions.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 LogonGrid.RowDefinitions[3].Height = new GridLength(0.0);
-                LogonGrid.RowDefinitions[2].Height = new GridLength(50.0);
+                LogonGrid.RowDefinitions[2].Height = new GridLength(70.0);
                 Live.IsChecked = false;
                 Live.IsEnabled = true;
                 Demo.IsChecked = false;
@@ -248,7 +248,7 @@ namespace UniversalNomadUploader
                 LiveOptions.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 DEVoptions.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 LogonGrid.RowDefinitions[2].Height = new GridLength(0.0);
-                LogonGrid.RowDefinitions[3].Height = new GridLength(50.0);
+                LogonGrid.RowDefinitions[3].Height = new GridLength(70.0);
                 Live.IsChecked = false;
                 Live.IsEnabled = false;
                 Demo.IsChecked = false;

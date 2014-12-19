@@ -69,28 +69,28 @@
         </Storyboard>
 
         <Storyboard x:Name="expandSingleInfoAnimation" >
-            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="75" To="150" Duration="0:0:0.3">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="100" To="150" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <ExponentialEase  EasingMode="EaseIn"  />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Name="reduceSingleInfoAnimation">
-            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="150" To="75" Duration="0:0:0.3">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="150" To="100" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <ExponentialEase  EasingMode="EaseOut"  />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Name="hideSingleInfoAnimation">
-            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="75" To="0" Duration="0:0:0.3">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="100" To="0" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <ExponentialEase  EasingMode="EaseOut"  />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Name="showSingleInfoAnimation">
-            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="0" To="75" Duration="0:0:0.3">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="0" To="100" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <ExponentialEase  EasingMode="EaseOut"  />
                 </DoubleAnimation.EasingFunction>
@@ -174,8 +174,8 @@
                     <ColumnDefinition Width="*" MinWidth="40" MaxWidth="50" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" MinHeight="100"/>
                 </Grid.RowDefinitions>
                 <Border Grid.Row="0" BorderBrush="{StaticResource BorderColour}" Margin="120,0,10,0" BorderThickness="0,0,0,1">
                     <Grid Grid.Row="0" >
@@ -206,7 +206,7 @@
                         <Button Name="Upload" Content="Upload" Style="{StaticResource UploadButtonStyle}" Grid.Column="1" Click="Upload_Click" Visibility="Collapsed" />
                     </Border>
                     <Border Grid.Column="2" BorderBrush="{StaticResource BorderColour}" BorderThickness="1,0,1,0" Margin="0,0,0,10">
-                        <Button Name="Delete" Content="Delete" Style="{StaticResource DeleteButtonStyle}" Click="Delete_Click" Visibility="Collapsed" />
+                        <Button Name="Delete" Content="Delete" Style="{StaticResource AppDeleteButtonStyle}" Click="Delete_Click" Visibility="Collapsed" />
                     </Border>
                 </Grid>
 
@@ -306,8 +306,7 @@
                         AutomationProperties.AutomationId="BackButton"
                         AutomationProperties.ItemType="Navigation Button"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Image Name="Logo" Source="{Binding Source={StaticResource NomadTitleLogo}}" Width="217" Height="63" VerticalAlignment="Center" HorizontalAlignment="Left" />
-                <TextBlock Text="Uploader" Style="{ThemeResource HeaderTextBlockStyle}" VerticalAlignment="Center" Margin="10,20,0,0" />
+                <Image Name="Logo" Source="{Binding Source={StaticResource NomadTitleLogo}}" Width="380" Height="79" VerticalAlignment="Center" HorizontalAlignment="Left" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Grid.Column="2" >
                 <TextBox Name="SearchTerm" Width="200" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{StaticResource BorderColour}" TextChanged="SearchTerm_TextChanged" />

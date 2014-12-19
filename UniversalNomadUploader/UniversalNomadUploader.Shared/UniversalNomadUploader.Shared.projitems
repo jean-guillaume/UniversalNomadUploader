@@ -132,7 +132,10 @@
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Zip.Scale-140.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Zip.Scale-180.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TinyIcons\Zip.Scale.png" />
-    <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.Scale-100.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.Scale-140.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.Scale-180.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.Scale-80.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\Upload.Scale-100.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\Upload.Scale-140.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\Upload.Scale-180.png" />
