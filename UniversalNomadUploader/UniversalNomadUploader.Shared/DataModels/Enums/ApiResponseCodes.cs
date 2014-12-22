@@ -6,6 +6,7 @@ namespace UniversalNomadUploader.DataModels.Enums
 {
     public enum ApiResponseCodes
     {
+        Unknown = -10,
         LearnerExistsWithPICSID = -9,
         APINotEnabledForOrganisation = -8,
         FormDoesntExist = -7,

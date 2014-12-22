@@ -69,33 +69,50 @@
         </Storyboard>
 
         <Storyboard x:Name="expandSingleInfoAnimation" >
-            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="100" To="150" Duration="0:0:0.3">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="75" To="150" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <ExponentialEase  EasingMode="EaseIn"  />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Name="reduceSingleInfoAnimation">
-            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="150" To="100" Duration="0:0:0.3">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="150" To="75" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <ExponentialEase  EasingMode="EaseOut"  />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Name="hideSingleInfoAnimation">
-            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="100" To="0" Duration="0:0:0.3">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="75" To="0" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <ExponentialEase  EasingMode="EaseOut"  />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Name="showSingleInfoAnimation">
-            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="0" To="100" Duration="0:0:0.3">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="FileInfoGrid" Storyboard.TargetProperty="Height" From="0" To="75" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <ExponentialEase  EasingMode="EaseOut"  />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
+
+        <Storyboard x:Name="showSearchBox">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="SearchStack" Storyboard.TargetProperty="Width" From="0" To="200" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseOut"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Storyboard x:Name="hideSearchBox">
+            <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="SearchStack" Storyboard.TargetProperty="Width" From="200" To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <ExponentialEase  EasingMode="EaseOut"  />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
     </Page.Resources>
 
     <!--
@@ -171,21 +188,22 @@
             <Grid Name="FileInfoGrid" Grid.Row="2" Height="0" HorizontalAlignment="Stretch" Background="{StaticResource FileInfoBackground}"  VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="11*" />
-                    <ColumnDefinition Width="*" MinWidth="40" MaxWidth="50" />
+                    <ColumnDefinition Width="*" MinWidth="70" MaxWidth="75" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="*" MinHeight="100"/>
+                    <RowDefinition Height="*" MinHeight="75"/>
                 </Grid.RowDefinitions>
                 <Border Grid.Row="0" BorderBrush="{StaticResource BorderColour}" Margin="120,0,10,0" BorderThickness="0,0,0,1">
                     <Grid Grid.Row="0" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="10*" />
-                            <ColumnDefinition Width="*" MinWidth="55" MaxWidth="60" />
+                            <ColumnDefinition Width="*" MinWidth="70" MaxWidth="75" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Vertical" Grid.Column="0" Margin="0,10,0,0">
                             <TextBlock Name="FileDetailsTitle" VerticalAlignment="Center" Text="File name:" HorizontalAlignment="Left" TextWrapping="NoWrap" Foreground="{StaticResource InfoFontColour}" FontSize="{StaticResource SmallFontSize}" Visibility="Visible" />
-                            <TextBlock Name="FileDetails" VerticalAlignment="Center" TextWrapping="NoWrap" FontSize="{StaticResource InfoFontSize}" Foreground="{StaticResource InfoFontColour}" Visibility="Visible" />
+                            <TextBlock Name="FileDetails" VerticalAlignment="Center" Margin="0,5,0,0" TextWrapping="NoWrap" FontSize="{StaticResource InfoFontSize}" Foreground="{StaticResource InfoFontColour}" Visibility="Visible" />
+                            <TextBox Name="FileDetailsRename" Padding="10" Height="46" Margin="0,2,0,0" Width="400" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="NoWrap" Style="{StaticResource LoginTextBox}" Visibility="Collapsed" />
                         </StackPanel>
                         <Border Grid.Column="1" BorderBrush="{StaticResource BorderColour}" BorderThickness="1,0,1,0" Margin="0,10,0,10" >
                             <Button Name="Rename" Content="Edit" Style="{StaticResource EditButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Click="Rename_Click" Visibility="Visible" />
@@ -195,12 +213,12 @@
                 <Grid Grid.Row="1" Margin="120,10,10,0" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10*" />
-                        <ColumnDefinition Width="*" MinWidth="55" MaxWidth="60"  />
-                        <ColumnDefinition Width="*" MinWidth="55" MaxWidth="60"  />
+                        <ColumnDefinition Width="*" MinWidth="70" MaxWidth="75"  />
+                        <ColumnDefinition Width="*" MinWidth="75" MaxWidth="75"  />
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Vertical" Grid.Row="1" >
                         <TextBlock Name="FileStatusTitle" VerticalAlignment="Center" Text="File status:" HorizontalAlignment="Left" TextWrapping="NoWrap" Foreground="{StaticResource InfoFontColour}" FontSize="{StaticResource SmallFontSize}" Visibility="Visible" />
-                        <TextBlock Name="FileStatus" TextWrapping="NoWrap" FontSize="{StaticResource InfoFontSize}" Foreground="{StaticResource InfoFontColour}" Visibility="Visible" />
+                        <TextBlock Name="FileStatus" Margin="0,5,0,0" TextWrapping="NoWrap" FontSize="{StaticResource InfoFontSize}" Foreground="{StaticResource InfoFontColour}" Visibility="Visible" />
                     </StackPanel>
                     <Border Grid.Column="1" BorderBrush="{StaticResource BorderColour}" BorderThickness="1,0,0,0" Margin="0,0,0,10">
                         <Button Name="Upload" Content="Upload" Style="{StaticResource UploadButtonStyle}" Grid.Column="1" Click="Upload_Click" Visibility="Collapsed" />
@@ -210,7 +228,7 @@
                     </Border>
                 </Grid>
 
-                <Button Name="InfoCancel" Style="{StaticResource CloseButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" Click="InfoCancel_Click" Visibility="Visible" />
+                <Button Name="InfoCancel" Style="{StaticResource CloseButtonStyle}" Content="Close" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" Click="InfoCancel_Click" Visibility="Visible" />
             </Grid>
             <!-- Horizontal scrolling grid -->
             <GridView
@@ -229,13 +247,12 @@
                     <DataTemplate>
                         <Grid HorizontalAlignment="Left" Width="180" Height="150" Background="{StaticResource FileInfoBackground}">
                             <StackPanel Orientation="Vertical" >
-                                <Grid>
+                                <Grid Background="{StaticResource BorderColour}">
                                     <Image Source="{Binding ImagePath}" Height="120" Width="180" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <Image Source="{Binding UploadStatus}" HorizontalAlignment="Right" VerticalAlignment="Top" Width="15" Height="15" Margin="0,2,2,0"  />
                                 </Grid>
                                 <Grid Height="30" >
                                     <TextBlock Text="{Binding Name}" Style="{StaticResource TitleTextBlockStyle}" Margin="15,0,15,0" MaxLines="1" />
-                                    <Image Source="{Binding TinyIcon}" HorizontalAlignment="Right" VerticalAlignment="Center" Width="20" Height="20" Margin="0,0,5,0"  />
+                                    <Image Source="{Binding UploadStatus}" HorizontalAlignment="Right" VerticalAlignment="Center" Width="15" Height="15" Margin="0,2,2,0"  />
                                 </Grid>
                             </StackPanel>
                         </Grid>
@@ -270,51 +287,51 @@
                 </GridView.GroupStyle>
             </GridView>
         </StackPanel>
-
-        <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed" Background="{StaticResource FadedGreyBrush20Percent}" >
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource FileInfoBackground}" >
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
-                    <TextBox Name="NewName" MaxLength="255" Width="400" Height="50" FontSize="26" />
-                    <AppBarButton Name="SaveName" IsCompact="True" Click="SaveName_Click" >
-                        <SymbolIcon Symbol="Save" />
-                    </AppBarButton>
-                    <AppBarButton Name="CancelNameChange" IsCompact="True" Click="CancelNameChange_Click" >
-                        <SymbolIcon Symbol="Cancel" />
-                    </AppBarButton>
-                </StackPanel>
-            </StackPanel>
-        </Grid>
-
-
-
         <!-- Back button and page title -->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="2*" MinWidth="250"/>
-                <ColumnDefinition Width="*" MinWidth="90" MaxWidth="100"/>
+                <ColumnDefinition Width="2*" MinWidth="200"/>
+                <ColumnDefinition Width="*" MinWidth="200" MaxWidth="210"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
-                        VerticalAlignment="Center"
+            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                <Button Name="SearchButton" Style="{StaticResource SearchButtonStyle}" Content="Search" Click="SearchButton_Click"/>
+                <Border Grid.Column="1" BorderBrush="{StaticResource BorderColour}" BorderThickness="1,0,0,0" Margin="0,40,0,40" >
+                </Border>
+                <Button x:Name="backButton" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
                         Style="{StaticResource LogoutButtonStyle}"
-                        HorizontalAlignment="Center"
-                          Grid.Column="3"
                         IsHitTestVisible="True"
+                        Content="Logout"
                         AutomationProperties.Name="Back"
                         AutomationProperties.AutomationId="BackButton"
                         AutomationProperties.ItemType="Navigation Button"/>
+                
+            </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Image Name="Logo" Source="{Binding Source={StaticResource NomadTitleLogo}}" Width="380" Height="79" VerticalAlignment="Center" HorizontalAlignment="Left" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Grid.Column="2" >
+            <StackPanel Name="SearchStack" Orientation="Horizontal" Width="0" Grid.Column="2" HorizontalAlignment="Right" >
                 <TextBox Name="SearchTerm" Width="200" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{StaticResource BorderColour}" TextChanged="SearchTerm_TextChanged" />
-                <Border BorderThickness="0" Width="32" Height="32" Background="{StaticResource NomadOrange}" >
-                    <Image Width="30" Source="{Binding Source={StaticResource SearchImagePath}}" />
-                </Border>
             </StackPanel>
             <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Collapsed" Grid.ColumnSpan="3" Grid.Row="0" ></ProgressBar>
+        </Grid>
+
+        <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed" Background="{StaticResource FadedBlackBrush}" >
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="White" Height="150" >
+                <Grid VerticalAlignment="Center" HorizontalAlignment="Center" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" Grid.Column="0" FontSize="26" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center" Margin="10,0,10,0" />
+                    <TextBox Name="NewName" MaxLength="255" Width="400" Height="50" FontSize="26" Grid.Column="1" TextChanged="NewName_TextChanged" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    <AppBarButton Name="SaveName" IsCompact="True" Click="SaveName_Click" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Right" IsEnabled="False" >
+                        <SymbolIcon Symbol="Save" />
+                    </AppBarButton>
+                </Grid>
+            </Grid>
         </Grid>
     </Grid>
     <Page.BottomAppBar>

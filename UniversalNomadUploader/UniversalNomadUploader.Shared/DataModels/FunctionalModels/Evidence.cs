@@ -43,73 +43,37 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                 switch (Type)
                 {
                     case MimeTypes.Audio:
-                        return new System.Uri("ms-appx:///Assets/AudioPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Audio.png");
                     case MimeTypes.CompressedFolder:
-                        return new System.Uri("ms-appx:///Assets/ZipPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Zip.png");
                     case MimeTypes.Corel:
-                        return new System.Uri("ms-appx:///Assets/CorelPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Corel.png");
                     case MimeTypes.Database:
-                        return new System.Uri("ms-appx:///Assets/DatabasePreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Database.png");
                     case MimeTypes.Movie:
                         return new System.Uri(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "/_VidThumbs/" + FileName + ".jpg");
                     case MimeTypes.PDF:
-                        return new System.Uri("ms-appx:///Assets/PDFPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/PDF.png");
                     case MimeTypes.Picture:
                         return new System.Uri(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "/" + FileName + "." + Extension );
                     case MimeTypes.PowerPoint:
-                        return new System.Uri("ms-appx:///Assets/GeneralPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Powerpoint.png");
                     case MimeTypes.Publisher:
-                        return new System.Uri("ms-appx:///Assets/PublisherPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Publisher.png");
                     case MimeTypes.Spreadsheet:
-                        return new System.Uri("ms-appx:///Assets/GeneralPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Spreadsheet.png");
                     case MimeTypes.Text:
-                        return new System.Uri("ms-appx:///Assets/GeneralPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Text.png");
                     case MimeTypes.Word:
-                        return new System.Uri("ms-appx:///Assets/GeneralPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/Word.png");
                     case MimeTypes.Unknown:
-                        return new System.Uri("ms-appx:///Assets/GeneralPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/File.png");
                     default:
-                        return new System.Uri("ms-appx:///Assets/GeneralPreview.png");
+                        return new System.Uri("ms-appx:///Assets/FileIcons/File.png");
                 }
             }
         }
-        public Uri TinyIcon
-        {
-            get
-            {
-                switch (Type)
-                {
-                    case MimeTypes.Audio:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Audio.png");
-                    case MimeTypes.CompressedFolder:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Zip.png");
-                    case MimeTypes.Corel:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Corel.png");
-                    case MimeTypes.Database:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Database.png");
-                    case MimeTypes.Movie:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Video.png");
-                    case MimeTypes.PDF:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/PDF.png");
-                    case MimeTypes.Picture:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Image.png");
-                    case MimeTypes.PowerPoint:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Powerpoint.png");
-                    case MimeTypes.Publisher:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Publisher.png");
-                    case MimeTypes.Spreadsheet:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Excel.png");
-                    case MimeTypes.Text:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Text.png");
-                    case MimeTypes.Word:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Word.png");
-                    case MimeTypes.Unknown:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Generic.png");
-                    default:
-                        return new System.Uri("ms-appx:///Assets/TinyIcons/Generic.png");
-                }
-            }
-        }
+        
         public Uri UploadStatus
         {
             get

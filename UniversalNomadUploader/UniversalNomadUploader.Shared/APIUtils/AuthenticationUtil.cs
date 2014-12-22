@@ -20,17 +20,25 @@ namespace UniversalNomadUploader.APIUtils
                 client.DefaultRequestHeaders.Add("X-Password", Password);
                 String url = ((ServerID == ServerEnum.DEV) ? "http://" : "https://") + WSUrl + "/Authentication/MobileAuthenticate";
                 var content = new StringContent("");
-                using (var response = await client.PostAsync(url, content))
+                try
                 {
-                    if (response.IsSuccessStatusCode)
+                    using (var response = await client.PostAsync(url, content))
                     {
-                        String data = await response.Content.ReadAsStringAsync();
-                        data = data.Replace("\"", "");
-                        if (!String.IsNullOrWhiteSpace(data))
+                        if (response.IsSuccessStatusCode)
                         {
-                            return Guid.Parse(data);
-                        }    
+                            String data = await response.Content.ReadAsStringAsync();
+                            data = data.Replace("\"", "");
+                            if (!String.IsNullOrWhiteSpace(data))
+                            {
+                                return Guid.Parse(data);
+                            }
+                        }
+                        return Guid.Empty;
                     }
+                }
+                catch (Exception)
+                {
+
                     return Guid.Empty;
                 }
             }
@@ -44,12 +52,19 @@ namespace UniversalNomadUploader.APIUtils
             {
                 client.DefaultRequestHeaders.Add("X-SessionID", SessionID.ToString());
                 String url = ((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + WSUrl + "/Authentication/VerifySession";
-                using (var response = await client.GetAsync(url))
+                try
                 {
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    using (var response = await client.GetAsync(url))
                     {
-                        return true;
+                        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            return true;
+                        }
+                        return false;
                     }
+                }
+                catch (Exception)
+                {
                     return false;
                 }
             }

@@ -60,6 +60,7 @@ namespace UniversalNomadUploader
         private AudioEncodingQuality _encodingQuality = AudioEncodingQuality.Auto;
         private Byte[] _PausedBuffer;
         private object[] selectedItems;
+        private bool HasAccessToAudio = false;
 
         private enum PageState
         {
@@ -126,7 +127,15 @@ namespace UniversalNomadUploader
         private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
-            await InitMediaCapture();
+            try
+            {
+                await InitMediaCapture();
+                HasAccessToAudio = true;
+            }
+            catch (Exception)
+            {
+                HasAccessToAudio = false;
+            }
             UpdateRecordingControls(RecordingMode.Initializing);
             InitTimer();
             RebindItems();
@@ -266,7 +275,7 @@ namespace UniversalNomadUploader
             {
                 FileStatusTitle.Text = "File status:";
                 FileStatus.Text = "";
-                FileDetails.Text = ((Evidence)itemGridView.SelectedItem).Name;
+                FileDetails.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name; 
                 if (((Evidence)itemGridView.SelectedItem).HasTryUploaded)
                 {
                     if (((Evidence)itemGridView.SelectedItem).UploadError != null && ((Evidence)itemGridView.SelectedItem).UploadError != "")
@@ -286,6 +295,11 @@ namespace UniversalNomadUploader
             }
             else if (this.itemGridView.SelectedItems.Count > 1)
             {
+                Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
+                Rename.Content = "Edit";
+                FileDetails.Visibility = Visibility.Visible;
+                FileDetailsRename.Visibility = Visibility.Collapsed;
+                FileDetailsRename.Text = "";
                 FileStatusTitle.Text = "Info:";
                 FileStatus.Text =  this.itemGridView.SelectedItems.Count.ToString() + " selected items";
             }
@@ -328,11 +342,28 @@ namespace UniversalNomadUploader
             FileInfoGrid.RowDefinitions[0].Height = (itemGridView.SelectedItems.Count <= 1) ? new GridLength(1, GridUnitType.Star) : new GridLength(0.0);
         }
 
-        private void Rename_Click(object sender, RoutedEventArgs e)
+        private async void Rename_Click(object sender, RoutedEventArgs e)
         {
-            DisableButtons(PageState.Renaming);
-            NewName.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name;
-            NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            if (Rename.Content.ToString() == "Edit")
+            {
+                Rename.Style = (Style)(App.Current as App).Resources["SaveButtonStyle"];
+                Rename.Content = "Save";
+                FileDetails.Visibility = Visibility.Collapsed;
+                FileDetailsRename.Visibility = Visibility.Visible;
+                FileDetailsRename.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name; 
+            }
+            else
+            {
+                Evidence evi = ((Evidence)itemGridView.SelectedItem);
+                evi.Name = FileDetailsRename.Text;
+                await EvidenceUtil.UpdateEvidenceNameAsync(evi);
+                Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
+                Rename.Content = "Edit";
+                FileDetails.Visibility = Visibility.Visible;
+                FileDetailsRename.Visibility = Visibility.Collapsed;
+                FileDetailsRename.Text = "";
+                RebindItems();
+            }
         }
 
         private async void SaveName_Click(object sender, RoutedEventArgs e)
@@ -376,6 +407,8 @@ namespace UniversalNomadUploader
                     CapturePhoto.IsEnabled = false;
                     CaptureVideo.IsEnabled = false;
                     backButton.IsEnabled = false;
+                    SearchButton.IsEnabled = false;
+                    BottomAppBar.IsOpen = true;
                     break;
                 case PageState.Renaming:
                     Delete.IsEnabled = false;
@@ -386,6 +419,8 @@ namespace UniversalNomadUploader
                     CapturePhoto.IsEnabled = false;
                     CaptureVideo.IsEnabled = false;
                     backButton.IsEnabled = false;
+                    SearchButton.IsEnabled = false;
+                    BottomAppBar.IsOpen = false;
                     break;
                 case PageState.Deleting:
                     Delete.IsEnabled = false;
@@ -396,6 +431,8 @@ namespace UniversalNomadUploader
                     CapturePhoto.IsEnabled = false;
                     CaptureVideo.IsEnabled = false;
                     backButton.IsEnabled = false;
+                    SearchButton.IsEnabled = false;
+                    BottomAppBar.IsOpen = true;
                     break;
                 case PageState.RecordingAudio:
                     Delete.IsEnabled = false;
@@ -405,16 +442,20 @@ namespace UniversalNomadUploader
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
                     CaptureVideo.IsEnabled = false;
+                    SearchButton.IsEnabled = false;
                     backButton.IsEnabled = false;
+                    BottomAppBar.IsOpen = true;
                     break;
                 case PageState.Default:
                     Delete.IsEnabled = true;
                     Upload.IsEnabled = true;
                     Rename.IsEnabled = true;
                     Import.IsEnabled = true;
+                    SearchButton.IsEnabled = true;
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;
                     CaptureVideo.IsEnabled = true;
+                    BottomAppBar.IsOpen = true;
                     backButton.IsEnabled = true;
                     break;
                 default:
@@ -422,6 +463,8 @@ namespace UniversalNomadUploader
                     Upload.IsEnabled = true;
                     Rename.IsEnabled = true;
                     Import.IsEnabled = true;
+                    BottomAppBar.IsOpen = true;
+                    SearchButton.IsEnabled = true;
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;
                     CaptureVideo.IsEnabled = true;
@@ -668,6 +711,7 @@ namespace UniversalNomadUploader
         private void ShowNewName()
         {
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            DisableButtons(PageState.Renaming);
         }
 
         private void HideNewName()
@@ -698,11 +742,11 @@ namespace UniversalNomadUploader
 
         private void ShowAudioControls()
         {
-            expandRecorderAnimation.Begin();
             if (FileInfoGrid.Height > 0)
             {
                 HideInfoGrid();
             }
+            expandRecorderAnimation.Begin();
         }
 
         private void HideInfoGrid()
@@ -894,6 +938,24 @@ namespace UniversalNomadUploader
                     (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 1.0;
                 }
             }
+        }
+
+        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SearchStack.Width == 200)
+            {
+                hideSearchBox.Begin();
+            }
+            else if (SearchStack.Width == 0)
+            {
+                showSearchBox.Begin();
+                SearchTerm.Focus(FocusState.Pointer);
+            }
+        }
+
+        private void NewName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SaveName.IsEnabled = !String.IsNullOrWhiteSpace(NewName.Text);
         }
 
     }

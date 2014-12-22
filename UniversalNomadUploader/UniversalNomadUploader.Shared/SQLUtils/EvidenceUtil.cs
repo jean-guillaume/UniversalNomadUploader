@@ -53,7 +53,7 @@ namespace UniversalNomadUploader.SQLUtils
                 if (dbEvi != null)
                 {
                     dbEvi.TriedUpload = evi.HasTryUploaded;
-                    if (evi.UploadedDate != null)
+                    if (evi.UploadedDate != null && evi.UploadedDate != DateTime.MinValue)
                     {
                         dbEvi.UploadedDate = evi.UploadedDate;
                         dbEvi.UploadError = "";

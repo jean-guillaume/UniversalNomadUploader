@@ -22,21 +22,28 @@ namespace UniversalNomadUploader.APIUtils
             {
                 client.DefaultRequestHeaders.Add("X-SessionID", SessionID.ToString());
                 String url = ((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + WSUrl + "/User/MobileGetProfile/";
-                using (var response = await client.GetAsync(url))
+                try
                 {
-                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                    using (var response = await client.GetAsync(url))
                     {
-                        throw new ApiException((ApiResponseCodes)(-10));
+                        if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                        {
+                            throw new ApiException((ApiResponseCodes)(-10));
+                        }
+                        if (response.ReasonPhrase == "OK" || Convert.ToInt32(response.ReasonPhrase) == 0)
+                        {
+                            String data = await response.Content.ReadAsStringAsync();
+                            return new User(JsonConvert.DeserializeObject<DataModels.APIModels.User>(data));
+                        }
+                        else
+                        {
+                            throw new ApiException((ApiResponseCodes)Convert.ToInt32(response.ReasonPhrase));
+                        }
                     }
-                    if (response.ReasonPhrase == "OK" || Convert.ToInt32(response.ReasonPhrase) == 0)
-                    {
-                        String data = await response.Content.ReadAsStringAsync();
-                        return new User(JsonConvert.DeserializeObject<DataModels.APIModels.User>(data));
-                    }
-                    else
-                    {
-                        throw new ApiException((ApiResponseCodes)Convert.ToInt32(response.ReasonPhrase));
-                    }
+                }
+                catch (Exception)
+                {
+                    throw new ApiException(ApiResponseCodes.Unknown);
                 }
             }
         }
