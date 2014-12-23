@@ -129,6 +129,7 @@ namespace UniversalNomadUploader
 
         private async void logon_Click(object sender, RoutedEventArgs e)
         {
+            logon.IsEnabled = false;
             ShowProgress();
             if (String.IsNullOrWhiteSpace(Username.Text))
             {
@@ -189,6 +190,7 @@ namespace UniversalNomadUploader
                 MessageDialog msg = new MessageDialog("Incorrect Username or Password", "Access denied");
                 await msg.ShowAsync();
                 HideProgress();
+                logon.IsEnabled = true;
                 return;
             }
         }

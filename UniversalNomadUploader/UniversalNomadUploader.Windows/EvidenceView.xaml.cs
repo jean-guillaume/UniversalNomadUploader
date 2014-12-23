@@ -307,6 +307,11 @@ namespace UniversalNomadUploader
             {
                 FileStatusTitle.Text = "File status:";
                 FileStatus.Text = "";
+                Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
+                Rename.Content = "Edit";
+                FileDetails.Visibility = Visibility.Visible;
+                FileDetailsRename.Visibility = Visibility.Collapsed;
+                FileDetailsRename.Text = "";
             }
             Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
             Delete.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
@@ -344,15 +349,16 @@ namespace UniversalNomadUploader
 
         private async void Rename_Click(object sender, RoutedEventArgs e)
         {
-            if (Rename.Content.ToString() == "Edit")
+            if (Rename.Content.ToString() == "Edit" && itemGridView.SelectedItems.Count > 0)
             {
                 Rename.Style = (Style)(App.Current as App).Resources["SaveButtonStyle"];
                 Rename.Content = "Save";
                 FileDetails.Visibility = Visibility.Collapsed;
                 FileDetailsRename.Visibility = Visibility.Visible;
-                FileDetailsRename.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name; 
+                FileDetailsRename.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name;
+                FileDetailsRename.Focus(FocusState.Pointer);
             }
-            else
+            else if (itemGridView.SelectedItems.Count > 0)
             {
                 Evidence evi = ((Evidence)itemGridView.SelectedItem);
                 evi.Name = FileDetailsRename.Text;
@@ -910,6 +916,11 @@ namespace UniversalNomadUploader
         private void InfoCancel_Click(object sender, RoutedEventArgs e)
         {
             itemGridView.SelectedItems.Clear();
+            Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
+            Rename.Content = "Edit";
+            FileDetails.Visibility = Visibility.Visible;
+            FileDetailsRename.Visibility = Visibility.Collapsed;
+            FileDetailsRename.Text = "";
         }
 
         private void SearchTerm_TextChanged(object sender, TextChangedEventArgs e)
@@ -923,11 +934,17 @@ namespace UniversalNomadUploader
                 {
                     if (!searchRes.Contains(item))
                     {
-                        (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 0.10;
+                        if ((itemGridView.ContainerFromItem(item) as GridViewItem) != null)
+                        {
+                            (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 0.10;
+                        }
                     }
                     else
                     {
-                        (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 1.0;
+                        if ((itemGridView.ContainerFromItem(item) as GridViewItem) != null)
+                        {
+                            (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 1.0;
+                        }
                     }
                 }
             }
@@ -935,7 +952,10 @@ namespace UniversalNomadUploader
             {
                 foreach (var item in itemGridView.Items)
                 {
-                    (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 1.0;
+                    if ((itemGridView.ContainerFromItem(item) as GridViewItem) != null)
+                    {
+                        (itemGridView.ContainerFromItem(item) as GridViewItem).Opacity = 1.0;
+                    }
                 }
             }
         }
@@ -945,6 +965,7 @@ namespace UniversalNomadUploader
             if (SearchStack.Width == 200)
             {
                 hideSearchBox.Begin();
+                SearchTerm.Text = "";
             }
             else if (SearchStack.Width == 0)
             {

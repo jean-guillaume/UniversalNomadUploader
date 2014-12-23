@@ -202,8 +202,8 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Vertical" Grid.Column="0" Margin="0,10,0,0">
                             <TextBlock Name="FileDetailsTitle" VerticalAlignment="Center" Text="File name:" HorizontalAlignment="Left" TextWrapping="NoWrap" Foreground="{StaticResource InfoFontColour}" FontSize="{StaticResource SmallFontSize}" Visibility="Visible" />
-                            <TextBlock Name="FileDetails" VerticalAlignment="Center" Margin="0,5,0,0" TextWrapping="NoWrap" FontSize="{StaticResource InfoFontSize}" Foreground="{StaticResource InfoFontColour}" Visibility="Visible" />
-                            <TextBox Name="FileDetailsRename" Padding="10" Height="46" Margin="0,2,0,0" Width="400" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="NoWrap" Style="{StaticResource LoginTextBox}" Visibility="Collapsed" />
+                            <TextBlock Name="FileDetails" VerticalAlignment="Center" Margin="0,5,0,0" MaxLines="1" TextWrapping="NoWrap" Text="LOL" FontSize="{StaticResource InfoFontSize}" Foreground="{StaticResource InfoFontColour}" Visibility="Visible" />
+                            <TextBox Name="FileDetailsRename"  Margin="0,1,0,0" Width="400" VerticalAlignment="Center" Text="LOL" HorizontalAlignment="Left" TextWrapping="NoWrap" Style="{StaticResource RenameTextBox}" Visibility="Collapsed" />
                         </StackPanel>
                         <Border Grid.Column="1" BorderBrush="{StaticResource BorderColour}" BorderThickness="1,0,1,0" Margin="0,10,0,10" >
                             <Button Name="Rename" Content="Edit" Style="{StaticResource EditButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Click="Rename_Click" Visibility="Visible" />
@@ -240,6 +240,7 @@
                     ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
                     SelectionMode="Multiple"
                     Padding="0,0,0,80"
+                    Height="Auto"
                     Margin="120,20,0,0"
                     SelectionChanged="itemGridView_SelectionChanged"
                     IsSwipeEnabled="false">
@@ -260,7 +261,7 @@
                 </GridView.ItemTemplate>
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Horizontal" />
+                        <StackPanel Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
                 <GridView.GroupStyle>
