@@ -137,6 +137,7 @@ namespace UniversalNomadUploader
                 MessageDialog msg = new MessageDialog("Please enter a Username", "Required");
                 await msg.ShowAsync();
                 HideProgress();
+                logon.IsEnabled = true;
                 return;
             }
             if (String.IsNullOrWhiteSpace(Password.Password))
@@ -144,6 +145,7 @@ namespace UniversalNomadUploader
                 MessageDialog msg = new MessageDialog("Please enter a Password", "Required");
                 await msg.ShowAsync();
                 HideProgress();
+                logon.IsEnabled = true;
                 return;
             }
             ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
@@ -170,6 +172,7 @@ namespace UniversalNomadUploader
                         MessageDialog msg = new MessageDialog(ErrorMessage, "Access denied");
                         await msg.ShowAsync();
                         HideProgress();
+                        logon.IsEnabled = true;
                         return;
                     }
                     GlobalVariables.IsOffline = false;
