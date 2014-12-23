@@ -201,13 +201,11 @@ namespace UniversalNomadUploader
 
         private void ShowProgress()
         {
-            SyncProgress.Visibility = Windows.UI.Xaml.Visibility.Visible;
             SyncProgress.IsIndeterminate = true;
         }
 
         private void HideProgress()
         {
-            SyncProgress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             SyncProgress.IsIndeterminate = false;
         }
 

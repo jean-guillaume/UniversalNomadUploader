@@ -33,7 +33,7 @@
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="60" >
                     <StackPanel Orientation="Vertical">
                         <Image Name="Logo" Source="{Binding Source={StaticResource NomadTitleLogo}}" Width="380" Height="79" VerticalAlignment="Center" DoubleTapped="pageTitle_DoubleTapped" HorizontalAlignment="Left" />
-                        <ProgressBar Name="SyncProgress" Height="10" VerticalAlignment="Bottom" Margin="2" Visibility="Visible" ></ProgressBar>
+                        <ProgressBar Name="SyncProgress" Height="15" VerticalAlignment="Bottom" Margin="2" Visibility="Visible" ></ProgressBar>
                     </StackPanel>
                     <Grid Name="LogonGrid" Margin="0,40,0,0">
                         <Grid.RowDefinitions>
