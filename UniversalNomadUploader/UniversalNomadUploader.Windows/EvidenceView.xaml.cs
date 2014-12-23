@@ -60,7 +60,6 @@ namespace UniversalNomadUploader
         private AudioEncodingQuality _encodingQuality = AudioEncodingQuality.Auto;
         private Byte[] _PausedBuffer;
         private object[] selectedItems;
-        private bool HasAccessToAudio = false;
 
         private enum PageState
         {
@@ -99,6 +98,7 @@ namespace UniversalNomadUploader
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.Loaded += EvidenceView_Loaded;
+            this.ContentStack.MaxHeight = Window.Current.Bounds.Height - 140.0;
             this.itemGridView.MaxHeight = Window.Current.Bounds.Height - 140.0;
             this.itemGridView.MinHeight = Window.Current.Bounds.Height - 140.0;
         }
@@ -130,11 +130,9 @@ namespace UniversalNomadUploader
             try
             {
                 await InitMediaCapture();
-                HasAccessToAudio = true;
             }
             catch (Exception)
             {
-                HasAccessToAudio = false;
             }
             UpdateRecordingControls(RecordingMode.Initializing);
             InitTimer();
@@ -169,6 +167,7 @@ namespace UniversalNomadUploader
             var coll = await EvidenceUtil.GetEvidenceAsync();
             var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd MMM yyyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
             this.DefaultViewModel["Groups"] = res;
+            BottomAppBar.IsOpen = coll.Count() > 0;
         }
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
@@ -265,12 +264,6 @@ namespace UniversalNomadUploader
 
         private void itemGridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.itemGridView.SelectedItems.Count > 0)
-            {
-                this.BottomAppBar.IsSticky = true;
-                this.BottomAppBar.IsOpen = true;
-            }
-
             if (this.itemGridView.SelectedItems.Count == 1)
             {
                 FileStatusTitle.Text = "File status:";

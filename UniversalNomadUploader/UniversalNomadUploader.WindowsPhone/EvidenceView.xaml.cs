@@ -435,7 +435,6 @@ namespace UniversalNomadUploader
             Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
             Rename.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
             Delete.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
-            Info.Visibility = (itemGridView.SelectedItems.Count == 1) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void Rename_Click(object sender, RoutedEventArgs e)
@@ -480,7 +479,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -490,7 +488,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -500,7 +497,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -510,7 +506,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -520,7 +515,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = true;
                     Upload.IsEnabled = true;
                     Rename.IsEnabled = true;
-                    Info.IsEnabled = true;
                     Import.IsEnabled = true;
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;
@@ -530,7 +524,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -540,7 +533,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = false;
                     Upload.IsEnabled = false;
                     Rename.IsEnabled = false;
-                    Info.IsEnabled = false;
                     Import.IsEnabled = false;
                     CaptureAudio.IsEnabled = false;
                     CapturePhoto.IsEnabled = false;
@@ -550,7 +542,6 @@ namespace UniversalNomadUploader
                     Delete.IsEnabled = true;
                     Upload.IsEnabled = true;
                     Rename.IsEnabled = true;
-                    Info.IsEnabled = true;
                     Import.IsEnabled = true;
                     CaptureAudio.IsEnabled = true;
                     CapturePhoto.IsEnabled = true;

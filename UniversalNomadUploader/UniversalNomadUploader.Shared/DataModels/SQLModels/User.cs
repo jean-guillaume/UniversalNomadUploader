@@ -19,5 +19,6 @@ namespace UniversalNomadUploader.DataModels.SQLModels
     public String Password { get; set; }
     public String Username { get; set; }
     public String Salt { get; set; }
+    public bool WasLastLogin { get; set; }
   }
 }

@@ -128,11 +128,11 @@
         </Grid.ChildrenTransitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="140" />
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/> 
         </Grid.RowDefinitions>
 
 
-        <StackPanel Name="ContentStack" Orientation="Vertical" Grid.Row="2" >
+        <StackPanel Name="ContentStack" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="2" >
             <Grid  Name="RecorderGrid" Grid.Row="2" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{StaticResource FileInfoBackground}" >
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
                     <StackPanel Orientation="Horizontal">
@@ -335,7 +335,7 @@
         </Grid>
     </Grid>
     <Page.BottomAppBar>
-        <CommandBar IsSticky="True" IsOpen="True">
+        <CommandBar>
             <CommandBar.PrimaryCommands>
                 <AppBarButton Name="Import" Content="Import" Click="Import_Click" Style="{StaticResource ImportButtonStyle}"  />
                 <AppBarButton Name="CapturePhoto" Content="Take photo" Click="CapturePhoto_Click" Style="{StaticResource PictureButtonStyle}" />

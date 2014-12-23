@@ -248,11 +248,6 @@
                         <SymbolIcon Symbol="Delete" />
                     </AppBarButton.Icon>
                 </AppBarButton>
-                <AppBarButton Name="Info" Label="Info" Click="Info_Click" Visibility="Collapsed">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="Help" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
                 <AppBarButton Name="Logout" Label="Logout" Click="Logout_Click" Visibility="Collapsed">
                 </AppBarButton>
             </CommandBar.SecondaryCommands>

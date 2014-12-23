@@ -65,6 +65,7 @@ namespace UniversalNomadUploader.SQLUtils
                 UniversalNomadUploader.DataModels.SQLModels.User dbuser = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == GlobalVariables.LoggedInUser.LocalID).SingleOrDefault();
                 if (dbuser != null)
                 {
+                    SetLastLoggedInUser(new User(dbuser));
                     dbuser.UserID = user.UserID;
                     dbuser.FirstName = user.FirstName;
                     dbuser.LastName = user.LastName;
@@ -137,6 +138,7 @@ namespace UniversalNomadUploader.SQLUtils
                     String EnteredPass = CryptographicBuffer.EncodeToBase64String(hashedBuffer);
                     if (EnteredPass == u.Password)
                     {
+                        SetLastLoggedInUser(new User(u));
                         GlobalVariables.LoggedInUser = new User(u);
                         return true;
                     }
@@ -145,5 +147,30 @@ namespace UniversalNomadUploader.SQLUtils
             }
         }
 
+        public static void SetLastLoggedInUser(User us)
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                DataModels.SQLModels.User u = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == us.LocalID).SingleOrDefault();
+                if (u != null)
+                {
+                    u.WasLastLogin = true;
+                    db.Update(u);
+                }
+            }
+        }
+
+        public static User GetLastLoggedInUser()
+        {
+            using (var db = new SQLiteConnection(GlobalVariables.dbPath))
+            {
+                DataModels.SQLModels.User u = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.WasLastLogin == true).SingleOrDefault();
+                if (u != null)
+                {
+                        return new User(u);
+                }
+                return null;
+            }
+        }
     }
 }

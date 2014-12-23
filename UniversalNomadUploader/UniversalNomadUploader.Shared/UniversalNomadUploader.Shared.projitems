@@ -48,7 +48,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\RelayCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\SuspensionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\ObservableDictionary.cs" />
-    <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en-US\Resources.resw" />
+    <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en-GB\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Assets\ButtonIcons\Audio.Scale-100.png" />
@@ -129,7 +129,6 @@
     <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.Scale-100.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.Scale-140.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.Scale-180.png" />
-    <Content Include="$(MSBuildThisFileDirectory)Assets\TitleLogo.Scale-80.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Assets\StatusIcons\" />
