@@ -359,6 +359,7 @@ namespace UniversalNomadUploader
                 FileDetailsRename.Visibility = Visibility.Visible;
                 FileDetailsRename.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name;
                 FileDetailsRename.Focus(FocusState.Pointer);
+                FileDetailsRename.Select(FileDetailsRename.Text.Length, 0);
             }
             else if (itemGridView.SelectedItems.Count > 0)
             {
@@ -539,6 +540,7 @@ namespace UniversalNomadUploader
             evi.Extension = "mp3";
             evi.CreatedDate = DateTime.Now;
             evi.ServerID = (int)GlobalVariables.SelectedServer;
+            evi.Name = "Audio File";
             evi.Type = MimeTypes.Audio;
             StorageFile _file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(evi.FileName + ".mp3", CreationCollisionOption.OpenIfExists);
             using (var dataReader = new DataReader(_audioStream.GetInputStreamAt(0)))
@@ -683,6 +685,7 @@ namespace UniversalNomadUploader
                 evi.FileName = Guid.NewGuid().ToString();
                 evi.Extension = newPhoto.FileType.Replace(".", "");
                 evi.CreatedDate = DateTime.Now;
+                evi.Name = "Photo";
                 evi.ServerID = (int)GlobalVariables.SelectedServer;
                 evi.Type = MimeTypes.Picture;
                 await newPhoto.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newPhoto.FileType, NameCollisionOption.ReplaceExisting);
@@ -705,6 +708,7 @@ namespace UniversalNomadUploader
                 evi.FileName = Guid.NewGuid().ToString();
                 evi.Extension = newVideo.FileType.Replace(".", "");
                 evi.CreatedDate = DateTime.Now;
+                evi.Name = "Video";
                 evi.ServerID = (int)GlobalVariables.SelectedServer;
                 evi.Type = MimeTypes.Movie;
                 await newVideo.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newVideo.FileType, NameCollisionOption.ReplaceExisting);
@@ -721,7 +725,9 @@ namespace UniversalNomadUploader
         private void ShowNewName()
         {
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            NewName.Text = CurrentEvidence.Name;
             NewName.Focus(FocusState.Keyboard);
+            NewName.Select(NewName.Text.Length, 0);
             DisableButtons(PageState.Renaming);
         }
 
@@ -825,6 +831,7 @@ namespace UniversalNomadUploader
                 evi.FileName = Guid.NewGuid().ToString();
                 evi.Extension = file.FileType.Replace(".", "");
                 evi.CreatedDate = DateTime.Now;
+                evi.Name = "Imported file";
                 evi.Type = GlobalVariables.GetMimeTypeFromExtension(file.FileType);
                 evi.ServerID = (int)GlobalVariables.SelectedServer;
                 await file.CopyAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + file.FileType, NameCollisionOption.ReplaceExisting);

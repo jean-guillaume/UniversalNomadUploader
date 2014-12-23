@@ -194,7 +194,7 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" MinHeight="75"/>
                 </Grid.RowDefinitions>
-                <Border Grid.Row="0" BorderBrush="{StaticResource BorderColour}" Margin="120,0,10,0" BorderThickness="0,0,0,1">
+                <Border Grid.Row="0" BorderBrush="{StaticResource BorderColour}" Margin="120,0,0,0" BorderThickness="0,0,0,1">
                     <Grid Grid.Row="0" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="10*" />
@@ -202,15 +202,15 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Vertical" Grid.Column="0" Margin="0,10,0,0">
                             <TextBlock Name="FileDetailsTitle" VerticalAlignment="Center" Text="File name:" HorizontalAlignment="Left" TextWrapping="NoWrap" Foreground="{StaticResource InfoFontColour}" FontSize="{StaticResource SmallFontSize}" Visibility="Visible" />
-                            <TextBlock Name="FileDetails" VerticalAlignment="Center" Margin="0,5,0,0" MaxLines="1" TextWrapping="NoWrap" Text="LOL" FontSize="{StaticResource InfoFontSize}" Foreground="{StaticResource InfoFontColour}" Visibility="Visible" />
-                            <TextBox Name="FileDetailsRename" MaxLength="255" TextChanged="FileDetailsRename_TextChanged"  Margin="0,1,0,0" Width="400" VerticalAlignment="Center" Text="LOL" HorizontalAlignment="Left" TextWrapping="NoWrap" Style="{StaticResource RenameTextBox}" Visibility="Collapsed" />
+                            <TextBlock Name="FileDetails" VerticalAlignment="Center" Margin="0,5,0,0" MaxLines="1" TextWrapping="NoWrap" FontSize="{StaticResource InfoFontSize}" Foreground="{StaticResource InfoFontColour}" Visibility="Visible" />
+                            <TextBox Name="FileDetailsRename" MaxLength="255" TextChanged="FileDetailsRename_TextChanged"  Margin="0,1,0,0" Width="400" VerticalAlignment="Center" HorizontalAlignment="Left" TextWrapping="NoWrap" Style="{StaticResource RenameTextBox}" Visibility="Collapsed" />
                         </StackPanel>
                         <Border Grid.Column="1" BorderBrush="{StaticResource BorderColour}" BorderThickness="1,0,1,0" Margin="0,10,0,10" >
                             <Button Name="Rename" Content="Edit" Style="{StaticResource EditButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Click="Rename_Click" Visibility="Visible" />
                         </Border>
                     </Grid>
                 </Border>
-                <Grid Grid.Row="1" Margin="120,10,10,0" >
+                <Grid Grid.Row="1" Margin="120,10,0,0" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10*" />
                         <ColumnDefinition Width="*" MinWidth="70" MaxWidth="75"  />
@@ -227,8 +227,7 @@
                         <Button Name="Delete" Content="Delete" Style="{StaticResource AppDeleteButtonStyle}" Click="Delete_Click" Visibility="Collapsed" />
                     </Border>
                 </Grid>
-
-                <Button Name="InfoCancel" Style="{StaticResource CloseButtonStyle}" Content="Close" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" Click="InfoCancel_Click" Visibility="Visible" />
+                <Button Name="InfoCancel" Style="{StaticResource CloseButtonStyle}" Content="Close" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" Click="InfoCancel_Click" Visibility="Visible" />
             </Grid>
             <!-- Horizontal scrolling grid -->
             <GridView

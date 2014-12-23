@@ -38,7 +38,7 @@ namespace UniversalNomadUploader.Common
         extensions.Add(".awb", MimeTypes.Audio);
         extensions.Add(".bmp", MimeTypes.Picture);
         extensions.Add(".caf", MimeTypes.Audio);
-        extensions.Add(".csv", MimeTypes.Text);
+        extensions.Add(".csv", MimeTypes.Spreadsheet);
         extensions.Add(".doc", MimeTypes.Word);
         extensions.Add(".docm", MimeTypes.Word);
         extensions.Add(".docx", MimeTypes.Word);
