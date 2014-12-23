@@ -24,7 +24,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             this.HasTryUploaded = e.TriedUpload;
             this.UploadedDate = e.UploadedDate;
             this.UploadError = e.UploadError;
-            this.Name = e.Name;
+            this.Name = (e.Name == null) ? "" : e.Name;
             this.Type = (MimeTypes)e.Type;
         }
 

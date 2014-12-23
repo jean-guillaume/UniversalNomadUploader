@@ -24,7 +24,7 @@ namespace UniversalNomadUploader.DataModels.SQLModels
             this.UploadError = e.UploadError;
             this.UploadedDate = e.UploadedDate;
             this.TriedUpload = e.HasTryUploaded;
-            this.Name = e.Name;
+            this.Name = (e.Name == null) ? "" : e.Name;
             this.Type = (int)e.Type;
         }
 

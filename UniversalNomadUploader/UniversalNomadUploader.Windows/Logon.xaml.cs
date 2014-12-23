@@ -71,6 +71,7 @@ namespace UniversalNomadUploader
             }
             Live.IsChecked = true;
             await HockeyClient.Current.SendCrashesAsync();
+            logon.IsEnabled = true;
         }
 
         /// <summary>

@@ -297,6 +297,7 @@ namespace UniversalNomadUploader
             {
                 Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
                 Rename.Content = "Edit";
+                Rename.IsEnabled = true;
                 FileDetails.Visibility = Visibility.Visible;
                 FileDetailsRename.Visibility = Visibility.Collapsed;
                 FileDetailsRename.Text = "";
@@ -309,6 +310,7 @@ namespace UniversalNomadUploader
                 FileStatus.Text = "";
                 Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
                 Rename.Content = "Edit";
+                Rename.IsEnabled = true;
                 FileDetails.Visibility = Visibility.Visible;
                 FileDetailsRename.Visibility = Visibility.Collapsed;
                 FileDetailsRename.Text = "";
@@ -368,6 +370,7 @@ namespace UniversalNomadUploader
                 FileDetails.Visibility = Visibility.Visible;
                 FileDetailsRename.Visibility = Visibility.Collapsed;
                 FileDetailsRename.Text = "";
+                SearchTerm.Text = "";
                 RebindItems();
             }
         }
@@ -489,6 +492,7 @@ namespace UniversalNomadUploader
                 await _mediaCapture.StartRecordToStreamAsync(encodingProfile, _audioStream);
                 UpdateRecordingControls(RecordingMode.Recording);
                 _timer.Start();
+                Duration.DataContext = "0:0:0";
             }
             catch (Exception)
             {
@@ -717,6 +721,7 @@ namespace UniversalNomadUploader
         private void ShowNewName()
         {
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            NewName.Focus(FocusState.Keyboard);
             DisableButtons(PageState.Renaming);
         }
 
@@ -977,6 +982,29 @@ namespace UniversalNomadUploader
         private void NewName_TextChanged(object sender, TextChangedEventArgs e)
         {
             SaveName.IsEnabled = !String.IsNullOrWhiteSpace(NewName.Text);
+        }
+
+        private void FileDetailsRename_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Rename.IsEnabled = !String.IsNullOrWhiteSpace(FileDetailsRename.Text);
+        }
+
+        private void NewName_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Tab)
+            {
+                NewName.Focus(FocusState.Programmatic);
+                e.Handled = true;
+            }
+        }
+
+        private void NameGrid_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Tab)
+            {
+                NewName.Focus(FocusState.Programmatic);
+                e.Handled = true;
+            }
         }
 
     }
