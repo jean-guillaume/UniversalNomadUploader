@@ -30,6 +30,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
@@ -126,7 +127,7 @@ namespace UniversalNomadUploader
         /// session.  The state will be null the first time a page is visited.</param>
         private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
+            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
             try
             {
                 await InitMediaCapture();
@@ -167,7 +168,7 @@ namespace UniversalNomadUploader
             var coll = await EvidenceUtil.GetEvidenceAsync();
             var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd MMM yyyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
             this.DefaultViewModel["Groups"] = res;
-            BottomAppBar.IsOpen = coll.Count() > 0;
+            BottomAppBar.IsOpen = coll.Count() == 0;
         }
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
@@ -486,7 +487,7 @@ namespace UniversalNomadUploader
                 await _mediaCapture.StartRecordToStreamAsync(encodingProfile, _audioStream);
                 UpdateRecordingControls(RecordingMode.Recording);
                 _timer.Start();
-                Duration.DataContext = "0:0:0";
+                Duration.DataContext = "00:00";
             }
             catch (Exception)
             {
@@ -622,7 +623,7 @@ namespace UniversalNomadUploader
         private void TimerOnTick(object sender, object o)
         {
             _elapsedTime = _elapsedTime.Add(_timer.Interval);
-            Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
+            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
         }
 
         private async void MediaCaptureOnRecordLimitationExceeded(MediaCapture sender)
@@ -656,7 +657,7 @@ namespace UniversalNomadUploader
 
             }
             ResetTimer();
-            Duration.DataContext = _elapsedTime.Minutes + ":" + _elapsedTime.Seconds + ":" + _elapsedTime.Milliseconds;
+            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
             UpdateRecordingControls(RecordingMode.Initializing);
             _PausedBuffer = null;
             HideAudioControls();
@@ -777,6 +778,7 @@ namespace UniversalNomadUploader
             if (RecorderGrid.Height == 0)
             {
                 ShowAudioControls();
+                BottomAppBar.IsOpen = false;
             }
             else
             {
@@ -1006,6 +1008,5 @@ namespace UniversalNomadUploader
                 e.Handled = true;
             }
         }
-
     }
 }

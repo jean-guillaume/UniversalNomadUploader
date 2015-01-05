@@ -26,11 +26,30 @@
         <x:String x:Key="UploadImagePath">/Assets/ButtonIcons/Upload.png</x:String>
         <x:String x:Key="VideoImagePath">/Assets/ButtonIcons/Video.png</x:String>
         <x:String x:Key="SaveImagePath">/Assets/ButtonIcons/Save.png</x:String>
+
+        <x:String x:Key="RecordDisabledImagePath">/Assets/RecorderIcons/Record-Disabled.png</x:String>
+        <x:String x:Key="RecordFocusedImagePath">/Assets/RecorderIcons/Record-Focused.png</x:String>
+        <x:String x:Key="RecordNormalImagePath">/Assets/RecorderIcons/Record-Normal.png</x:String>
+        <x:String x:Key="RecordPointerOverImagePath">/Assets/RecorderIcons/Record-PointerOver.png</x:String>
+        <x:String x:Key="RecordPointerPressedImagePath">/Assets/RecorderIcons/Record-PointerPressed.png</x:String>
+        <x:String x:Key="RecordPressedImagePath">/Assets/RecorderIcons/Record-Pressed.png</x:String>
+        <x:String x:Key="RecordUnfocusedImagePath">/Assets/RecorderIcons/Record-Unfocused.png</x:String>
+
+        <x:String x:Key="StopDisabledImagePath">/Assets/RecorderIcons/Stop-Disabled.png</x:String>
+        <x:String x:Key="StopFocusedImagePath">/Assets/RecorderIcons/Stop-Focused.png</x:String>
+        <x:String x:Key="StopNormalImagePath">/Assets/RecorderIcons/Stop-Normal.png</x:String>
+        <x:String x:Key="StopPointerOverImagePath">/Assets/RecorderIcons/Stop-PointerOver.png</x:String>
+        <x:String x:Key="StopPointerPressedImagePath">/Assets/RecorderIcons/Stop-PointerPressed.png</x:String>
+        <x:String x:Key="StopPressedImagePath">/Assets/RecorderIcons/Stop-Pressed.png</x:String>
+        <x:String x:Key="StopUnfocusedImagePath">/Assets/RecorderIcons/Stop-Unfocused.png</x:String>
+
+
         <x:Double x:Key="LargeFontSize">22</x:Double>
         <x:Double x:Key="ExtraLargeFontSize">40</x:Double>
         <x:Double x:Key="SmallFontSize">12</x:Double>
         <x:Double x:Key="InfoFontSize">24</x:Double>
-        
+
+
         <!-- Global solid colour brushes -->
         <SolidColorBrush x:Key="FileInfoBackground" Color="#ECF0F1" ></SolidColorBrush>
         <SolidColorBrush x:Key="BorderColour" Color="#BEC3C7" ></SolidColorBrush>
@@ -42,6 +61,7 @@
         <SolidColorBrush x:Key="FadedWhiteBrush" Color="#FFFFFF" Opacity="0.6" ></SolidColorBrush>
         <SolidColorBrush x:Key="NomadOrangeBrush" Color="#FCBF00" Opacity="1.0" />
         <SolidColorBrush x:Key="FadedBlackBrush" Color="#000000" Opacity="0.4" />
+        <SolidColorBrush x:Key="RecordingBorderBrush" Color="#000000" Opacity="0.4" />
 
         <SolidColorBrush x:Key="UnselectedToggleButtonBrush" Color="#bec3c7" Opacity="0.4" />
         <SolidColorBrush x:Key="SelectedToggleButtonBrush" Color="#bec3c7" Opacity="1.0" />
@@ -146,7 +166,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <Style x:Key="CloseButtonStyle" TargetType="Button" >
             <Setter Property="Width" Value="70" />
             <Setter Property="Height" Value="70" />
@@ -321,7 +341,136 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
+        <Style x:Key="RecordButtonStyle" TargetType="Button" >
+            <Setter Property="Width" Value="80" />
+            <Setter Property="Height" Value="80" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualStateGroup.Transitions>
+
+                                    </VisualStateGroup.Transitions>
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonNormalImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonPointerOverImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonNormalImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonPressedImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonNormalImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonDisabledImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonNormalImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Grid Background="Transparent">
+                                <Image x:Name="ButtonNormalImage" IsHitTestVisible="False" Source="{Binding Source={StaticResource RecordNormalImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible" />
+                                <Image x:Name="ButtonPointerOverImage" IsHitTestVisible="False" Source="{Binding Source={StaticResource RecordFocusedImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Image x:Name="ButtonPressedImage" IsHitTestVisible="False" Source="{Binding Source={StaticResource RecordPointerPressedImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Image x:Name="ButtonDisabledImage" IsHitTestVisible="False" Source="{Binding Source={StaticResource RecordDisabledImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="StopButtonStyle" TargetType="Button" >
+            <Setter Property="Width" Value="80" />
+            <Setter Property="Height" Value="80" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualStateGroup.Transitions>
+
+                                    </VisualStateGroup.Transitions>
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonNormalImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonPointerOverImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonNormalImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonPressedImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonNormalImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonDisabledImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonNormalImage" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Grid Background="Transparent">
+                                <Image x:Name="ButtonNormalImage" IsHitTestVisible="False" Source="{Binding Source={StaticResource StopNormalImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible" />
+                                <Image x:Name="ButtonPointerOverImage" IsHitTestVisible="False" Source="{Binding Source={StaticResource StopFocusedImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Image x:Name="ButtonPressedImage" IsHitTestVisible="False" Source="{Binding Source={StaticResource StopPointerPressedImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Image x:Name="ButtonDisabledImage" IsHitTestVisible="False" Source="{Binding Source={StaticResource StopDisabledImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="VideoButtonStyle" TargetType="AppBarButton">
             <Setter Property="Width" Value="100" />
             <Setter Property="Height" Value="88" />
