@@ -382,7 +382,6 @@
                                             </ObjectAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </VisualState>
-
                                     <VisualState x:Name="Disabled">
                                         <Storyboard>
                                             <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonDisabledImage" Storyboard.TargetProperty="Visibility">
@@ -564,7 +563,7 @@
                                     </VisualState>
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
-                            <Rectangle x:Name="ButtonEllipse" Height="60" Width="55" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0">
+                            <Rectangle x:Name="ButtonEllipse" Height="100" Width="88" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Transparent" Stroke="Black" StrokeThickness="0">
                             </Rectangle>
                             <StackPanel Orientation="Vertical" Margin="0,17,0,10" >
                                 <Image x:Name="ButtonImage" Height="30" Width="30" Source="{Binding Source={StaticResource AudioImagePath}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
