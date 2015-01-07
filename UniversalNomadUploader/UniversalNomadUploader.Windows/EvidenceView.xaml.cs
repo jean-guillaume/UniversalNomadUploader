@@ -318,12 +318,12 @@ namespace UniversalNomadUploader
             }
             else if (itemGridView.SelectedItems.Count == 0)
             {
-                if (FileInfoGrid.Height == 75.0)
+                if (FileInfoGrid.Height == 100.0)
                     hideSingleInfoAnimation.Begin();
                 else
                     reduceInfoAnimation.Begin();
             }
-            else if (FileInfoGrid.Height != 75.0 && FileInfoGrid.Height > 0 && itemGridView.SelectedItems.Count > 1)
+            else if (FileInfoGrid.Height != 100.0 && FileInfoGrid.Height > 0 && itemGridView.SelectedItems.Count > 1)
             {
                 reduceSingleInfoAnimation.Begin();
             }
@@ -762,7 +762,7 @@ namespace UniversalNomadUploader
 
         private void HideInfoGrid()
         {
-            if (FileInfoGrid.Height == 75.0)
+            if (FileInfoGrid.Height == 100.0)
             {
                 hideSingleInfoAnimation.Begin();
             }
