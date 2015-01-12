@@ -7,7 +7,7 @@ namespace UniversalNomadUploader.DataModels.Enums
     public enum ServerEnum
     {
         Live = 1,
-        Demo = 2,
+        Practice = 2,
         QA = 3,
         Beta = 4,
         UAT1 = 5,

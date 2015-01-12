@@ -24,7 +24,7 @@ namespace UniversalNomadUploader.SQLUtils
         private const String UAT2HOST = "onefileuat2.onefile.co.uk";
         private const String BETAHOST = "www5.onefile.co.uk";
         private const String QAHOST = "www3.onefile.co.uk";
-        private const String DEMOHOST = "www2.onefile.co.uk";
+        private const String PRACTICEHOST = "www2.onefile.co.uk";
         private const String LIVEHOST = "live.onefile.co.uk";
 
 
@@ -33,7 +33,7 @@ namespace UniversalNomadUploader.SQLUtils
         private const String UAT2WS = "wsapiuat2.onefile.co.uk";
         private const String BETAWS = "wsapibeta.onefile.co.uk";
         private const String QAWS = "wsapi3.onefile.co.uk";
-        private const String DEMOWS = "wsapi2.onefile.co.uk";
+        private const String PRACTICEWS = "wsapi2.onefile.co.uk";
         private const String LIVEWS = "wsapi.onefile.co.uk";
 
         private const String DEVNAME = "DEV";
@@ -41,7 +41,7 @@ namespace UniversalNomadUploader.SQLUtils
         private const String UAT2NAME = "UAT2";
         private const String BETANAME = "BETA";
         private const String QANAME = "QA";
-        private const String DEMONAME = "DEMO";
+        private const String PRACTICENAME = "PRACTICE";
         private const String LIVENAME = "LIVE";
 
         private const String DEVKEY = "slh1";
@@ -49,14 +49,14 @@ namespace UniversalNomadUploader.SQLUtils
         private const String UAT2KEY = "suat2";
         private const String BETAKEY = "sof5";
         private const String QAKEY = "sof3";
-        private const String DEMOKEY = "sof2";
+        private const String PRACTICEKEY = "sof2";
         private const String LIVEKEY = "sof1";
 
 
         public static void SetServers()
         {
             setLiveServer();
-            setDemoServer();
+            setPracticeServer();
             setQAServer();
             setBetaServer();
             setUAT1Server();
@@ -212,7 +212,7 @@ namespace UniversalNomadUploader.SQLUtils
             }
         }
 
-        private static void setDemoServer()
+        private static void setPracticeServer()
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {
@@ -220,10 +220,10 @@ namespace UniversalNomadUploader.SQLUtils
                 if (server != null)
                 {
                     server.ServerID = 2;
-                    server.HostUrl = DEMOHOST;
-                    server.ServerKey = DEMOKEY;
-                    server.ServerName = DEMONAME;
-                    server.WsUrl = DEMOWS;
+                    server.HostUrl = PRACTICEHOST;
+                    server.ServerKey = PRACTICEKEY;
+                    server.ServerName = PRACTICENAME;
+                    server.WsUrl = PRACTICEWS;
                     int success = db.Update(server);
                 }
                 else
@@ -231,10 +231,10 @@ namespace UniversalNomadUploader.SQLUtils
                     int success = db.Insert(new Server()
                     {
                         ServerID = 2,
-                        HostUrl = DEMOHOST,
-                        ServerKey = DEMOKEY,
-                        ServerName = DEMONAME,
-                        WsUrl = DEMOWS
+                        HostUrl = PRACTICEHOST,
+                        ServerKey = PRACTICEKEY,
+                        ServerName = PRACTICENAME,
+                        WsUrl = PRACTICEWS
                     });
                 }
             }

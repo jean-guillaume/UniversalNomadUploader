@@ -212,13 +212,13 @@ namespace UniversalNomadUploader
         private void Live_Click(object sender, RoutedEventArgs e)
         {
             GlobalVariables.SelectedServer = ServerEnum.Live;
-            Demo.IsChecked = false;
+            Practice.IsChecked = false;
             Beta.IsChecked = false;
         }
 
-        private void Demo_Click(object sender, RoutedEventArgs e)
+        private void Practice_Click(object sender, RoutedEventArgs e)
         {
-            GlobalVariables.SelectedServer = ServerEnum.Demo;
+            GlobalVariables.SelectedServer = ServerEnum.Practice;
             Beta.IsChecked = false;
             Live.IsChecked = false;
         }
@@ -226,7 +226,7 @@ namespace UniversalNomadUploader
         private void Beta_Click(object sender, RoutedEventArgs e)
         {
             GlobalVariables.SelectedServer = ServerEnum.Beta;
-            Demo.IsChecked = false;
+            Practice.IsChecked = false;
             Live.IsChecked = false;
         }
 
@@ -237,28 +237,30 @@ namespace UniversalNomadUploader
                 GlobalVariables.SelectedServer = ServerEnum.Live;
                 LiveOptions.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 DEVoptions.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                LogonGrid.RowDefinitions[3].Height = new GridLength(0.0);
+                DEVoptions2.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 LogonGrid.RowDefinitions[2].Height = new GridLength(70.0);
+                LogonGrid.RowDefinitions[3].Height = new GridLength(0.0);
+                LogonGrid.RowDefinitions[4].Height = new GridLength(0.0);
                 Live.IsChecked = false;
                 Live.IsEnabled = true;
-                Demo.IsChecked = false;
-                Demo.IsEnabled = true;
-                Beta.IsChecked = false;
-                Beta.IsEnabled = true;
+                Practice.IsChecked = false;
+                Practice.IsEnabled = true;
             }
             else
             {
                 GlobalVariables.SelectedServer = ServerEnum.UAT1;
                 LiveOptions.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 DEVoptions.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                DEVoptions2.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 LogonGrid.RowDefinitions[2].Height = new GridLength(0.0);
                 LogonGrid.RowDefinitions[3].Height = new GridLength(70.0);
+                LogonGrid.RowDefinitions[4].Height = new GridLength(70.0);
                 Live.IsChecked = false;
                 Live.IsEnabled = false;
-                Demo.IsChecked = false;
-                Demo.IsEnabled = false;
+                Practice.IsChecked = false;
+                Practice.IsEnabled = false;
                 Beta.IsChecked = false;
-                Beta.IsEnabled = false;
+                Beta.IsEnabled = true;
             }
         }
 

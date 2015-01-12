@@ -41,21 +41,26 @@
                             <RowDefinition Height="70" />
                             <RowDefinition Height="70" />
                             <RowDefinition Height="0" />
+                            <RowDefinition Height="0" />
                             <RowDefinition Height="70" />
                         </Grid.RowDefinitions>
                         <TextBox Name="Username" Style="{StaticResource LoginTextBox}" Padding="10" PlaceholderText="Username" Height="46"  TextChanged="Username_TextChanged"></TextBox>
                         <PasswordBox Grid.Row="1" Style="{StaticResource LoginPasswordBox}"  Padding="10" IsPasswordRevealButtonEnabled="True" PlaceholderText="Password" Name="Password" Height="46" ></PasswordBox>
                         <StackPanel Name="LiveOptions" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" >
                             <ToggleButton Name="Live" Style="{StaticResource LogonToggleButton}"  Margin="0,0,20,0" Width="120" Height="44" Content="Live" Click="Live_Click"></ToggleButton>
-                            <ToggleButton Name="Demo" Style="{StaticResource LogonToggleButton}" Margin="0,0,20,0" Width="120" Height="44" Content="Demo" Click="Demo_Click"></ToggleButton>
-                            <ToggleButton Name="Beta" Style="{StaticResource LogonToggleButton}" Width="120" Height="44" Content="Beta" Click="Beta_Click"></ToggleButton>
+                            <ToggleButton Name="Practice" Style="{StaticResource LogonToggleButton}" Width="120" Height="44" Content="Practice" Click="Practice_Click"></ToggleButton>
                         </StackPanel>
                         <StackPanel Name="DEVoptions" Visibility="Collapsed" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" >
-                            <ToggleButton Name="UAT1" Style="{StaticResource LogonToggleButton}" Margin="0,0,20,0" Width="120" Height="44" Content="UAT 1" Click="UAT1_Click"></ToggleButton>
-                            <ToggleButton Name="UAT2" Style="{StaticResource LogonToggleButton}" Margin="0,0,20,0" Width="120" Height="44"  Content="UAT 2" Click="UAT2_Click"></ToggleButton>
-                            <ToggleButton Name="DEV" Style="{StaticResource LogonToggleButton}" Width="120" Height="44" Content="DEV" Click="DEV_Click"></ToggleButton>
+                            <ToggleButton Name="Beta" Style="{StaticResource LogonToggleButton}" Margin="0,0,20,0" Width="120" Height="44" Content="Beta" Click="Beta_Click"></ToggleButton>
+                                <ToggleButton Name="UAT1" Style="{StaticResource LogonToggleButton}"  Width="120" Height="44" Content="UAT 1" Click="UAT1_Click"></ToggleButton>
+                            </StackPanel>
+                        <StackPanel Name="DEVoptions2" Visibility="Collapsed" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="4" >
+                            <StackPanel Orientation="Horizontal">
+                                <ToggleButton Name="UAT2" Style="{StaticResource LogonToggleButton}" Margin="0,0,20,0" Width="120" Height="44"  Content="UAT 2" Click="UAT2_Click"></ToggleButton>
+                                <ToggleButton Name="DEV" Style="{StaticResource LogonToggleButton}" Width="120" Height="44" Content="DEV" Click="DEV_Click"></ToggleButton>
+                            </StackPanel>
                         </StackPanel>
-                        <Button Name="logon" Style="{StaticResource LogonButton}" Content="Log In" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="4"  Height="44"  Click="logon_Click" ></Button>
+                        <Button Name="logon" Style="{StaticResource LogonButton}" Content="Log In" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="5"  Height="44"  Click="logon_Click" ></Button>
                     </Grid>
                 </StackPanel>
             </Grid>

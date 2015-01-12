@@ -219,7 +219,7 @@ namespace UniversalNomadUploader
 
         private void Demo_Click(object sender, RoutedEventArgs e)
         {
-            GlobalVariables.SelectedServer = ServerEnum.Demo;
+            GlobalVariables.SelectedServer = ServerEnum.Practice;
             Beta.IsChecked = false;
             Live.IsChecked = false;
         }
