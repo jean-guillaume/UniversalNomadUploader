@@ -15,10 +15,10 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SynthesizeLinkMetadata>true</SynthesizeLinkMetadata>
-    <PackageCertificateKeyFile>UniversalNomadUploader.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>UniversalNomadUploader.Windows_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>3A10BD978AEDB7B70171165F6CE7A6E48FA2090E</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>A5BF18F321A97CE048E743B0F1D0CC50F4706A0E</PackageCertificateThumbprint>
     <AppxPackageDir>\\ATHENA\RedirectedFolders\Ben.Marshall\My Documents\Uploader\</AppxPackageDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -122,6 +122,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="packages.config" />
+    <None Include="UniversalNomadUploader.Windows_StoreKey.pfx" />
     <None Include="UniversalNomadUploader.Windows_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +156,7 @@
     <Content Include="Assets\Wide310x150Logo.scale-180.png" />
     <Content Include="Assets\Wide310x150Logo.scale-80.png" />
     <Content Include="Assets\WideLogo.scale-100.png" />
+    <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="HockeyApp">

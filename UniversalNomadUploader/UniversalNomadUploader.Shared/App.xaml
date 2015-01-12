@@ -88,10 +88,10 @@
         <SolidColorBrush x:Key="LoginTextBoxBorderBrush" Color="#BEC3C7" Opacity="1.0" />
         <SolidColorBrush x:Key="LoginTextBoxTextBrush" Color="#666666" Opacity="1.0" />
 
-        <SolidColorBrush x:Key="ProgressBarBackgroundThemeBrush" Color="#59FFFFFF" />
+        <SolidColorBrush x:Key="ProgressBarBackgroundThemeBrush" Color="Transparent" />
         <SolidColorBrush x:Key="ProgressBarBorderThemeBrush" Color="Transparent" />
-        <SolidColorBrush x:Key="ProgressBarForegroundThemeBrush" Color="LimeGreen" />
-        <SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="LimeGreen" />
+        <SolidColorBrush x:Key="ProgressBarForegroundThemeBrush" Color="#FCBF00" />
+        <SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="#FCBF00" />
 
         <x:Double x:Key="GridViewItemSelectedBorderThemeThickness">2</x:Double>
         <SolidColorBrush x:Key="ListViewItemSelectedBackgroundThemeBrush" Color="#FFECF0F1" />

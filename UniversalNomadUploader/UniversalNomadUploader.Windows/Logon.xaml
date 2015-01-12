@@ -52,8 +52,8 @@
                         </StackPanel>
                         <StackPanel Name="DEVoptions" Visibility="Collapsed" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" >
                             <ToggleButton Name="Beta" Style="{StaticResource LogonToggleButton}" Margin="0,0,20,0" Width="120" Height="44" Content="Beta" Click="Beta_Click"></ToggleButton>
-                                <ToggleButton Name="UAT1" Style="{StaticResource LogonToggleButton}"  Width="120" Height="44" Content="UAT 1" Click="UAT1_Click"></ToggleButton>
-                            </StackPanel>
+                            <ToggleButton Name="UAT1" Style="{StaticResource LogonToggleButton}"  Width="120" Height="44" Content="UAT 1" Click="UAT1_Click"></ToggleButton>
+                        </StackPanel>
                         <StackPanel Name="DEVoptions2" Visibility="Collapsed" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="4" >
                             <StackPanel Orientation="Horizontal">
                                 <ToggleButton Name="UAT2" Style="{StaticResource LogonToggleButton}" Margin="0,0,20,0" Width="120" Height="44"  Content="UAT 2" Click="UAT2_Click"></ToggleButton>
