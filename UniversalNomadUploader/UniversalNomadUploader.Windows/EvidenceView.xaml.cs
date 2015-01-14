@@ -487,7 +487,6 @@ namespace UniversalNomadUploader
                 await _mediaCapture.StartRecordToStreamAsync(encodingProfile, _audioStream);
                 UpdateRecordingControls(RecordingMode.Recording);
                 _timer.Start();
-                Duration.DataContext = "00:00";
             }
             catch (Exception)
             {
@@ -500,6 +499,7 @@ namespace UniversalNomadUploader
             await _mediaCapture.StopRecordAsync();
             UpdateRecordingControls(RecordingMode.Stopped);
             _timer.Stop();
+            _elapsedTime = new TimeSpan();
         }
 
         private async void PauseButton_Click(object sender, RoutedEventArgs e)
@@ -564,6 +564,7 @@ namespace UniversalNomadUploader
             evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
             CurrentEvidence = evi;
             HideAudioControls();
+            InitTimer();
             ShowNewName();
         }
 
@@ -618,6 +619,7 @@ namespace UniversalNomadUploader
             _timer = new DispatcherTimer();
             _timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             _timer.Tick += TimerOnTick;
+            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
         }
 
         private void TimerOnTick(object sender, object o)

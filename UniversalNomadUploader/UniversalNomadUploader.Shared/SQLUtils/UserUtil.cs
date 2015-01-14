@@ -68,6 +68,7 @@ namespace UniversalNomadUploader.SQLUtils
                     SetLastLoggedInUser(new User(dbuser));
                     dbuser.UserID = user.UserID;
                     dbuser.FirstName = user.FirstName;
+                    dbuser.WasLastLogin = 1;
                     dbuser.LastName = user.LastName;
                     dbuser.OrganisationID = user.OrganisationID;
                     int success = db.Update(dbuser);
@@ -151,11 +152,17 @@ namespace UniversalNomadUploader.SQLUtils
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {
+                var users = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(o => o.LocalID > 0);
+                foreach (var item in users)
+                { 
+                    item.WasLastLogin = 0;
+                    db.Update(item);
+                }
                 DataModels.SQLModels.User u = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.LocalID == us.LocalID).SingleOrDefault();
                 if (u != null)
                 {
-                    u.WasLastLogin = true;
-                    db.Update(u);
+                    u.WasLastLogin = 1;
+                    int test = db.Update(u);
                 }
             }
         }
@@ -164,7 +171,7 @@ namespace UniversalNomadUploader.SQLUtils
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {
-                DataModels.SQLModels.User u = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.WasLastLogin == true).SingleOrDefault();
+                DataModels.SQLModels.User u = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.WasLastLogin == 1).SingleOrDefault();
                 if (u != null)
                 {
                         return new User(u);
