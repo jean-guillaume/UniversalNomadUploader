@@ -45,7 +45,7 @@ namespace UniversalNomadUploader
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
             InitHandlers();
-            HockeyClient.Current.Configure("8c14cfa45bbc5629e1ebc62ff9b0696b");
+            HockeyClient.Current.Configure("c8b1504ef7282c9ab3f776ed69b8751e");
         }
 
         void InitHandlers()

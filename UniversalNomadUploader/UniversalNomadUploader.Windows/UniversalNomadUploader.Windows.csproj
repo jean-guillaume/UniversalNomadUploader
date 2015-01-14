@@ -20,6 +20,7 @@
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <PackageCertificateThumbprint>A5BF18F321A97CE048E743B0F1D0CC50F4706A0E</PackageCertificateThumbprint>
     <AppxPackageDir>\\ATHENA\RedirectedFolders\Ben.Marshall\My Documents\Uploader\</AppxPackageDir>
+    <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
