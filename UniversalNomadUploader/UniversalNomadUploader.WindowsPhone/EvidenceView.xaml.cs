@@ -33,6 +33,9 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
+using Camera;
+using Windows.Media.Devices;
+
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
 
 namespace UniversalNomadUploader
@@ -53,6 +56,10 @@ namespace UniversalNomadUploader
             Paused,
             Stopped
         };
+
+        //Photo/Video capture
+        private Camera.Camera camera;
+
         private RecordingMode CurrentMode;
         private MediaCapture _AudioMediaCapture;
         private IRandomAccessStream _audioStream;
@@ -81,7 +88,7 @@ namespace UniversalNomadUploader
             Default
         }
 
-        private async void EnumerateCameras()
+      /* JG  private async void EnumerateCameras()
         {
             var devices = await Windows.Devices.Enumeration.DeviceInformation.FindAllAsync(
                 Windows.Devices.Enumeration.DeviceClass.VideoCapture);
@@ -103,7 +110,7 @@ namespace UniversalNomadUploader
             else
             {
             }
-        }
+        }*/
 
         private async void InitCaptureSettings()
         {
@@ -118,6 +125,7 @@ namespace UniversalNomadUploader
                 _captureInitSettings.VideoDeviceId = _deviceList[0].Id;
         }
 
+        /*JG
         // Create and initialze the MediaCapture object.
         public async void InitCameraMediaCapture()
         {
@@ -132,7 +140,7 @@ namespace UniversalNomadUploader
             await _CameraMediaCapture.InitializeAsync(_captureInitSettings);
 
             CreateProfile();
-        }
+        }*/
 
         void _CameraMediaCapture_RecordLimitationExceeded(MediaCapture sender)
         {
@@ -145,34 +153,36 @@ namespace UniversalNomadUploader
         }
 
         // Create a profile.
+        /* JG
         private void CreateProfile()
         {
             _profile = Windows.Media.MediaProperties.MediaEncodingProfile.CreateMp4(Windows.Media.MediaProperties.VideoEncodingQuality.Auto);
         }
+        */
         // Start the video capture.
-        private async void StartMediaCaptureSession()
+       /* JG private async void StartMediaCaptureSession()
         {
             try
             {
                 CurrentVideoName = Guid.NewGuid().ToString();
-                StorageFile CurrentVideoFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(CurrentVideoName + ".mp4", CreationCollisionOption.ReplaceExisting);
+                StorageFile CurrentVideoFile = await KnownFolders.VideosLibrary.CreateFileAsync(CurrentVideoName + ".mp4", CreationCollisionOption.ReplaceExisting);
                 await _CameraMediaCapture.StartRecordToStorageFileAsync(_profile, CurrentVideoFile);
                 _recording = true;
                 (App.Current as App).IsRecording = true;
             }
             catch (Exception er)
             {
-                
+
                 throw;
             }
-        }
+        }*/
 
         // Stop the video capture.
         private async void StopMediaCaptureSession()
         {
             try
             {
-                StorageFile CurrentVideoFile = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync(CurrentVideoName + ".mp4");
+                StorageFile CurrentVideoFile = await KnownFolders.VideosLibrary.GetFileAsync(CurrentVideoName + ".mp4");
                 Evidence evi = new Evidence();
                 evi.FileName = CurrentVideoName;
                 evi.CreatedDate = DateTime.Now;
@@ -185,7 +195,7 @@ namespace UniversalNomadUploader
                 if (CurrentVideoFile != null)
                 {
                     evi.Extension = CurrentVideoFile.FileType.Replace(".", "");
-                    
+
                     evi.UserID = GlobalVariables.LoggedInUser.LocalID;
                     evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
                     CurrentEvidence = evi;
@@ -232,7 +242,6 @@ namespace UniversalNomadUploader
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.Loaded += EvidenceView_Loaded;
             HardwareButtons.BackPressed += HardwareButtons_BackPressed;
-
         }
 
         async void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
@@ -274,7 +283,7 @@ namespace UniversalNomadUploader
             await InitAudioMediaCapture();
             UpdateRecordingControls(RecordingMode.Initializing);
             InitTimer();
-            EnumerateCameras();
+           //JG EnumerateCameras();
             RebindItems();
         }
 
@@ -295,7 +304,7 @@ namespace UniversalNomadUploader
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
+        {    
             navigationHelper.OnNavigatedFrom(e);
         }
 
@@ -304,7 +313,7 @@ namespace UniversalNomadUploader
         private async void RebindItems()
         {
             var coll = await EvidenceUtil.GetEvidenceAsync();
-            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd/MM/yyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
+            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd MMM yyyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
             this.DefaultViewModel["Groups"] = res;
         }
 
@@ -740,11 +749,16 @@ namespace UniversalNomadUploader
             InitTimer();
         }
 
-        private async void CapturePhoto_Click(object sender, RoutedEventArgs e)
+        private async void PreviewPhoto_Click(object sender, RoutedEventArgs e)
         {
+            camera = new Camera.Camera();
+            Preview.Source = await camera.Initialize(CaptureUse.Photo);
+            await camera.startPreview();
+            /*JG
             EnumerateCameras();
             Preview.Source = _CameraMediaCapture;
             await _CameraMediaCapture.StartPreviewAsync();
+             */
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
             CaptureContainer.Visibility = Visibility.Visible;
             Appbar.IsOpen = false;
@@ -753,13 +767,19 @@ namespace UniversalNomadUploader
             //DisableButtons(PageState.CapturingPhoto);
         }
 
-        private async void CaptureVideo_Click(object sender, RoutedEventArgs e)
+        private async void PreviewVideo_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                camera = new Camera.Camera();
+                Preview.Source = await camera.Initialize(CaptureUse.Video);
+                await camera.startPreview();
+
+                /* JG
                 EnumerateCameras();
                 Preview.Source = _CameraMediaCapture;
                 await _CameraMediaCapture.StartPreviewAsync();
+                */
                 CaptureContainer.Visibility = Visibility.Visible;
                 Appbar.IsOpen = false;
                 Appbar.IsSticky = false;
@@ -955,7 +975,7 @@ namespace UniversalNomadUploader
 
         }
 
-        private async void StartCapture_Click(object sender, RoutedEventArgs e)
+        private async void StartRecord_Click(object sender, RoutedEventArgs e)
         {
             String NewFileName = Guid.NewGuid().ToString();
             StorageFile newFile;
@@ -964,17 +984,21 @@ namespace UniversalNomadUploader
             evi.CreatedDate = DateTime.Now;
             evi.ServerID = (int)GlobalVariables.SelectedServer;
 
+
             if (_CurrentPageState == PageState.CapturingPhoto)
             {
-                newFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(NewFileName + ".jpg", CreationCollisionOption.ReplaceExisting);
+                newFile = await camera.startRecording(NewFileName);
+                //JG newFile = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(NewFileName + ".jpg", CreationCollisionOption.ReplaceExisting);
                 evi.Type = MimeTypes.Picture;
-                await _CameraMediaCapture.CapturePhotoToStorageFileAsync(ImageEncodingProperties.CreateJpeg(), newFile);
+                //JG await _CameraMediaCapture.CapturePhotoToStorageFileAsync(ImageEncodingProperties.CreateJpeg(), newFile);
+                freeResources();
             }
             else
             {
-                StartMediaCaptureSession();
+                newFile = await camera.startRecording(NewFileName);
+                //JG StartMediaCaptureSession();
                 StopRecording.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                StartCapture.IsEnabled = false;
+                //JG StartCapture.IsEnabled = false;
                 return;
             }
 
@@ -993,10 +1017,26 @@ namespace UniversalNomadUploader
             await (App.Current as App).CleanupCaptureResources();
         }
 
-        private void StopRecording_Click(object sender, RoutedEventArgs e)
+        private async void StopRecord_Click(object sender, RoutedEventArgs e)
         {
-            StopMediaCaptureSession();
+            await camera.stopVideoRecording();
+            //JG StopMediaCaptureSession();
             StopRecording.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+
+            freeResources();
+        }
+
+        //JG
+        //Permits to free the resources of the camera and the Preview. 
+        private async void freeResources()
+        {
+            if (camera != null)
+            {
+                await camera.stopPreview();
+                Preview.Source = null;
+                camera.Dispose();
+                camera = null;
+            }
         }
 
     }
