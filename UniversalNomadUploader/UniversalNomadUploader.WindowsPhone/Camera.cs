@@ -24,6 +24,8 @@ namespace Camera
 
         }
 
+
+        //TODO Put initialize in Constructor ? (problem of async) check if initialized ?
         /**
          *Initialize encoding for the photo and the video
          *Return: useful for Preview.Source = await camera.Initialize(CaptureUse.Video);
@@ -53,6 +55,11 @@ namespace Camera
         {
             StorageFile storageFile = null;
 
+            if( _fileName == "")
+            {
+                _fileName = "default";
+            }
+
             try
             {
                 if (m_captureUse == CaptureUse.Photo)
@@ -72,11 +79,11 @@ namespace Camera
             //If the authorization to write is not given
             catch (UnauthorizedAccessException ex)
             {
-                string a = ex.Message;
+                return null;
             }
             catch(Exception ex)
             {
-                string a = ex.Message;
+                return null;
             }
 
             return storageFile;
