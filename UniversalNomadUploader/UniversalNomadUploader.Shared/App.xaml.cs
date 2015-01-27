@@ -44,8 +44,14 @@ namespace UniversalNomadUploader
         {
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
+            this.Resuming += App_Resuming;
             InitHandlers();
             HockeyClient.Current.Configure("c8b1504ef7282c9ab3f776ed69b8751e");
+        }
+
+        void App_Resuming(object sender, object e)
+        {
+            throw new NotImplementedException();
         }
 
         void InitHandlers()
@@ -139,9 +145,14 @@ namespace UniversalNomadUploader
                     throw new Exception("Failed to create initial page");
                 }
             }
-
+            Window.Current.Activated += Current_Activated;
             // Ensure the current window is active
             Window.Current.Activate();
+        }
+
+        void Current_Activated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
+        {
+            
         }
 
 #if WINDOWS_PHONE_APP
@@ -172,6 +183,19 @@ namespace UniversalNomadUploader
             await SuspensionManager.SaveAsync();
             deferral.Complete();
         }
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
+        }
+
+        
+
+
+#if WINDOWS_PHONE_APP
+        
+#endif
+
 
 
 #if WINDOWS_PHONE_APP

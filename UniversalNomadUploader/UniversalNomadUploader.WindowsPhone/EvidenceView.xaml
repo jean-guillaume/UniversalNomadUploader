@@ -22,7 +22,7 @@
             Source="{Binding Groups}"
             IsSourceGrouped="true"
             />
-        
+
 
         <Storyboard x:Name="expandRecorderAnimation" >
             <DoubleAnimation EnableDependentAnimation="True" Storyboard.TargetName="RecorderGrid" Storyboard.TargetProperty="Height" From="0" To="200" Duration="0:0:0.3">
@@ -53,6 +53,8 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
+
+
     </Page.Resources>
 
     <!--
@@ -60,7 +62,7 @@
         * Row 0 contains the back button and page title
         * Row 1 contains the rest of the page layout
     -->
-    <Grid Name="ContainerGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Name="ContainerGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" HorizontalAlignment="Left">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
@@ -71,63 +73,188 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Horizontal scrolling grid -->
-        <ScrollViewer HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Hidden" VerticalScrollMode="Disabled" Grid.Row="1">
-            <GridView
+        <SemanticZoom Name="SemanticView" Grid.Row="1">
+            <SemanticZoom.ZoomedInView>
+                <ListView Background="Orange"
+                    x:Name="itemListView"
+                    Padding="10"
+                          Height="600"
+                    AutomationProperties.AutomationId="ItemListView"
+                    AutomationProperties.Name="Grouped Items"
+                    ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+                    SelectionMode="Multiple"
+                    SelectionChanged="itemListView_SelectionChanged"
+                          IsSwipeEnabled="True"
+                   ScrollViewer.IsHorizontalScrollChainingEnabled="False"
+                    >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Left" Width="100" Height="100">
+                                <Image Stretch="UniformToFill" Source="{Binding ImagePath}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" HorizontalAlignment="Left"  Opacity="1" Foreground="AntiqueWhite" Style="{StaticResource TitleTextBlockStyle}"/>
+                                <SymbolIcon Symbol="Accept"  Foreground="AntiqueWhite" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" BorderThickness="5" BorderBrush="Blue" Height="79" Width="79" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding Name}"
+                                               Foreground="Aquamarine"
+                                               FontSize="38.667"
+                                               FontWeight="SemiBold"
+                                               TextLineBounds="Tight"
+                                               OpticalMarginAlignment="TrimSideBearings"
+                                               IsColorFontEnabled="False"
+                                               IsTextScaleFactorEnabled="False"
+                                               HorizontalAlignment="Left"
+                                               VerticalAlignment="Bottom"/>
+                                    </Border>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                            <GroupStyle.Panel>
+                                <ItemsPanelTemplate>
+                                    <VariableSizedWrapGrid Orientation="Horizontal"  />
+                                </ItemsPanelTemplate>
+                            </GroupStyle.Panel>
+                        </GroupStyle>                        
+                    </ListView.GroupStyle>
+                    <!--<ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Button 
+                                            Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
+                                            AutomationProperties.Name="Group Title"                                    
+                                            Click="Button_Click"
+                                            >
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Key}" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                            <GroupStyle.Panel>
+                                <ItemsPanelTemplate>
+                                    <VariableSizedWrapGrid Orientation="Horizontal"  />
+                                </ItemsPanelTemplate>
+                            </GroupStyle.Panel>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                    -->
+                </ListView>
+            </SemanticZoom.ZoomedInView>
+            <SemanticZoom.ZoomedOutView>
+                <ListView x:Name="itemListViewOut" Background="White" Foreground="Black" VerticalAlignment="Center"
+                          ScrollViewer.IsHorizontalScrollChainingEnabled="False"
+                          ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock HorizontalAlignment="Center"
+                                   Text="{Binding Group.Key}" FontSize="24" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Margin" Value="4" />
+                            <Setter Property="Padding" Value="5" />
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="100" ItemHeight="70"
+                              Orientation="Horizontal" MaximumRowsOrColumns="3"></ItemsWrapGrid>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
+            </SemanticZoom.ZoomedOutView>
+        </SemanticZoom>
+        <!--
+        <ListView
             x:Name="itemGridView"
             AutomationProperties.AutomationId="ItemGridView"
             AutomationProperties.Name="Grouped Items"
-            Padding="116,0,40,46"
+            Padding="10" 
+            Grid.Row="1"
             ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
             SelectionMode="Multiple"
             SelectionChanged="itemGridView_SelectionChanged"
             IsSwipeEnabled="false">
-                <GridView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid HorizontalAlignment="Left" Width="150" Height="150">
-                            <StackPanel Orientation="Vertical" >
-                                <Border Height="20">
-                                    <SymbolIcon Symbol="Accept" IsHitTestVisible="True" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" />
-                                </Border>
-                                <Image Source="{Binding ImagePath}" Height="48" Width="48" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,20" />
-                                <ProgressBar Name="Progress" Visibility="Collapsed" />
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Bottom" >
-                                <TextBlock Text="{Binding Name}" Style="{StaticResource TitleTextBlockStyle}" Height="30" Margin="15,0,15,0"/>
-                            </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </GridView.ItemTemplate>
-                <GridView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <ItemsWrapGrid Orientation="Horizontal" GroupPadding="0,0,70,0"/>
-                    </ItemsPanelTemplate>
-                </GridView.ItemsPanel>
-                <GridView.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0,0,0,2">
-                                    <Button Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Left" Width="100" Height="100">
+                        <Image Stretch="UniformToFill" Source="{Binding ImagePath}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" HorizontalAlignment="Left"  Opacity="1" Foreground="AntiqueWhite" Style="{StaticResource TitleTextBlockStyle}"/>
+                        <SymbolIcon Symbol="Accept" IsHitTestVisible="True" Foreground="AntiqueWhite" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Button Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
                                     AutomationProperties.Name="Group Title"
                                     >
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Key}" Margin="0,-11,10,10" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
-                                        </StackPanel>
-                                    </Button>
-                                </Grid>
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                    </GroupStyle>
-                </GridView.GroupStyle>
-            </GridView>
-        </ScrollViewer>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Key}" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                    <GroupStyle.Panel>
+                        <ItemsPanelTemplate>
+                            <VariableSizedWrapGrid Orientation="Horizontal"  />
+                        </ItemsPanelTemplate>
+                    </GroupStyle.Panel>
+                </GroupStyle>
+            </ListView.GroupStyle>
+        </ListView>
+        -->
+        <!-- NEW -->
+        <!--
+        <ListView ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
+                  ItemTemplate="{StaticResource AddrBookItemTemplate}">
+            <ListView.GroupStyle>
+                <GroupStyle HidesIfEmpty="True" 
+                            HeaderTemplate="{StaticResource AddrBookGroupHeaderTemplate}"/>
+            </ListView.GroupStyle>
+        </ListView> 
+        -->
 
-        <Grid Name="NameGrid" Grid.RowSpan="2" Visibility="Collapsed"  >
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"  >
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" Margin="10,0,10,0" />
-                    <TextBox Name="NewName" MaxLength="255" Width="400" Height="50" FontSize="26" />
+        <Grid Name="NameGrid" Grid.RowSpan="2"  Visibility="Collapsed"  >
+            <Rectangle Fill="AntiqueWhite"></Rectangle>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Right" VerticalAlignment="Center" TextAlignment="Center" />
+                <TextBox Grid.Column="1" Name="NewName" MaxLength="255" FontSize="26" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <AppBarButton Name="SaveName" IsCompact="True" Click="SaveName_Click" >
                         <SymbolIcon Symbol="Save" />
                     </AppBarButton>
@@ -135,7 +262,7 @@
                         <SymbolIcon Symbol="Cancel" />
                     </AppBarButton>
                 </StackPanel>
-            </StackPanel>
+            </Grid>
         </Grid>
         <Grid  Name="RecorderGrid" Grid.Row="1" Height="0" HorizontalAlignment="Stretch" VerticalAlignment="Top"  >
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
@@ -188,7 +315,7 @@
                 </Grid>
             </StackPanel>
         </Grid>
-        
+
         <!-- Back button and page title -->
         <Grid>
             <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" FontSize="50" 
@@ -200,20 +327,17 @@
         <TextBlock Text="Upload status" FontWeight="Bold" Grid.Row="1" Grid.Column="0" FontSize="18" Margin="0,0,10,0" Visibility="Collapsed" />
         <TextBlock Text="" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="Collapsed" />
         <TextBlock Text="" Grid.Row="1" Grid.Column="1" FontSize="18" Width="250" TextWrapping="WrapWholeWords" Visibility="Collapsed" />
-        <Grid Name="CaptureContainer" Grid.RowSpan="2" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <CaptureElement Name="Preview" Grid.Row="2" Height="400"  >
-            </CaptureElement>
-            <AppBarButton Name="StartRecord" Icon="Camera" HorizontalAlignment="Right" Foreground="White" Click="StartRecord_Click" Grid.Row="0" IsCompact="True" >
-                
-            </AppBarButton>
-            <AppBarButton Name="StopRecording" Click="StopRecord_Click" Foreground="White" Icon="Cancel" HorizontalAlignment="Right" Grid.Row="1" IsCompact="True" Visibility="Collapsed" >
 
-            </AppBarButton>
+        <!--Preview-->
+        <Grid Name="CaptureContainer" Grid.RowSpan="2" Visibility="Collapsed">
+            <Rectangle Name="PreviewBlackRect" Fill="Black" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ></Rectangle>
+            <CaptureElement Name="Preview" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+            <StackPanel Name="previewButtons" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                <AppBarButton Name="StartStopRecord" Icon="Video" HorizontalAlignment="Right" Foreground="AntiqueWhite" Click="StartStopRecord_Click" IsCompact="True"/>
+                <AppBarButton Name="TakePicture" Icon="Camera" HorizontalAlignment="Right" Foreground="AntiqueWhite" Click="TakePicture_Click" IsCompact="True" />
+                <AppBarButton Name="LeavePreviewMode" Icon="Cancel" HorizontalAlignment="Right" Foreground="AntiqueWhite" Click="LeavePreviewMode_Click"  IsCompact="True" />
+            </StackPanel>
         </Grid>
     </Grid>
     <Page.BottomAppBar>
@@ -227,11 +351,8 @@
                 <AppBarButton Name="Import" Label="Import" IsCompact="True" Click="Import_Click">
                     <SymbolIcon Symbol="Import" />
                 </AppBarButton>
-                <AppBarButton Name="CapturePhoto" Label="Take photo" IsCompact="True" Click="PreviewPhoto_Click">
+                <AppBarButton Name="EnterPreviewMode" Label="Photo/Video" IsCompact="True" Click="EnterPreviewMode_Click" >
                     <SymbolIcon Symbol="Camera" />
-                </AppBarButton>
-                <AppBarButton Name="CaptureVideo" Label="Video" IsCompact="True" Click="PreviewVideo_Click" >
-                    <SymbolIcon Symbol="Video" />
                 </AppBarButton>
                 <AppBarButton Name="CaptureAudio" Label="Record audio" IsCompact="True" Click="CaptureAudio_Click" >
                     <SymbolIcon Symbol="Microphone" />
