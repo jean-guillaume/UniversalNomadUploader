@@ -55,6 +55,7 @@
         </Storyboard>
 
 
+
     </Page.Resources>
 
     <!--
@@ -73,74 +74,16 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <SemanticZoom Name="SemanticView" Grid.Row="1">
+        <SemanticZoom Name="SemanticView" Grid.Row="1" ViewChangeStarted="SemanticZoom_ViewChangeStarted">
             <SemanticZoom.ZoomedInView>
-                <ListView Background="Orange"
-                    x:Name="itemListView"
-                    Padding="10"
-                          Height="600"
-                    AutomationProperties.AutomationId="ItemListView"
-                    AutomationProperties.Name="Grouped Items"
-                    ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-                    SelectionMode="Multiple"
-                    SelectionChanged="itemListView_SelectionChanged"
-                          IsSwipeEnabled="True"
-                   ScrollViewer.IsHorizontalScrollChainingEnabled="False"
-                    >
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid HorizontalAlignment="Left" Width="100" Height="100">
-                                <Image Stretch="UniformToFill" Source="{Binding ImagePath}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" HorizontalAlignment="Left"  Opacity="1" Foreground="AntiqueWhite" Style="{StaticResource TitleTextBlockStyle}"/>
-                                <SymbolIcon Symbol="Accept"  Foreground="AntiqueWhite" HorizontalAlignment="Right" VerticalAlignment="Top" />
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical" />
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
+                <ListView Background="Orange" x:Name="itemListView" ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}" SelectionMode="Multiple">
                     <ListView.GroupStyle>
-                        <GroupStyle>
+                        <GroupStyle HidesIfEmpty="True">
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate>
-                                    <Border Background="White" BorderThickness="5" BorderBrush="Blue" Height="79" Width="79" HorizontalAlignment="Left">
-                                        <TextBlock Text="{Binding Name}"
-                                               Foreground="Aquamarine"
-                                               FontSize="38.667"
-                                               FontWeight="SemiBold"
-                                               TextLineBounds="Tight"
-                                               OpticalMarginAlignment="TrimSideBearings"
-                                               IsColorFontEnabled="False"
-                                               IsTextScaleFactorEnabled="False"
-                                               HorizontalAlignment="Left"
-                                               VerticalAlignment="Bottom"/>
+                                    <Border Background="White" BorderThickness="3" Height="50" Width="50" BorderBrush="Blue" >
+                                        <TextBlock Text="{Binding Key}" FontSize="30" FontWeight="SemiBold" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
-                            <GroupStyle.Panel>
-                                <ItemsPanelTemplate>
-                                    <VariableSizedWrapGrid Orientation="Horizontal"  />
-                                </ItemsPanelTemplate>
-                            </GroupStyle.Panel>
-                        </GroupStyle>                        
-                    </ListView.GroupStyle>
-                    <!--<ListView.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Button 
-                                            Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
-                                            AutomationProperties.Name="Group Title"                                    
-                                            Click="Button_Click"
-                                            >
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Key}" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
-                                            </StackPanel>
-                                        </Button>
-                                    </Grid>
                                 </DataTemplate>
                             </GroupStyle.HeaderTemplate>
                             <GroupStyle.Panel>
@@ -150,31 +93,63 @@
                             </GroupStyle.Panel>
                         </GroupStyle>
                     </ListView.GroupStyle>
-                    -->
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Left" Width="100" Height="100">
+                                <Image Stretch="UniformToFill" Source="{Binding ImagePath}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Foreground="AntiqueWhite" Style="{StaticResource TitleTextBlockStyle}"/>
+                                <SymbolIcon Symbol="Accept" Foreground="AntiqueWhite" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
                 </ListView>
             </SemanticZoom.ZoomedInView>
             <SemanticZoom.ZoomedOutView>
-                <ListView x:Name="itemListViewOut" Background="White" Foreground="Black" VerticalAlignment="Center"
+                <ListView x:Name="itemListViewOut" Foreground="Black" VerticalAlignment="Center"
                           ScrollViewer.IsHorizontalScrollChainingEnabled="False"
                           ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}">
                     <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock HorizontalAlignment="Center"
-                                   Text="{Binding Group.Key}" FontSize="24" />
-                            </StackPanel>
+                        <DataTemplate >
+                            <Border Background="White" BorderThickness="3" Height="50" Width="50" BorderBrush="Blue" >
+                                <TextBlock Text="{Binding Image}" FontSize="30" FontWeight="SemiBold" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
-
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
-                            <Setter Property="Margin" Value="4" />
-                            <Setter Property="Padding" Value="5" />
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <Border x:Name="TiltContainer">
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroup x:Name="CommonStates">
+                                                    <VisualState x:Name="Normal" />
+                                                    <VisualState x:Name="Pressed">
+                                                        <Storyboard>
+                                                            <PointerDownThemeAnimation Storyboard.TargetName="TiltContainer" />
+                                                        </Storyboard>
+                                                    </VisualState>
+                                                    <VisualStateGroup.Transitions>
+                                                        <VisualTransition From="Pressed" To="Normal">
+                                                            <Storyboard>
+                                                                <PointerUpThemeAnimation Storyboard.TargetName="TiltContainer" />
+                                                            </Storyboard>
+                                                        </VisualTransition>
+                                                    </VisualStateGroup.Transitions>
+                                                </VisualStateGroup>
+                                            </VisualStateManager.VisualStateGroups>
+                                            <ContentPresenter ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                      Content="{Binding Source={StaticResource groupedItemsViewSource}}"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      Margin="{TemplateBinding Padding}" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </ListView.ItemContainerStyle>
-
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsWrapGrid ItemWidth="100" ItemHeight="70"
@@ -184,65 +159,6 @@
                 </ListView>
             </SemanticZoom.ZoomedOutView>
         </SemanticZoom>
-        <!--
-        <ListView
-            x:Name="itemGridView"
-            AutomationProperties.AutomationId="ItemGridView"
-            AutomationProperties.Name="Grouped Items"
-            Padding="10" 
-            Grid.Row="1"
-            ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-            SelectionMode="Multiple"
-            SelectionChanged="itemGridView_SelectionChanged"
-            IsSwipeEnabled="false">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid HorizontalAlignment="Left" Width="100" Height="100">
-                        <Image Stretch="UniformToFill" Source="{Binding ImagePath}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" HorizontalAlignment="Left"  Opacity="1" Foreground="AntiqueWhite" Style="{StaticResource TitleTextBlockStyle}"/>
-                        <SymbolIcon Symbol="Accept" IsHitTestVisible="True" Foreground="AntiqueWhite" HorizontalAlignment="Right" VerticalAlignment="Top" />
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Orientation="Vertical" />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.HeaderTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Button Foreground="{ThemeResource ApplicationHeaderForegroundThemeBrush}"
-                                    AutomationProperties.Name="Group Title"
-                                    >
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Key}" Style="{StaticResource SubheaderTextBlockStyle}" TextWrapping="NoWrap" />
-                                    </StackPanel>
-                                </Button>
-                            </Grid>
-                        </DataTemplate>
-                    </GroupStyle.HeaderTemplate>
-                    <GroupStyle.Panel>
-                        <ItemsPanelTemplate>
-                            <VariableSizedWrapGrid Orientation="Horizontal"  />
-                        </ItemsPanelTemplate>
-                    </GroupStyle.Panel>
-                </GroupStyle>
-            </ListView.GroupStyle>
-        </ListView>
-        -->
-        <!-- NEW -->
-        <!--
-        <ListView ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-                  ItemTemplate="{StaticResource AddrBookItemTemplate}">
-            <ListView.GroupStyle>
-                <GroupStyle HidesIfEmpty="True" 
-                            HeaderTemplate="{StaticResource AddrBookGroupHeaderTemplate}"/>
-            </ListView.GroupStyle>
-        </ListView> 
-        -->
 
         <Grid Name="NameGrid" Grid.RowSpan="2"  Visibility="Collapsed"  >
             <Rectangle Fill="AntiqueWhite"></Rectangle>

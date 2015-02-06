@@ -69,6 +69,9 @@ namespace UniversalNomadUploader
         private Byte[] m_PausedBuffer;
         private PageState m_CurrentState = PageState.Default;
 
+        //JG just a quick fix need to suppress and correct that
+        private List<string> SZkeys = new List<string>();
+
         private enum PageState
         {
             Uploading,
@@ -353,7 +356,6 @@ namespace UniversalNomadUploader
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
-//            ((ListViewBase)SemanticView.ZoomedOutView).ItemsSource = groupedItemsViewSource.View.CollectionGroups;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -366,7 +368,36 @@ namespace UniversalNomadUploader
         private async void RebindItems()
         {
             var coll = await EvidenceUtil.GetEvidenceAsync();
-            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd MMM yyyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
+            List<Evidence> a = coll.ToList<Evidence>().OrderBy(o => o.Name).ToList();
+            for (int i = 0; i < a.Count; i++)
+            {
+                if (i > 0)
+                {
+                    if (a[i].Name != "")
+                    {
+                        if (SZkeys[SZkeys.Count - 1] != a[i].Name.Substring(0, 1))
+                        {
+
+                            SZkeys.Add(a[i].Name.Substring(0, 1));
+
+                        }
+                    }
+                }
+                else
+                {
+                    if (a[i].Name == "")
+                    {
+                        SZkeys.Add("");
+                    }
+                    else
+                    {
+                        SZkeys.Add(a[i].Name.Substring(0, 1));
+                    }
+                }
+            }
+
+            // var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd MMM yyyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
+            var res = coll.GroupBy(x => x.Name == "" ? " " : x.Name.Substring(0, 1)).OrderBy(x => x.Key);
             this.DefaultViewModel["Groups"] = res;
         }
 
@@ -516,12 +547,6 @@ namespace UniversalNomadUploader
             }
             else
             {
-                //The state must be 
-
-                if (itemListView.SelectedItem == null)
-                {
-                    throw new NullReferenceException("No item selected");
-                }
                 Evidence evi = ((Evidence)itemListView.SelectedItem); //Can throw null exception
                 evi.Name = NewName.Text;
                 await EvidenceUtil.UpdateEvidenceNameAsync(evi);
@@ -903,9 +928,19 @@ namespace UniversalNomadUploader
             Username.SelectionStart = Username.Text.Length;
         }
 
+        private void SemanticZoom_ViewChangeStarted(object sender, SemanticZoomViewChangedEventArgs e)
+        {
+
+
+            if (e.IsSourceZoomedInView == true)
+            {
+                e.DestinationItem.Item = SZkeys;
+            }
+        }
+
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
 
-        }        
+        }
     }
 }

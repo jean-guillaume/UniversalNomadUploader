@@ -74,17 +74,18 @@ namespace UniversalNomadUploader
         //Parameter : the use you want (photo or video)
         private async Task RecordPictureOrVideo(CaptureUse _CurrentUse)
         {
+            StorageFile testingRecord = null;
             String NewFileName = Guid.NewGuid().ToString();
             Evidence evi = new Evidence();
             evi.FileName = NewFileName;
             evi.CreatedDate = DateTime.Now;
             evi.ServerID = (int)GlobalVariables.SelectedServer;
 
+
             //Photo Capturing
             if (_CurrentUse == CaptureUse.Photo)
             {
                 bool mediaTypeExceptionCatched = false;
-                StorageFile testingRecord = null;
 
                 try
                 {
@@ -106,17 +107,18 @@ namespace UniversalNomadUploader
 
                     testingRecord = await m_camera.startRecording(NewFileName);
                 }
-                evi.Type = MimeTypes.Picture;
+                evi.Type = MimeTypes.Picture;                
 
                 //  ShowNewName();
                 LeavePreviewMode_Click(null, null);
                 DisableButtons(PageState.SetNewName);
             }
+            //Video recording
             else
             {
-                //Video recording
-                bool mediaTypeExceptionCatched = false;
-                StorageFile testingRecord = null;
+               
+                bool mediaTypeExceptionCatched = false;                
+                evi.Type = MimeTypes.Movie;
 
                 if (m_CurrentState != PageState.RecordingVideo)
                 {
@@ -151,6 +153,17 @@ namespace UniversalNomadUploader
                     DisableButtons(PageState.SetNewName);
                 }
 
+            }
+
+            if (testingRecord != null)
+            {
+                evi.Extension = testingRecord.FileType.Replace(".", "");
+                evi.Size = Convert.ToDouble((await testingRecord.GetBasicPropertiesAsync()).Size);
+                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
+                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
+                CurrentEvidence = evi;
+                CaptureContainer.Visibility = Visibility.Collapsed;
+                DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
             }
         }
 

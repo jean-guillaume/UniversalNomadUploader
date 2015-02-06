@@ -1,0 +1,151 @@
+﻿<Page
+    x:Class="UniversalNomadUploader.EvidenceViewer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UniversalNomadUploader"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    
+    <Page.Resources>
+        <!--
+            Collection of grouped items displayed by this page, bound to a subset
+            of the complete item list because items in groups cannot be virtualized
+        -->
+        <CollectionViewSource
+            x:Name="groupedItemsViewSource"
+            Source="{Binding Groups}"
+            IsSourceGrouped="true"
+            />
+    </Page.Resources>
+
+    <Grid Name="ContainerGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" HorizontalAlignment="Left">
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="90" />
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <SemanticZoom Name="SemanticView" Grid.Row="1" >
+            <SemanticZoom.ZoomedInView>
+                <ListView Background="Orange" x:Name="itemListView" ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}" SelectionMode="Multiple">
+                    <ListView.GroupStyle>
+                        <GroupStyle HidesIfEmpty="True">
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" BorderThickness="3" Height="50" Width="50" BorderBrush="Blue" >
+                                        <TextBlock Text="{Binding Key}" FontSize="30" FontWeight="SemiBold" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                            <GroupStyle.Panel>
+                                <ItemsPanelTemplate>
+                                    <VariableSizedWrapGrid Orientation="Horizontal"  />
+                                </ItemsPanelTemplate>
+                            </GroupStyle.Panel>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Left" Width="100" Height="100">
+                                <Image Stretch="UniformToFill" Source="{Binding ImagePath}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Foreground="AntiqueWhite" Style="{StaticResource TitleTextBlockStyle}"/>
+                                <SymbolIcon Symbol="Accept" Foreground="AntiqueWhite" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </SemanticZoom.ZoomedInView>
+            <SemanticZoom.ZoomedOutView>
+                <ListView x:Name="itemListViewOut" Foreground="Black" VerticalAlignment="Center"
+                          ScrollViewer.IsHorizontalScrollChainingEnabled="False"
+                          ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate >
+                            <Border Background="White" BorderThickness="3" Height="50" Width="50" BorderBrush="Blue" >
+                                <TextBlock Text="{Binding Image}" FontSize="30" FontWeight="SemiBold" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <Border x:Name="TiltContainer">
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroup x:Name="CommonStates">
+                                                    <VisualState x:Name="Normal" />
+                                                    <VisualState x:Name="Pressed">
+                                                        <Storyboard>
+                                                            <PointerDownThemeAnimation Storyboard.TargetName="TiltContainer" />
+                                                        </Storyboard>
+                                                    </VisualState>
+                                                    <VisualStateGroup.Transitions>
+                                                        <VisualTransition From="Pressed" To="Normal">
+                                                            <Storyboard>
+                                                                <PointerUpThemeAnimation Storyboard.TargetName="TiltContainer" />
+                                                            </Storyboard>
+                                                        </VisualTransition>
+                                                    </VisualStateGroup.Transitions>
+                                                </VisualStateGroup>
+                                            </VisualStateManager.VisualStateGroups>
+                                            <ContentPresenter ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                      Content="{Binding Source={StaticResource groupedItemsViewSource}}"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      Margin="{TemplateBinding Padding}" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="100" ItemHeight="70"
+                              Orientation="Horizontal" MaximumRowsOrColumns="3"></ItemsWrapGrid>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
+            </SemanticZoom.ZoomedOutView>
+        </SemanticZoom>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar Name="Appbar" IsSticky="True" >
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Name="Upload" Label="Upload" Click="Upload_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Upload" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Name="Import" Label="Import" IsCompact="True" Click="Import_Click">
+                    <SymbolIcon Symbol="Import" />
+                </AppBarButton>
+                <AppBarButton Name="EnterPreviewMode" Label="Record" IsCompact="True" Click="EnterPreviewMode_Click" >
+                    <SymbolIcon Symbol="Camera" />
+                </AppBarButton>
+            </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Name="Rename" Label="Rename" Click="Rename_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Rename" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Name="Delete" Label="Delete" Click="Delete_Click" Visibility="Collapsed">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="Delete" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Name="Logout" Label="Logout" Click="Logout_Click" Visibility="Collapsed">
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

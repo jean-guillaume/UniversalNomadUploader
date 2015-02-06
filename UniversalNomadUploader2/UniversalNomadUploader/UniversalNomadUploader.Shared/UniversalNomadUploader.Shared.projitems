@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>10b6f1c1-1d9b-4c94-8b68-6cb5badd836d</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>UniversalNomadUploader</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="$(MSBuildThisFileDirectory)App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="$(MSBuildThisFileDirectory)APIUtils\AuthenticationUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)APIUtils\UserUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\GlobalVariables.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\NameToNameInfoConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateFlyoutConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateSymbolCOnverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateVisibilityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadedColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadErrorMessageFlyoutMessageConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadErrorMessageVisibilityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadVisibilityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\APIModels\User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\Enums\ApiResponseCodes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\Enums\LogType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\Enums\MimeTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\Enums\ServerEnum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\FunctionalModels\Evidence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\FunctionalModels\User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\SampleDataSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\SQLModels\EventLog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\SQLModels\Evidence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\SQLModels\Server.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModel\SQLModels\User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\APIException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\EventLogUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\EvidenceUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\ServerUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\TableUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\UserUtil.cs" />
+    <Content Include="$(MSBuildThisFileDirectory)DataModel\SampleData.json" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\LightGray.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\MediumGray.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\DarkGray.png" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\NavigationHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\RelayCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\SuspensionManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ObservableDictionary.cs" />
+    <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en-US\Resources.resw" />
+  </ItemGroup>
+</Project>

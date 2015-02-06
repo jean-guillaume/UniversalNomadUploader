@@ -133,7 +133,14 @@ namespace UniversalNomadUploader
         
 
         private async void logon_Click(object sender, RoutedEventArgs e)
-        {            
+        {        
+            //jg
+          /*  if(true)
+            {
+                this.Frame.Navigate(typeof(EvidenceView));
+                return;
+            }*/
+
             ShowProgress();
             if (String.IsNullOrWhiteSpace(Username.Text))
             {

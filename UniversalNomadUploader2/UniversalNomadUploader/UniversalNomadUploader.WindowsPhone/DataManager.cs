@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace UniversalNomadUploader
+{
+    public class DataManager
+    {
+        private DBManager m_DBManager;
+        private ServerManager m_ServerManager;
+        private CaptureEvidence m_CaptureEvidence;
+
+        public DBManager dbManager
+        {
+            get { return m_DBManager; }
+            set { m_DBManager = value; }
+        }
+
+        public ServerManager serverManager
+        {
+            get { return m_ServerManager; }
+            set { m_ServerManager = value; }
+        }
+
+        public CaptureEvidence captureEvidence
+        {
+            get { return m_CaptureEvidence; }
+            set { m_CaptureEvidence = value; }
+        } 
+
+        public DataManager()
+        {
+            m_CaptureEvidence = new CaptureEvidence();
+        }
+               
+        public void UploadToServer()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SaveToDatabase()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void ReadDatabase()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+}
