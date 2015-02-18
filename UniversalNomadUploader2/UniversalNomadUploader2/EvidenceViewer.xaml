@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    
+
     <Page.Resources>
         <!--
             Collection of grouped items displayed by this page, bound to a subset
@@ -19,6 +19,7 @@
             Source="{Binding EvidenceItems}"
             IsSourceGrouped="true"
             />
+ 
     </Page.Resources>
 
     <Grid Name="ContainerGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" HorizontalAlignment="Stretch">
@@ -31,6 +32,7 @@
             <RowDefinition Height="90" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        
         <SemanticZoom Name="SemanticView" Grid.Row="1" >
             <SemanticZoom.ZoomedInView>
                 <ListView Background="Orange" x:Name="itemListView" ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}" SelectionMode="Multiple">
@@ -38,9 +40,9 @@
                         <GroupStyle HidesIfEmpty="True">
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate>
-                                    <Border Background="White" BorderThickness="3" Height="50" Width="50" BorderBrush="Blue" >
-                                        <TextBlock Text="{Binding Key}" FontSize="30" FontWeight="SemiBold" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
+                                    <StackPanel Margin="1,0,0,6" Orientation="Horizontal">
+                                        <Button Name="btnHeaderKey" Click="btnHeaderKey_Click" Width="50" Content="{Binding Key}" FontSize="26.667" Foreground="MediumBlue" Style="{StaticResource TextButtonStyle}"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </GroupStyle.HeaderTemplate>
                             <GroupStyle.Panel>
@@ -51,17 +53,16 @@
                         </GroupStyle>
                     </ListView.GroupStyle>
                     <ListView.ItemTemplate>
-                        <DataTemplate>                            
+                        <DataTemplate>
                             <Grid HorizontalAlignment="Left" Width="100" Height="100">
                                 <Image Stretch="UniformToFill" Source="{Binding ImagePath}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Foreground="AntiqueWhite" Style="{StaticResource TitleTextBlockStyle}"/>
-                                <SymbolIcon Symbol="Accept" Foreground="AntiqueWhite" HorizontalAlignment="Right" VerticalAlignment="Top" />
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical" />
+                            <VirtualizingStackPanel Orientation="Vertical" />
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
                 </ListView>
@@ -71,8 +72,7 @@
                               ItemsSource="{Binding Source={StaticResource groupedItemsViewSource},Path=CollectionGroups}">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="BurlyWood" 
-                                        Width="80" Height="80" Margin="6">
+                            <Border Width="80" Height="80" Margin="6">
                                 <TextBlock Text="{Binding Group.Key}" 
                                                Foreground="White" 
                                                HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="48" Padding="6"/>

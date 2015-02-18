@@ -4,10 +4,10 @@ using System.Text;
 
 namespace UniversalNomadUploader.DataModels.FunctionalModels
 {
-    public class User
+    public class FunctionnalUser
     {
 
-        public User(APIModels.User user)
+        public FunctionnalUser(APIModels.APIUser user)
         {
             this.UserID = user.UserID;
             this.FirstName = user.FirstName;
@@ -15,7 +15,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             this.OrganisationID = user.OrganisationID;
         }
 
-        public User(SQLModels.User dbuser)
+        public FunctionnalUser(SQLModels.SQLUser dbuser)
         {
             this.UserID = dbuser.UserID;
             this.FirstName = dbuser.FirstName;
@@ -27,7 +27,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             this.Username = dbuser.Username;
         }
 
-        public User()
+        public FunctionnalUser()
         {
         }
 

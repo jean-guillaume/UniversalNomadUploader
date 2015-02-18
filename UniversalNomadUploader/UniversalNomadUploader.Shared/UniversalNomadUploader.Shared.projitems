@@ -12,11 +12,13 @@
     <ApplicationDefinition Include="$(MSBuildThisFileDirectory)App.xaml">
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="$(MSBuildThisFileDirectory)APIUtils\AuthenticationUtil.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)APIUtils\UserUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)APIUtils\APIAuthenticationUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)APIUtils\APIUserUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CaptureEvidence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\GlobalVariables.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\NameToNameInfoConverter.cs" />
@@ -27,23 +29,26 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadErrorMessageFlyoutMessageConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadErrorMessageVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadVisibilityConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataModels\APIModels\User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\APIModels\APIUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ApiResponseCodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\LogType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\MimeTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ServerEnum.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataModels\FunctionalModels\Evidence.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataModels\FunctionalModels\User.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\EventLog.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\Evidence.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\Server.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\FunctionalModels\FunctionnalEvidence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\FunctionalModels\FunctionnalUser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\SQLEventLog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\SQLEvidence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\SQLServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\SQLUser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DBManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\APIException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\EventLogUtil.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\EvidenceUtil.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\ServerUtil.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\TableUtil.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\UserUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microphone.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServerManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\SQLEventLogUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\SQLEvidenceUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\SQLServerUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\SQLTableUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLUtils\SQLUserUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\NavigationHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\RelayCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\SuspensionManager.cs" />

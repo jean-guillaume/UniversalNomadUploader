@@ -5,16 +5,16 @@ using UniversalNomadUploader.DataModels.Enums;
 
 namespace UniversalNomadUploader.DataModels.FunctionalModels
 {
-    public class Evidence
+    public class FunctionnalEvidence
     {
-        public Evidence()
+        public FunctionnalEvidence()
         {
 
         }
 
-        public Evidence(SQLModels.Evidence e)
+        public FunctionnalEvidence(SQLModels.SQLEvidence e)
         {
-            this.LocalID = e.LocalID;
+            this.LocalID = e.LocalID; // primary key
             this.UserID = e.UserID;
             this.ServerID = e.ServerID;
             this.FileName = e.FileName;
@@ -28,11 +28,23 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             this.Type = (MimeTypes)e.Type;
         }
 
+        public FunctionnalEvidence(String _fileName, String _extension, DateTime _createdDate, int _serverID, int _userID, String _name, MimeTypes _mimeType, Double _size)
+        {
+            this.FileName = _fileName;
+            this.Extension = _extension;
+            this.CreatedDate = _createdDate;
+            this.ServerID = _serverID;
+            this.UserID = _userID;
+            this.Name = _name;
+            this.Type = _mimeType;
+            this.Size = _size;
+        }
+
         public int LocalID { get; set; }
         public int UserID { get; set; }
         public int ServerID { get; set; }
         public String FileName { get; set; }
-        public String Extension { get; set; }        
+        public String Extension { get; set; }
         public Double Size { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool HasTryUploaded { get; set; }
@@ -60,7 +72,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                     case MimeTypes.PDF:
                         return new System.Uri("ms-appx:///Assets/FileIcons/PDF.png");
                     case MimeTypes.Picture:
-                        return new System.Uri(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "/" + FileName + "." + Extension );
+                        return new System.Uri(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "/" + FileName + "." + Extension);
                     case MimeTypes.PowerPoint:
                         return new System.Uri("ms-appx:///Assets/FileIcons/Powerpoint.png");
                     case MimeTypes.Publisher:
@@ -78,7 +90,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                 }
             }
         }
-     
+
         public Uri UploadStatus
         {
             get

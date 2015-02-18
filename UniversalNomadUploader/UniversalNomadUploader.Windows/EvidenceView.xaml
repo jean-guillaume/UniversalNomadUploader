@@ -11,11 +11,11 @@
     RequestedTheme="Light"
     mc:Ignorable="d">
 
-    <Page.Resources>
-        <!--
+    <!--<Page.Resources>
+        --><!--
             Collection of grouped items displayed by this page, bound to a subset
             of the complete item list because items in groups cannot be virtualized
-        -->
+        --><!--
         <CollectionViewSource
             x:Name="groupedItemsViewSource"
             Source="{Binding Groups}"
@@ -115,11 +115,11 @@
 
     </Page.Resources>
 
-    <!--
+    --><!--
         This grid acts as a root panel for the page that defines two rows:
         * Row 0 contains the back button and page title
         * Row 1 contains the rest of the page layout
-    -->
+    --><!--
     <Grid Name="ContainerGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
@@ -218,7 +218,7 @@
                 </Grid>
                 <Button Name="InfoCancel" Style="{StaticResource CloseButtonStyle}" Content="Close" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" Click="InfoCancel_Click" Visibility="Visible" />
             </Grid>
-            <!-- Horizontal scrolling grid -->
+            --><!-- Horizontal scrolling grid --><!--
             <GridView
                     x:Name="itemGridView"
                     AutomationProperties.AutomationId="ItemGridView"
@@ -276,7 +276,7 @@
                 </GridView.GroupStyle>
             </GridView>
         </StackPanel>
-        <!-- Back button and page title -->
+        --><!-- Back button and page title --><!--
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
@@ -331,7 +331,7 @@
                 <AppBarButton Name="CaptureAudio" Content="Record audio" Click="CaptureAudio_Click" Style="{StaticResource AudioButtonStyle}"  />
             </CommandBar.PrimaryCommands>
         </CommandBar>
-    </Page.BottomAppBar>
+    </Page.BottomAppBar>-->
 </Page>
 
     

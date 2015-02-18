@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="UniversalNomadUploader2.Camera">
+  <Class Name="UniversalNomadUploader.Camera">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <NestedTypes>
-      <Enum Name="UniversalNomadUploader2.Camera.State" Collapsed="true">
+      <Enum Name="UniversalNomadUploader.Camera.State" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Camera.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
-      <Class Name="UniversalNomadUploader2.Camera.MediaTypeException" Collapsed="true">
+      <Class Name="UniversalNomadUploader.Camera.MediaTypeException" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Camera.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -16,69 +16,58 @@
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>AEAABAAAACABAUABBAAAAAAAQCBAAAAAAAAAAAAAEAA=</HashCode>
-      <FileName>Camera.cs</FileName>
+      <FileName>Shared\Camera.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="UniversalNomadUploader2.CaptureEvidence">
+  <Class Name="UniversalNomadUploader.CaptureEvidence">
     <Position X="3.25" Y="3" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAEAAAAAAgAAYAAAAAAACQAAAAAAQAAAIAAAAAABBA=</HashCode>
-      <FileName>CaptureEvidence.cs</FileName>
+      <HashCode>AAAAAAAAAAkAAYAAAAAAAGQAAAAAAQAAAIAAAAAAABA=</HashCode>
+      <FileName>Shared\CaptureEvidence.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="m_Camera" />
       <Field Name="m_Microphone" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="UniversalNomadUploader2.Microphone">
+  <Class Name="UniversalNomadUploader.Microphone">
     <Position X="0.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAgAAAAIAAAAQAAAAAAIAAAAAAABAAAAAAAIAAAAAA=</HashCode>
-      <FileName>Microphone.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAIAAAAAAABAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Shared\Microphone.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="UniversalNomadUploader2.DBManager">
-    <Position X="5.75" Y="6.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>DBManager.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="UniversalNomadUploader2.UI">
-    <Position X="8.25" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>UI.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsAssociation>
-      <Property Name="DataManager" />
-    </ShowAsAssociation>
-  </Class>
-  <Class Name="UniversalNomadUploader2.ServerManager">
-    <Position X="10.5" Y="6.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>UploadManager.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="UniversalNomadUploader2.DataManager">
+  <Class Name="UniversalNomadUploader.DataManager">
     <Position X="8.25" Y="3" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAgACAAAAAAAAIAAAAAAAAAACBAAAAAIABBAAAA=</HashCode>
+      <HashCode>AAAAAAgACAAAAAAAAIAAAAAAAAAACAEAAAAAABAAAAA=</HashCode>
       <FileName>DataManager.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="dbManager" />
-      <Property Name="serverManager" />
       <Property Name="captureEvidence" />
     </ShowAsAssociation>
   </Class>
-  <Enum Name="UniversalNomadUploader2.CaptureType">
+  <Class Name="UniversalNomadUploader.DBManager">
+    <Position X="6" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAECAACBMAAAgEAAQgAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Shared\DBManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniversalNomadUploader.ServerManager">
+    <Position X="11" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAYIAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Shared\ServerManager.cs</FileName>
+      <NewMemberFileName>UploadManager.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="UniversalNomadUploader.CaptureType">
     <Position X="3.25" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAACAAAAEAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
-      <FileName>CaptureEvidence.cs</FileName>
+      <FileName>Shared\CaptureEvidence.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Font Name="Segoe UI" Size="9" />

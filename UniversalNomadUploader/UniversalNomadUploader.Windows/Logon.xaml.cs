@@ -20,6 +20,7 @@ using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.Exceptions;
 using Windows.Storage;
 using HockeyApp;
+using UniversalNomadUploader.SQLUtils;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -153,14 +154,14 @@ namespace UniversalNomadUploader
             Boolean HasAuthed = false;
             if (GlobalVariables.HasInternetAccess())
             {
-                Guid Session = await AuthenticationUtil.Authenticate(Username.Text.ToUpper(), Password.Password, GlobalVariables.SelectedServer);
+                Guid Session = await APIAuthenticationUtil.Authenticate(Username.Text.ToUpper(), Password.Password, GlobalVariables.SelectedServer);
                 if (Session != Guid.Empty)
                 {
                     String ErrorMessage = String.Empty;
                     try
                     {
-                        await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text.ToUpper(), SessionID = Session }, Password.Password);
-                        await SQLUtils.UserUtil.UpdateUser(await APIUtils.UserUtil.GetProfile());
+                        await SQLUserUtil.InsertUser(new FunctionnalUser() { Username = Username.Text.ToUpper(), SessionID = Session }, Password.Password);
+                        await SQLUserUtil.UpdateUser(await APIUserUtil.GetProfile());
                     }
                     catch (ApiException exception)
                     {
@@ -182,7 +183,7 @@ namespace UniversalNomadUploader
             }
             else
             {
-                if (SQLUtils.UserUtil.AuthenticateOffline(Username.Text, Password.Password))
+                if (SQLUserUtil.AuthenticateOffline(Username.Text, Password.Password))
                 {
                     GlobalVariables.IsOffline = true;
                     HasAuthed = true;

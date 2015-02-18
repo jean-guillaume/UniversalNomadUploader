@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UniversalNomadUploader.DataModels.FunctionalModels;
-using UniversalNomadUploader.DefaultClasses;
+
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -26,19 +26,11 @@ namespace UniversalNomadUploader
     {
         DBManager db = null;
         ObservableDictionary defaultViewModel = new ObservableDictionary();
-        IEnumerable<IGrouping<String, Evidence>> evidenceGrouped;
+        //IEnumerable<IGrouping<String, Evidence>> evidenceGrouped;
 
         public ObservableDictionary DefaultViewModel
         {
             get { return this.defaultViewModel; }
-        }
-
-        public IEnumerable<IGrouping<String, Evidence>> EvidenceGrouped
-        {
-            get
-            {
-                return evidenceGrouped;
-            }
         }
 
         public EvidenceViewer()
@@ -53,7 +45,7 @@ namespace UniversalNomadUploader
         /// </summary>
         /// <param name="e">Event data that describes how this page was reached.
         /// This parameter is typically used to configure the page.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             // TODO: Prepare page for display here.
 
@@ -63,19 +55,11 @@ namespace UniversalNomadUploader
             // If you are using the NavigationHelper provided by some templates,
             // this event is handled for you.
 
-            if (db == null)
-            {
-                db = new DBManager("UniversalNomadUploader.db");
-            }
-            else
-            {
-                db = (DBManager)e.Parameter;
-            }
-            //db.add();
-            evidenceGrouped = db.readAllEvidence();
-            //var res = evidenceGrouped.GroupBy(x => x.Name == "" ? " " : x.Name.Substring(0, 1)).OrderBy(x => x.Key);
-            this.DefaultViewModel["EvidenceItems"] = evidenceGrouped;
-            //itemListView.ItemsSource = evidenceGrouped;
+            db = new DBManager();
+
+            await System.Threading.Tasks.Task.Run(() => { return; });
+            var evidenceGrouped = db.readAllEvidence();
+            this.DefaultViewModel["EvidenceItems"] = evidenceGrouped.ToList();
         }
 
         private void Import_Click(object sender, RoutedEventArgs e)
@@ -103,24 +87,14 @@ namespace UniversalNomadUploader
 
         }
 
-        private void StartStopRecord_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void TakePicture_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void LeavePreviewMode_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void Upload_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void btnHeaderKey_Click(object sender, RoutedEventArgs e)
+        {
+            SemanticView.IsZoomedInViewActive = false;
         }
     }
 }

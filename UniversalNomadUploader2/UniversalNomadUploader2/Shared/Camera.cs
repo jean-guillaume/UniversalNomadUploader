@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Windows.Media;
 using Windows.Media.Capture;
 using Windows.Media.Devices;
 using Windows.Media.MediaProperties;
 using Windows.Storage;
 
-namespace Camera
+namespace UniversalNomadUploader
 {
     class Camera : IDisposable
     {
@@ -33,7 +32,14 @@ namespace Camera
         {
             if (m_CurrentState != State.Instantiated && m_CurrentState != State.Initialized)
             {
-                throw new Exception("Camera.Initialize: Previewing still running, stop him before initalizing.");
+                if (m_CurrentState == State.Previewing)
+                {
+                    await stopPreview();
+                }
+                else
+                {
+                    throw new Exception("Camera.Initialize: Previewing still running, stop it before initalizing.");
+                }
             }
 
             // Create MediaCapture and init
@@ -46,7 +52,7 @@ namespace Camera
             m_imgEncodingProp.Width = 640;
             m_imgEncodingProp.Height = 480;
 
-            m_videoEncodingProp = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.HD1080p);
+            m_videoEncodingProp = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto);
 
             m_captureUse = _use;
             m_CurrentState = State.Initialized;
@@ -73,16 +79,8 @@ namespace Camera
                 _fileName = "default";
             }
 
-            try
-            {
-                storageFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(_fileName + ".jpg", CreationCollisionOption.GenerateUniqueName);
-                await m_mediaCapture.CapturePhotoToStorageFileAsync(m_imgEncodingProp, storageFile);
-
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            storageFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(_fileName + ".jpg", CreationCollisionOption.GenerateUniqueName);
+            await m_mediaCapture.CapturePhotoToStorageFileAsync(m_imgEncodingProp, storageFile);
 
             return storageFile;
         }
@@ -106,15 +104,8 @@ namespace Camera
                 _fileName = "default";
             }
 
-            try
-            {
-                storageFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(_fileName + ".mp4", CreationCollisionOption.GenerateUniqueName);
-                await m_mediaCapture.StartRecordToStorageFileAsync(m_videoEncodingProp, storageFile);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            storageFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(_fileName + ".mp4", CreationCollisionOption.GenerateUniqueName);
+            await m_mediaCapture.StartRecordToStorageFileAsync(m_videoEncodingProp, storageFile);
 
             if (m_CurrentState == State.Previewing)
             {

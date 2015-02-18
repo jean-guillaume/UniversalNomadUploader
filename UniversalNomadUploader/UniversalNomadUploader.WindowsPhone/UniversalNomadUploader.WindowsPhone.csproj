@@ -80,10 +80,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Camera.cs" />
-    <Compile Include="EvidenceViewCamera.cs" />
-    <Compile Include="EvidenceView.xaml.cs">
-      <DependentUpon>EvidenceView.xaml</DependentUpon>
+    <Compile Include="CaptureView.xaml.cs">
+      <DependentUpon>CaptureView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataManager.cs" />
+    <Compile Include="EvidenceViewer.xaml.cs">
+      <DependentUpon>EvidenceViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Logon.xaml.cs">
       <DependentUpon>Logon.xaml</DependentUpon>
@@ -131,13 +133,17 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="EvidenceView.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="CaptureView.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EvidenceViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Logon.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">

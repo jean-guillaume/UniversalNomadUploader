@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Security.Cryptography;
-using UniversalNomadUploader.Common;
 using UniversalNomadUploader.DataModels.FunctionalModels;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
@@ -154,7 +153,7 @@ namespace UniversalNomadUploader.SQLUtils
             {
                 var users = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(o => o.LocalID > 0);
                 foreach (var item in users)
-                { 
+                {
                     item.WasLastLogin = 0;
                     db.Update(item);
                 }
@@ -174,7 +173,7 @@ namespace UniversalNomadUploader.SQLUtils
                 DataModels.SQLModels.User u = db.Table<UniversalNomadUploader.DataModels.SQLModels.User>().Where(usr => usr.WasLastLogin == 1).SingleOrDefault();
                 if (u != null)
                 {
-                        return new User(u);
+                    return new User(u);
                 }
                 return null;
             }

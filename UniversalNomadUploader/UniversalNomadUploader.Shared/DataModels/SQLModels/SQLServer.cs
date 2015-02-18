@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace UniversalNomadUploader.DataModels.SQLModels
 {
-  public class Server
+  public class SQLServer
   {
     [PrimaryKey]
     public int ServerID { get; set; }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using UniversalNomadUploader.DataModels.FunctionalModels;
 
 namespace UniversalNomadUploader
 {
@@ -27,26 +29,22 @@ namespace UniversalNomadUploader
         {
             get { return m_CaptureEvidence; }
             set { m_CaptureEvidence = value; }
-        } 
+        }
 
         public DataManager()
         {
             m_CaptureEvidence = new CaptureEvidence();
         }
-               
-        public void UploadToServer()
-        {
-            throw new System.NotImplementedException();
-        }
 
-        public void SaveToDatabase()
+        public async Task<Guid> authenticateToServer(String _username, String _password)
         {
-            throw new System.NotImplementedException();
-        }
+            Guid Session = await m_ServerManager.Authenticate(_username, _password, GlobalVariables.SelectedServer, m_DBManager.getServerWSURLfromDB());
 
-        public void ReadDatabase()
-        {
-            throw new System.NotImplementedException();
+            await m_DBManager.InsertUser(new User() { Username = _username.ToUpper(), SessionID = Session }, _password);
+            await m_DBManager.UpdateUser(await APIUtils.UserUtil.GetProfile());
+
+            return Session;
+
         }
     }
 }

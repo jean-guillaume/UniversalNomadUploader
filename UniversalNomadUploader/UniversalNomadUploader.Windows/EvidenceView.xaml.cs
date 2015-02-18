@@ -42,7 +42,7 @@ namespace UniversalNomadUploader
     /// </summary>
     public sealed partial class EvidenceView : Page
     {
-        private NavigationHelper navigationHelper;
+       /* private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
         private CancellationTokenSource cts;
         private Evidence CurrentEvidence = null;
@@ -1009,6 +1009,6 @@ namespace UniversalNomadUploader
                 NewName.Focus(FocusState.Programmatic);
                 e.Handled = true;
             }
-        }
+        }*/
     }
 }

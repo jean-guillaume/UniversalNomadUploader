@@ -78,8 +78,7 @@ namespace UniversalNomadUploader
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            TableUtil.CreateTables();
-            ServerUtil.SetServers();
+            DBManager.InitDB();
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -136,7 +135,7 @@ namespace UniversalNomadUploader
                 rootFrame.ContentTransitions = null;
                 rootFrame.Navigated += this.RootFrame_FirstNavigated;
 #endif
-
+                                              
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter

@@ -31,7 +31,6 @@ namespace UniversalNomadUploader
         String m_fileNameEvi;
         String m_extensionEvi;
         int m_serverIDEvi;
-        String m_nameEvi;
         MimeTypes m_mimeTypeEvi;
 
         private enum PageState
@@ -55,14 +54,44 @@ namespace UniversalNomadUploader
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             UIState(PageState.Default);
-            Preview.Source = await m_dataManager.captureEvidence.Initialize(CaptureType.Video);
+            Preview.Source = await m_dataManager.captureEvidence.Initialize(CaptureType.Photo);
             await Preview.Source.StartPreviewAsync();
-            db = (DBManager) e.Parameter;
+            db = (DBManager)e.Parameter;
         }
+
+        async void Current_Activated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
+        {
+            if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated)
+            {
+                UIState(PageState.Default);
+                await Preview.Source.StopPreviewAsync();
+            }
+
+            if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.CodeActivated)
+            {
+                Preview.Source = await m_dataManager.captureEvidence.Initialize(CaptureType.Photo);
+            }
+        }
+
+       /* async void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            if (m_camera != null)
+            {
+                await (App.Current as App).CleanupCaptureResources();
+                e.Handled = true;
+            }
+        }*/
+
+       /* private async void LeavePreviewMode_Click(object sender, RoutedEventArgs e)
+        {            
+            DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
+            await m_camera.stopPreview();
+            freeResources();
+        }*/
 
         private void UIState(PageState _state)
         {
-            switch(_state)
+            switch (_state)
             {
                 case PageState.Default:
                     Appbar.Visibility = Windows.UI.Xaml.Visibility.Visible;
@@ -97,18 +126,18 @@ namespace UniversalNomadUploader
 
             storageFileResult = await m_dataManager.captureEvidence.TakePicture(fileName);
 
-            if( storageFileResult == null)
+            if (storageFileResult == null)
             {
                 await Preview.Source.StopPreviewAsync();
                 Preview.Source = await m_dataManager.captureEvidence.Initialize(CaptureType.Photo);
                 await Preview.Source.StartPreviewAsync();
                 storageFileResult = await m_dataManager.captureEvidence.TakePicture(fileName);
             }
-                        
+
             m_extensionEvi = "jpg";
             m_fileNameEvi = fileName;
             m_serverIDEvi = 0;
-            m_mimeTypeEvi = MimeTypes.Picture;           
+            m_mimeTypeEvi = MimeTypes.Picture;
 
             UIState(PageState.SavingName);
         }
@@ -134,7 +163,7 @@ namespace UniversalNomadUploader
         private void StopRecord_Click(object sender, RoutedEventArgs e)
         {
             m_dataManager.captureEvidence.StopVideoRecord();
-                        
+
             m_extensionEvi = "mp4";
             m_serverIDEvi = 0;
             m_mimeTypeEvi = MimeTypes.Movie;
@@ -168,6 +197,6 @@ namespace UniversalNomadUploader
         {
 
         }
-        
+
     }
 }

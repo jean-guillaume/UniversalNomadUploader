@@ -5,7 +5,7 @@ using System.Text;
 
 namespace UniversalNomadUploader.DataModels.SQLModels
 {
-  public class User
+  public class SQLUser
   {
     [PrimaryKey]
     [AutoIncrement]

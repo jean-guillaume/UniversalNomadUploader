@@ -13,14 +13,14 @@ namespace UniversalNomadUploader.Common
         private static ServerEnum _SelectedServer = ServerEnum.Live;
         public static ServerEnum SelectedServer { get { return _SelectedServer; } set { _SelectedServer = value; } }
         public static String dbPath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.Current.Resources["DatabaseName"].ToString());
-        private static User _LoggedInUser = null;
-        public static User LoggedInUser
+        private static FunctionnalUser _LoggedInUser = null;
+        public static FunctionnalUser LoggedInUser
         {
             get
             {
                 if (_LoggedInUser == null)
                 {
-                    _LoggedInUser =  SQLUtils.UserUtil.GetLastLoggedInUser();
+                    _LoggedInUser =  SQLUtils.SQLUserUtil.GetLastLoggedInUser();
                     _SelectedServer = (ServerEnum)_LoggedInUser.ServerID; //can throw exception
                 }
                 return _LoggedInUser;

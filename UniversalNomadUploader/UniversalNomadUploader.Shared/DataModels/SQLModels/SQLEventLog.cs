@@ -5,7 +5,7 @@ using System.Text;
 
 namespace UniversalNomadUploader.DataModels.SQLModels
 {
-    public class EventLog
+    public class SQLEventLog
     {
         [PrimaryKey]
         [AutoIncrement]

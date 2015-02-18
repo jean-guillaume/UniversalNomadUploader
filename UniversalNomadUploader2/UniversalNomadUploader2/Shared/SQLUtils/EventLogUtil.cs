@@ -13,7 +13,7 @@ namespace UniversalNomadUploader.SQLUtils
     {
         public static async Task InsertEventAsync(String EventDetails, LogType type)
         {
-            await Task.Run(() => InsertEvent(EventDetails, type));        
+            await Task.Run(() => InsertEvent(EventDetails, type));
         }
 
         public static void InsertEvent(string EventDetails, LogType type)

@@ -87,35 +87,47 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Camera.cs" />
-    <Compile Include="CaptureEvidence.cs" />
+    <Compile Include="Logon.xaml.cs">
+      <DependentUpon>Logon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shared\APIUtils\AuthenticationUtil.cs" />
+    <Compile Include="Shared\Camera.cs" />
+    <Compile Include="Shared\CaptureEvidence.cs" />
     <Compile Include="CaptureView.xaml.cs">
       <DependentUpon>CaptureView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DataModels\APIModels\User.cs" />
-    <Compile Include="DataModels\Enums\ApiResponseCodes.cs" />
-    <Compile Include="DataModels\Enums\LogType.cs" />
-    <Compile Include="DataModels\Enums\MimeTypes.cs" />
-    <Compile Include="DataModels\Enums\ServerEnum.cs" />
-    <Compile Include="DataModels\FunctionalModels\Evidence.cs" />
-    <Compile Include="DataModels\FunctionalModels\User.cs" />
-    <Compile Include="DataModels\SQLModels\EventLog.cs" />
-    <Compile Include="DataModels\SQLModels\SQLEvidence.cs" />
-    <Compile Include="DataModels\SQLModels\Server.cs" />
-    <Compile Include="DataModels\SQLModels\User.cs" />
-    <Compile Include="DBManager.cs" />
-    <Compile Include="DefaultClasses\ObservableDictionnary.cs" />
+    <Compile Include="Shared\DataModels\APIModels\User.cs" />
+    <Compile Include="Shared\DataModels\Enums\ApiResponseCodes.cs" />
+    <Compile Include="Shared\DataModels\Enums\LogType.cs" />
+    <Compile Include="Shared\DataModels\Enums\MimeTypes.cs" />
+    <Compile Include="Shared\DataModels\Enums\ServerEnum.cs" />
+    <Compile Include="Shared\DataModels\FunctionalModels\Evidence.cs" />
+    <Compile Include="Shared\DataModels\FunctionalModels\User.cs" />
+    <Compile Include="Shared\DataModels\SQLModels\EventLog.cs" />
+    <Compile Include="Shared\DataModels\SQLModels\SQLEvidence.cs" />
+    <Compile Include="Shared\DataModels\SQLModels\Server.cs" />
+    <Compile Include="Shared\DataModels\SQLModels\User.cs" />
+    <Compile Include="Shared\DBManager.cs" />
+    <Compile Include="Shared\DefaultClasses\NavigationHelper.cs" />
+    <Compile Include="Shared\DefaultClasses\ObservableDictionnary.cs" />
     <Compile Include="EvidenceViewer.xaml.cs">
       <DependentUpon>EvidenceViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LogonManager.cs" />
-    <Compile Include="Microphone.cs" />
+    <Compile Include="Shared\DefaultClasses\SuspensionManager.cs" />
+    <Compile Include="Shared\Exceptions\APIExceptions.cs" />
+    <Compile Include="Shared\GlobalVariables.cs" />
+    <Compile Include="Shared\Microphone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataManager.cs" />
+    <Compile Include="Shared\ServerManager.cs" />
+    <Compile Include="Shared\SQLUtils\EventLogUtil.cs" />
+    <Compile Include="Shared\SQLUtils\EvidenceUtil.cs" />
+    <Compile Include="Shared\SQLUtils\ServerUtil.cs" />
+    <Compile Include="Shared\APIUtils\UserUtil.cs" />
+    <Compile Include="Shared\SQLUtils\TableUtil.cs" />
+    <Compile Include="Shared\SQLUtils\UserUtil.cs" />
     <Compile Include="SQLite\SQLite.cs" />
     <Compile Include="SQLite\SQLiteAsync.cs" />
-    <Compile Include="UI.cs" />
-    <Compile Include="UploadManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -143,6 +155,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Logon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <SDKReference Include="Microsoft.VCLibs, version=12.0">
@@ -152,7 +168,17 @@
       <Name>SQLite for Windows Phone 8.1</Name>
     </SDKReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="HockeyApp">
+      <HintPath>..\packages\HockeySDK.WINRT.2.2.2\lib\portable-wpa81\HockeyApp.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeyAppPCL">
+      <HintPath>..\packages\HockeySDK.Core.2.2.2\lib\portable-net45+win8+wp8+wpa81+win81\HockeyAppPCL.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>

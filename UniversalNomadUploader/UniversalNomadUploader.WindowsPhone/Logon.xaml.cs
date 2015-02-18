@@ -1,4 +1,4 @@
-﻿using UniversalNomadUploader.Common;
+﻿using UniversalNomadUploader;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,8 +19,9 @@ using UniversalNomadUploader.APIUtils;
 using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.Exceptions;
 using Windows.Storage;
-using HockeyApp;
 using Windows.UI.ViewManagement;
+using UniversalNomadUploader.Common;
+using HockeyApp;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -34,6 +35,7 @@ namespace UniversalNomadUploader
 
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private DataManager m_dataManager = null;  
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
@@ -60,7 +62,7 @@ namespace UniversalNomadUploader
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
             this.Loaded += Logon_Loaded;
-            
+            m_dataManager = new DataManager();
         }
 
         async void Logon_Loaded(object sender, RoutedEventArgs e)
@@ -91,7 +93,7 @@ namespace UniversalNomadUploader
         /// session. The state will be null the first time a page is visited.</param>
         private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            
+
         }
 
         /// <summary>
@@ -129,17 +131,16 @@ namespace UniversalNomadUploader
 
         #endregion
 
-
-        
-
         private async void logon_Click(object sender, RoutedEventArgs e)
-        {        
-            //jg
-          /*  if(true)
-            {
-                this.Frame.Navigate(typeof(EvidenceView));
-                return;
-            }*/
+        {
+            //TODO : suppress
+            Username.Text = "BASSESSOR1";
+            Password.Password = "Test1234";
+            GlobalVariables.SelectedServer = ServerEnum.UAT1;
+            UAT2.IsChecked = false;
+            DEV.IsChecked = false;
+            MessageDialog a = new MessageDialog("HACK HACK HACK");
+            await a.ShowAsync();
 
             ShowProgress();
             if (String.IsNullOrWhiteSpace(Username.Text))
@@ -156,52 +157,12 @@ namespace UniversalNomadUploader
                 HideProgress();
                 return;
             }
-            ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
-            roamingSettings.Values["Username"] = Username.Text;
-            Boolean HasAuthed = false;
-            if (GlobalVariables.HasInternetAccess())
+
+            ServerManager server = new ServerManager(Username.Text, Password.Password);
+
+            if (await server.Connect() == 0)
             {
-                Guid Session = await AuthenticationUtil.Authenticate(Username.Text.ToUpper(), Password.Password, GlobalVariables.SelectedServer);
-                if (Session != Guid.Empty)
-                {
-                    String ErrorMessage = String.Empty;
-                    try
-                    {
-                        await SQLUtils.UserUtil.InsertUser(new User() { Username = Username.Text.ToUpper(), SessionID = Session }, Password.Password);
-                        await SQLUtils.UserUtil.UpdateUser(await APIUtils.UserUtil.GetProfile());
-                    }
-                    catch (ApiException exception)
-                    {
-                        ErrorMessage = exception.Message;
-                    }
-                    HideProgress();
-                    if (ErrorMessage != String.Empty)
-                    {
-                        MessageDialog msg = new MessageDialog(ErrorMessage, "Access denied");
-                        await msg.ShowAsync();
-                        HideProgress();
-                        return;
-                    }
-                    GlobalVariables.IsOffline = false;
-                    HasAuthed = true;
-                    this.Frame.Navigate(typeof(EvidenceView));
-                }
-            }
-            else
-            {
-                if (SQLUtils.UserUtil.AuthenticateOffline(Username.Text, Password.Password))
-                {
-                    GlobalVariables.IsOffline = true;
-                    HasAuthed = true;
-                    this.Frame.Navigate(typeof(EvidenceView));
-                }
-            }
-            if (!HasAuthed)
-            {
-                MessageDialog msg = new MessageDialog("Incorrect Username or Password", "Access denied");
-                await msg.ShowAsync();
-                HideProgress();
-                return;
+                this.Frame.Navigate(typeof(EvidenceViewer), m_dataManager);
             }
         }
 

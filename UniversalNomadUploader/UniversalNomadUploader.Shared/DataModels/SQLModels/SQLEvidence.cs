@@ -6,13 +6,13 @@ using UniversalNomadUploader.DataModels.Enums;
 
 namespace UniversalNomadUploader.DataModels.SQLModels
 {
-    public class Evidence
+    public class SQLEvidence
     {
-        public Evidence()
+        public SQLEvidence()
         {
         }
 
-        public Evidence(FunctionalModels.Evidence e)
+        public SQLEvidence(FunctionalModels.FunctionnalEvidence e)
         {
             this.LocalID = e.LocalID;
             this.UserID = e.UserID;
@@ -30,10 +30,10 @@ namespace UniversalNomadUploader.DataModels.SQLModels
 
         [PrimaryKey]
         [AutoIncrement]
+        public int LocalID { get; set; }
         public DateTime CreatedDate { get; set; }
         public String Extension { get; set; }
-        public String FileName { get; set; }
-        public int LocalID { get; set; }
+        public String FileName { get; set; }        
         public String Name { get; set; }
         public int ServerID { get; set; }
         public Double Size { get; set; }        

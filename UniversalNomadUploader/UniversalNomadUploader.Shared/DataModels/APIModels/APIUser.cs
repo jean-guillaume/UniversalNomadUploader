@@ -4,7 +4,7 @@ using System.Text;
 
 namespace UniversalNomadUploader.DataModels.APIModels
 {
-    public class User
+    public class APIUser
     {
         public int UserID { get; set; }
         public String FirstName { get; set; }

@@ -6,9 +6,9 @@ namespace UniversalNomadUploader.Common
 {
     public class EvidenceConverter
     {
-        public static IEnumerable<DataModels.FunctionalModels.Evidence> ToFunctionalEvidence(IEnumerable<DataModels.SQLModels.Evidence> Evs)
+        public static IEnumerable<DataModels.FunctionalModels.FunctionnalEvidence> ToFunctionalEvidence(IEnumerable<DataModels.SQLModels.SQLEvidence> Evs)
         {
-            List<DataModels.FunctionalModels.Evidence> e = new List<DataModels.FunctionalModels.Evidence>();
+            List<DataModels.FunctionalModels.FunctionnalEvidence> e = new List<DataModels.FunctionalModels.FunctionnalEvidence>();
             foreach (var item in Evs)
             {
                 e.Add(ToFunctionalEvidence(item));
@@ -16,9 +16,9 @@ namespace UniversalNomadUploader.Common
             return e;
         }
 
-        public static DataModels.FunctionalModels.Evidence ToFunctionalEvidence(DataModels.SQLModels.Evidence item)
+        public static DataModels.FunctionalModels.FunctionnalEvidence ToFunctionalEvidence(DataModels.SQLModels.SQLEvidence item)
         {
-            return new DataModels.FunctionalModels.Evidence(item);
+            return new DataModels.FunctionalModels.FunctionnalEvidence(item);
         }
     }
 }
