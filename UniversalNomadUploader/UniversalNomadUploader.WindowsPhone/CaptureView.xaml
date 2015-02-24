@@ -1,0 +1,237 @@
+﻿<Page
+    x:Class="UniversalNomadUploader.CaptureView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UniversalNomadUploader"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    
+    <Page.Resources>
+        <!-- Default style for Windows.UI.Xaml.Controls.AppBarButton -->
+        <Style TargetType="AppBarButton">
+            <Setter Property="Foreground" Value="{ThemeResource AppBarItemForegroundThemeBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="AppBarButton">
+                        <Grid x:Name="RootGrid" Width="100" Background="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="RotatingButton">
+                                    
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="ApplicationViewStates">
+                                    <VisualState x:Name="Landscape"/>
+
+                                    <VisualState x:Name="Portrait">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TakePicture" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Green"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <!-- FullSize is used when we are in landscape or filled mode -->
+                                    <VisualState x:Name="FullSize"/>
+                                    <!-- Compact is used when we are in portrait or snapped mode -->
+                                    <VisualState x:Name="Compact">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextLabel" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Width">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="60"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackgroundEllipse" Storyboard.TargetProperty="Fill">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppBarItemPointerOverBackgroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppBarItemPointerOverForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OutlineEllipse" Storyboard.TargetProperty="Stroke">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppBarItemForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackgroundEllipse" Storyboard.TargetProperty="Fill">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppBarItemForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppBarItemPressedForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OutlineEllipse" Storyboard.TargetProperty="Stroke">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppBarItemDisabledForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppBarItemDisabledForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextLabel" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppBarItemDisabledForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="FocusStates">
+                                    <VisualState x:Name="Focused">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                            Storyboard.TargetName="FocusVisualWhite"
+                            Storyboard.TargetProperty="Opacity"
+                            To="1"
+                            Duration="0"/>
+                                            <DoubleAnimation
+                            Storyboard.TargetName="FocusVisualBlack"
+                            Storyboard.TargetProperty="Opacity"
+                            To="1"
+                            Duration="0"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Unfocused" />
+                                    <VisualState x:Name="PointerFocused" />
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            <StackPanel VerticalAlignment="Top" Margin="0,14,0,13">
+                                <Grid Width="40" Height="40" Margin="0,0,0,5" HorizontalAlignment="Center">
+                                    <Ellipse
+                    x:Name="BackgroundEllipse"
+                    UseLayoutRounding="False"
+                    Width="40"
+                    Height="40"
+                    Fill="Black"
+                    Opacity="0.1"/>
+                                    <Ellipse
+                    x:Name="OutlineEllipse"
+                    UseLayoutRounding="False"
+                    Width="40"
+                    Height="40"
+                    Stroke="White"
+                    StrokeThickness="0" />
+                                    <ContentPresenter
+                    x:Name="Content"
+                    Content="{TemplateBinding Icon}"
+                    Foreground="White"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    AutomationProperties.AccessibilityView="Raw"/>
+                                </Grid>
+                                <TextBlock
+                  x:Name="TextLabel"
+                  Text="{TemplateBinding Label}"
+                  Foreground="{ThemeResource AppBarItemForegroundThemeBrush}"
+                  FontSize="12"
+                  FontFamily="{TemplateBinding FontFamily}"
+                  TextAlignment="Center"
+                  Width="88"
+                  TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <Rectangle
+                x:Name="FocusVisualWhite"
+                IsHitTestVisible="False"
+                Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}"
+                StrokeEndLineCap="Square"
+                StrokeDashArray="1,1"
+                Opacity="0"
+                StrokeDashOffset="1.5"/>
+                            <Rectangle
+                x:Name="FocusVisualBlack"
+                IsHitTestVisible="False"
+                Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}"
+                StrokeEndLineCap="Square"
+                StrokeDashArray="1,1"
+                Opacity="0"
+                StrokeDashOffset="0.5"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <!--Preview-->
+    <Grid Name="CaptureContainer">
+        <!--<VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="ApplicationViewStates">
+
+                <VisualState x:Name="Landscape">
+                    <Storyboard>
+                        
+                    </Storyboard>
+                </VisualState>
+
+                <VisualState x:Name="Portrait">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rect_1" Storyboard.TargetProperty="Fill">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Brown"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rect_2" Storyboard.TargetProperty="Fill">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Purple"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rect_3" Storyboard.TargetProperty="Fill">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Orange"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>-->
+        
+        <CaptureElement Name="Preview"  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"/>
+
+        <Grid Name="VideoRecordBtn" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
+            <AppBarButton Name="StopRecordVideo" Icon="Stop" Click="StopRecordVideo_Click" />
+        </Grid>
+        <Grid Name="AudioRecordBtn" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
+            <AppBarButton Name="StopRecordAudio" Icon="Stop" Click="StopRecordAudio_Click" />
+        </Grid>
+
+        <Grid Name="SavingNameGrid" Visibility="Collapsed">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Name:" Style="{StaticResource BodyTextBlockStyle}" FontSize="26" Height="50" HorizontalAlignment="Right" VerticalAlignment="Center" TextAlignment="Center" />
+                <TextBox Grid.Column="1" Name="NewName" MaxLength="255" FontSize="26" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <AppBarButton Name="SaveName" IsCompact="True" Click="SaveName_Click" >
+                        <SymbolIcon Symbol="Save" />
+                    </AppBarButton>
+                    <AppBarButton Name="CancelSaveName" IsCompact="True" Click="CancelSaveName_Click">
+                        <SymbolIcon Symbol="Cancel" />
+                    </AppBarButton>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <StackPanel Name="Appbar" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+            <AppBarButton  Name="TakePicture" Label="Take Picture" IsCompact="True" Click="TakePicture_Click" >
+                <SymbolIcon Symbol="Camera" />
+            </AppBarButton>
+            <AppBarButton Name="RecordVideo" Label="Record Video" IsCompact="True" Click="StartVideoRecord_Click" >
+                <SymbolIcon Symbol="Video" />
+            </AppBarButton>
+            <AppBarButton Name="RecordAudio" Label="Record Audio" IsCompact="True" Click="StartRecordAudio_Click" >
+                <SymbolIcon Symbol="Microphone" VerticalAlignment="Top" />
+            </AppBarButton>
+        </StackPanel>
+    </Grid>
+</Page>
