@@ -22,7 +22,7 @@ namespace UniversalNomadUploader.SQLUtils
         {
             using (var db = new SQLiteConnection(GlobalVariables.dbPath))
             {
-                return EvidenceConverter.ToFunctionalEvidence(db.Table<DataModels.SQLModels.Evidence>().Where(usr => usr.UserID == GlobalVariables.LoggedInUser.LocalID));
+               // return EvidenceConverter.ToFunctionalEvidence(db.Table<DataModels.SQLModels.Evidence>().Where(usr => usr.UserID == GlobalVariables.LoggedInUser.LocalID));
             }
         }
 

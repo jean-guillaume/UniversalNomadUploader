@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Sensors;
+using Windows.Graphics.Display;
 using Windows.Media.Capture;
 using Windows.Media.Devices;
 using Windows.Storage;
@@ -41,10 +43,13 @@ namespace UniversalNomadUploader
                     break;
 
                 default: break;
-            }
+            }           
+            
 
             return mediaCapture;
         }
+
+        #region Camera
 
         public async Task<StorageFile> TakePicture(String _filename)
         {
@@ -73,17 +78,7 @@ namespace UniversalNomadUploader
         public async void StopVideoRecord()
         {
             await m_Camera.stopVideoRecording();
-        }
-
-        public async void StartAudioRecord(String _filename)
-        {
-            await m_Microphone.StartRecord(_filename);
-        }
-
-        public void StopAudioRecord()
-        {
-            m_Microphone.StopRecord();
-        }
+        }        
 
         public async void StartPreview()
         {
@@ -94,5 +89,21 @@ namespace UniversalNomadUploader
         {
             await m_Camera.stopPreview();
         }
+
+        #endregion 
+
+        #region Microphone
+
+        public async Task<StorageFile> StartAudioRecord(String _filename)
+        {
+            return await m_Microphone.StartRecord(_filename);
+        }
+
+        public async void StopAudioRecord()
+        {
+            await m_Microphone.StopRecord();
+        }
+
+        #endregion 
     }
 }

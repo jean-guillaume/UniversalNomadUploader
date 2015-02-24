@@ -11,11 +11,14 @@
     RequestedTheme="Light"
     mc:Ignorable="d">
 
-    <!--<Page.Resources>
-        --><!--
+    <!--
+    <Page.Resources>
+        -->
+    <!--
             Collection of grouped items displayed by this page, bound to a subset
             of the complete item list because items in groups cannot be virtualized
-        --><!--
+        -->
+    <!--
         <CollectionViewSource
             x:Name="groupedItemsViewSource"
             Source="{Binding Groups}"
@@ -331,7 +334,8 @@
                 <AppBarButton Name="CaptureAudio" Content="Record audio" Click="CaptureAudio_Click" Style="{StaticResource AudioButtonStyle}"  />
             </CommandBar.PrimaryCommands>
         </CommandBar>
-    </Page.BottomAppBar>-->
+    </Page.BottomAppBar>
+    -->
 </Page>
 
     

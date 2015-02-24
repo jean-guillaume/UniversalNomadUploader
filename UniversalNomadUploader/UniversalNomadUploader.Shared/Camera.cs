@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Sensors;
+using Windows.Graphics.Display;
 using Windows.Media.Capture;
 using Windows.Media.Devices;
 using Windows.Media.MediaProperties;
@@ -43,20 +45,20 @@ namespace UniversalNomadUploader
             }
 
             // Create MediaCapture and init
-            m_mediaCapture = new MediaCapture();
+            m_mediaCapture = new MediaCapture();            
             await m_mediaCapture.InitializeAsync();
-            m_mediaCapture.VideoDeviceController.PrimaryUse = _use;
-            m_mediaCapture.SetRecordRotation(VideoRotation.None);
+            m_mediaCapture.SetPreviewRotation(VideoRotation.Clockwise90Degrees);
+            m_mediaCapture.VideoDeviceController.PrimaryUse = _use;            
 
             m_imgEncodingProp = ImageEncodingProperties.CreateJpeg();
-            m_imgEncodingProp.Width = 640;
-            m_imgEncodingProp.Height = 480;
 
             m_videoEncodingProp = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto);
 
             m_captureUse = _use;
             m_CurrentState = State.Initialized;
 
+
+            
             return m_mediaCapture;
         }
 
