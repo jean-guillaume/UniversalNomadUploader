@@ -49,8 +49,6 @@ namespace UniversalNomadUploader
             return mediaCapture;
         }
 
-        #region Camera
-
         public async Task<StorageFile> TakePicture(String _filename)
         {
             try
@@ -90,10 +88,11 @@ namespace UniversalNomadUploader
             await m_Camera.stopPreview();
         }
 
-        #endregion 
-
-        #region Microphone
-
+        public Double getOrientationAngle(SimpleOrientation _orientation)
+        {
+            return m_Camera.OrientationAngle(_orientation);
+        }
+                
         public async Task<StorageFile> StartAudioRecord(String _filename)
         {
             return await m_Microphone.StartRecord(_filename);
@@ -103,7 +102,5 @@ namespace UniversalNomadUploader
         {
             await m_Microphone.StopRecord();
         }
-
-        #endregion 
     }
 }

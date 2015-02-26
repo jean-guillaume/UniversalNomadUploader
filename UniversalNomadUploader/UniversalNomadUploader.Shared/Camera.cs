@@ -51,13 +51,10 @@ namespace UniversalNomadUploader
             m_mediaCapture.VideoDeviceController.PrimaryUse = _use;            
 
             m_imgEncodingProp = ImageEncodingProperties.CreateJpeg();
-
             m_videoEncodingProp = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto);
 
             m_captureUse = _use;
             m_CurrentState = State.Initialized;
-
-
             
             return m_mediaCapture;
         }
@@ -81,7 +78,7 @@ namespace UniversalNomadUploader
                 _fileName = "default";
             }
 
-            storageFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(_fileName + ".jpg", CreationCollisionOption.GenerateUniqueName);
+            storageFile = await KnownFolders.PicturesLibrary.CreateFileAsync(_fileName + ".jpg", CreationCollisionOption.GenerateUniqueName);
             await m_mediaCapture.CapturePhotoToStorageFileAsync(m_imgEncodingProp, storageFile);
 
             return storageFile;
@@ -106,7 +103,7 @@ namespace UniversalNomadUploader
                 _fileName = "default";
             }
 
-            storageFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(_fileName + ".mp4", CreationCollisionOption.GenerateUniqueName);
+            storageFile = await KnownFolders.VideosLibrary.CreateFileAsync(_fileName + ".mp4", CreationCollisionOption.GenerateUniqueName);
             await m_mediaCapture.StartRecordToStorageFileAsync(m_videoEncodingProp, storageFile);
 
             if (m_CurrentState == State.Previewing)
@@ -130,7 +127,7 @@ namespace UniversalNomadUploader
             }
 
             await m_mediaCapture.StopRecordAsync();
-
+            
             if (m_CurrentState == State.PreviewingAndRecording)
             {
                 m_CurrentState = State.Previewing;
@@ -178,6 +175,33 @@ namespace UniversalNomadUploader
             {
                 m_CurrentState = State.Initialized;
             }
+        }
+
+        public Double OrientationAngle(SimpleOrientation _orientation)
+        {
+            switch (_orientation)
+            {
+                case SimpleOrientation.NotRotated:
+                    return 0;
+
+                case SimpleOrientation.Rotated90DegreesCounterclockwise:
+                    return 90;
+
+                case SimpleOrientation.Rotated180DegreesCounterclockwise:
+                    return 180;
+
+                case SimpleOrientation.Rotated270DegreesCounterclockwise:
+                    return -90;
+
+                case SimpleOrientation.Faceup:
+                    break;
+                case SimpleOrientation.Facedown:
+                    break;
+                default:
+                    break;
+            }
+
+            return 0;
         }
 
         public void Dispose()

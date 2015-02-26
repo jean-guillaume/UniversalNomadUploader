@@ -33,7 +33,14 @@
     <Capability Name="musicLibrary" />
     <Capability Name="picturesLibrary" />
     <Capability Name="videosLibrary" />
+    <m3:Capability Name="contacts" />
+    <m3:Capability Name="appointments" />
+    <Capability Name="enterpriseAuthentication" />
+    <Capability Name="removableStorage" />
+    <Capability Name="sharedUserCertificates" />
     <DeviceCapability Name="microphone" />
     <DeviceCapability Name="webcam" />
+    <DeviceCapability Name="location" />
+    <DeviceCapability Name="proximity" />
   </Capabilities>
 </Package>

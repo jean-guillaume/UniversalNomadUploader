@@ -11,6 +11,7 @@ using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
 using Windows.Phone.UI.Input;
 using Windows.Storage;
+using Windows.Storage.FileProperties;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
@@ -36,7 +37,7 @@ namespace UniversalNomadUploader
         SimpleOrientationSensor m_simpleorientation;
         StorageFile m_file = null;
         MimeTypes m_mimeTypeEvi;
-        Double m_currentRotation = 0;
+        Double m_currentAngle = 0;
 
         private enum PageState
         {
@@ -62,92 +63,28 @@ namespace UniversalNomadUploader
             }
         }
 
+
         private async void OrientationChanged(object sender, SimpleOrientationSensorOrientationChangedEventArgs e)
         {
-            //put the storyboard in xaml
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                SimpleOrientation orientation = e.Orientation;
+                Double nextAngle = m_dataManager.getOrientationAngle(e.Orientation);
+                Storyboard sbRotatingButton = (Storyboard)FindName("RotatingBtnAnimation");
 
-                Storyboard sb = new Storyboard();
-                DoubleAnimation rotateDoubleAnimationPicture = new DoubleAnimation();
-                rotateDoubleAnimationPicture.Duration = new Duration(TimeSpan.FromMilliseconds(500));
+                DoubleAnimation rotateAnimation = (DoubleAnimation)FindName("RotatingTakePicture");
+                rotateAnimation.From = m_currentAngle;
+                rotateAnimation.To = nextAngle;
+                rotateAnimation = (DoubleAnimation)FindName("RotatingRecordVideo");
+                rotateAnimation.From = m_currentAngle;
+                rotateAnimation.To = nextAngle;
+                rotateAnimation = (DoubleAnimation)FindName("RotatingRecordAudio");
+                rotateAnimation.From = m_currentAngle;
+                rotateAnimation.To = nextAngle;
 
-                DoubleAnimation rotateDoubleAnimationVideo = new DoubleAnimation();
-                rotateDoubleAnimationVideo.Duration = new Duration(TimeSpan.FromMilliseconds(500));
-
-                DoubleAnimation rotateDoubleAnimationAudio = new DoubleAnimation();
-                rotateDoubleAnimationAudio.Duration = new Duration(TimeSpan.FromMilliseconds(500));
-
-                RotateTransform swiftPicture = new RotateTransform();
-                swiftPicture.CenterX = TakePicture.ActualWidth / 2;
-                swiftPicture.CenterY = TakePicture.ActualHeight / 2;
-                TakePicture.RenderTransform = swiftPicture;
-
-                RotateTransform swiftVideo = new RotateTransform();
-                swiftVideo.CenterX = RecordVideo.ActualWidth / 2;
-                swiftVideo.CenterY = RecordVideo.ActualHeight / 2;
-                RecordVideo.RenderTransform = swiftVideo;
-
-                RotateTransform swiftAudio = new RotateTransform();
-                swiftAudio.CenterX = RecordAudio.ActualWidth / 2;
-                swiftAudio.CenterY = RecordAudio.ActualHeight / 2;
-                RecordAudio.RenderTransform = swiftAudio;
-
-                rotateDoubleAnimationPicture.From = m_currentRotation;
-                
-                switch (orientation)
-                {
-                    case SimpleOrientation.NotRotated:
-                        rotateDoubleAnimationPicture.To = m_currentRotation = 0;
-                        rotateDoubleAnimationVideo.To = m_currentRotation;
-                        rotateDoubleAnimationAudio.To = m_currentRotation;
-                        break;
-
-                    case SimpleOrientation.Rotated90DegreesCounterclockwise:
-                        rotateDoubleAnimationPicture.To = m_currentRotation = 90;
-                        rotateDoubleAnimationVideo.To = m_currentRotation;
-                        rotateDoubleAnimationAudio.To = m_currentRotation;
-                        break;
-
-                    case SimpleOrientation.Rotated180DegreesCounterclockwise:
-                        rotateDoubleAnimationPicture.To = m_currentRotation = 180;
-                        rotateDoubleAnimationVideo.To = m_currentRotation;
-                        rotateDoubleAnimationAudio.To = m_currentRotation;
-                        break;
-
-                    case SimpleOrientation.Rotated270DegreesCounterclockwise:
-                        rotateDoubleAnimationPicture.To = m_currentRotation = 270;
-                        rotateDoubleAnimationVideo.To = m_currentRotation;
-                        rotateDoubleAnimationAudio.To = m_currentRotation;
-                        break;
-
-                    case SimpleOrientation.Faceup:
-                        break;
-                    case SimpleOrientation.Facedown:
-                        break;
-                    default:
-                        break;
-                }
-
-                Storyboard.SetTarget(rotateDoubleAnimationPicture, TakePicture);
-                Storyboard.SetTargetName(rotateDoubleAnimationPicture, TakePicture.Name);
-                Storyboard.SetTargetProperty((Timeline)rotateDoubleAnimationPicture, (new PropertyPath("(UIElement.RenderTransform).(RotateTransform.Angle)")).Path);
-                sb.Children.Add(rotateDoubleAnimationPicture);
-
-                Storyboard.SetTarget(rotateDoubleAnimationVideo, RecordVideo);
-                Storyboard.SetTargetName(rotateDoubleAnimationVideo, RecordVideo.Name);
-                Storyboard.SetTargetProperty((Timeline)rotateDoubleAnimationVideo, (new PropertyPath("(UIElement.RenderTransform).(RotateTransform.Angle)")).Path);
-                sb.Children.Add(rotateDoubleAnimationVideo);
-
-                Storyboard.SetTarget(rotateDoubleAnimationAudio, RecordAudio);
-                Storyboard.SetTargetName(rotateDoubleAnimationAudio, RecordAudio.Name);
-                Storyboard.SetTargetProperty((Timeline)rotateDoubleAnimationAudio, (new PropertyPath("(UIElement.RenderTransform).(RotateTransform.Angle)")).Path);
-                sb.Children.Add(rotateDoubleAnimationAudio);
-                
-                sb.Begin();
+                m_currentAngle = nextAngle;
+                sbRotatingButton.Begin();
             });
-        }        
+        }
 
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.
@@ -160,36 +97,6 @@ namespace UniversalNomadUploader
             Preview.Source = await m_dataManager.InitializeCamera(CaptureType.Photo);
             await Preview.Source.StartPreviewAsync();
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-
-            
-            //m_sensor.OrientationChanged += async (s, arg) =>
-            //{
-            //   await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            //    {
-
-            //        switch (arg.Orientation)
-            //        {
-            //            case SimpleOrientation.Rotated90DegreesCounterclockwise:
-            //                TakePicture.Icon.RenderTransform = new RotateTransform() { CenterX = 0.5, CenterY = 0.5, Angle = 45 };
-            //                /*if (ct != null) // Just to make sure
-            //                {
-            //                    ct.CenterX = TakePicture.ActualWidth / 2;
-            //                    ct.CenterY = TakePicture.ActualHeight / 2;
-            //                    ct.Rotation += 90;
-            //                }*/
-            //                break;
-            //            case SimpleOrientation.Rotated180DegreesCounterclockwise:
-            //                break;
-            //            case SimpleOrientation.Rotated270DegreesCounterclockwise:
-            //                break;
-            //            default:
-            //                break;
-            //        }
-            //    });
-            //};
-
-           // m_sensor.OrientationChanged -= (s, arg) => { };
-
         }
 
         protected override async void OnNavigatedFrom(NavigationEventArgs e)
@@ -331,8 +238,8 @@ namespace UniversalNomadUploader
         {
             UIState(PageState.VideoRecording);
 
-            String filename = Guid.NewGuid().ToString();
-            m_file = await m_dataManager.StartVideoRecord(filename);
+            String fileName = Guid.NewGuid().ToString();
+            m_file = await m_dataManager.StartVideoRecord(fileName);
 
             if (m_file == null)
             {
@@ -394,7 +301,22 @@ namespace UniversalNomadUploader
                 UIState(PageState.SavingName);
                 return;
             }
-            m_file = null; // put in the initial value for the next test on null
+
+            if (m_mimeTypeEvi == MimeTypes.Movie || m_mimeTypeEvi == MimeTypes.Picture)
+            {
+
+                StorageFolder VideoThumbs = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFolderAsync("_VidThumbs", CreationCollisionOption.OpenIfExists);
+                StorageFile VideoThumb = await VideoThumbs.CreateFileAsync(m_file.DisplayName + ".jpg", CreationCollisionOption.ReplaceExisting);
+
+                using (var stream = await m_file.GetThumbnailAsync(ThumbnailMode.VideosView))
+                {
+                    stream.AsStream().CopyTo(await VideoThumb.OpenStreamForWriteAsync());
+                }
+
+                await m_file.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, m_file.DisplayName + m_file.FileType, NameCollisionOption.ReplaceExisting);
+            }
+
+            m_file = null; // put in the initial state
             UIState(PageState.Default);
         }
 

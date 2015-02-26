@@ -7,8 +7,22 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    
+
     <Page.Resources>
+        <Storyboard x:Name="RotatingBtnAnimation">
+            <DoubleAnimation x:Name="RotatingTakePicture" Duration="0:0:0.5"
+                                Storyboard.TargetName="TakePicture"
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"/>
+            <DoubleAnimation x:Name="RotatingRecordVideo" Duration="0:0:0.5" 
+                                Storyboard.TargetName="RecordVideo"
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"/>
+            <DoubleAnimation x:Name="RotatingRecordAudio" Duration="0:0:0.5" 
+                                Storyboard.TargetName="RecordAudio"
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"/>
+        </Storyboard>
+             
+                      
+
         <!-- Default style for Windows.UI.Xaml.Controls.AppBarButton -->
         <Style TargetType="AppBarButton">
             <Setter Property="Foreground" Value="{ThemeResource AppBarItemForegroundThemeBrush}"/>
@@ -22,7 +36,16 @@
                         <Grid x:Name="RootGrid" Width="100" Background="Transparent">
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="RotatingButton">
-                                    
+                                    <VisualState>
+                                        <Storyboard x:Name="RotateTakePictureBtn" x:Uid="RotateTakePictureBtn">
+                                            <DoubleAnimation Duration="0:0:2" To="100.0" 
+                                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" 
+                                                     />
+                                            <DoubleAnimation Duration="0:0:2" To="100.0" 
+                                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" 
+                                                     />
+                                        </Storyboard>
+                                    </VisualState>
                                 </VisualStateGroup>
                                 <VisualStateGroup x:Name="ApplicationViewStates">
                                     <VisualState x:Name="Landscape"/>
@@ -192,7 +215,7 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>-->
-        
+
         <CaptureElement Name="Preview"  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"/>
 
         <Grid Name="VideoRecordBtn" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
@@ -223,14 +246,23 @@
             </Grid>
         </Grid>
         <StackPanel Name="Appbar" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-            <AppBarButton  Name="TakePicture" Label="Take Picture" IsCompact="True" Click="TakePicture_Click" >
+            <AppBarButton  Name="TakePicture" Label="Take Picture" IsCompact="True" Click="TakePicture_Click" RenderTransformOrigin="0.5, 0.5">
+                <AppBarButton.RenderTransform>
+                    <RotateTransform/>
+                </AppBarButton.RenderTransform>
                 <SymbolIcon Symbol="Camera" />
             </AppBarButton>
-            <AppBarButton Name="RecordVideo" Label="Record Video" IsCompact="True" Click="StartVideoRecord_Click" >
+            <AppBarButton Name="RecordVideo" Label="Record Video" IsCompact="True" Click="StartVideoRecord_Click" RenderTransformOrigin="0.5, 0.5">
+                <AppBarButton.RenderTransform>
+                    <RotateTransform/>
+                </AppBarButton.RenderTransform>
                 <SymbolIcon Symbol="Video" />
             </AppBarButton>
-            <AppBarButton Name="RecordAudio" Label="Record Audio" IsCompact="True" Click="StartRecordAudio_Click" >
-                <SymbolIcon Symbol="Microphone" VerticalAlignment="Top" />
+            <AppBarButton Name="RecordAudio" Label="Record Audio" IsCompact="True" Click="StartRecordAudio_Click" RenderTransformOrigin="0.5, 0.5" >
+                <AppBarButton.RenderTransform>
+                    <RotateTransform/>
+                </AppBarButton.RenderTransform>
+                <SymbolIcon Symbol="Microphone"/>
             </AppBarButton>
         </StackPanel>
     </Grid>
