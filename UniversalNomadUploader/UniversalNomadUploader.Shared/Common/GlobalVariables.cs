@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Text;
 using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.DataModels.FunctionalModels;

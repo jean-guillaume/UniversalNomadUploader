@@ -189,33 +189,7 @@
 
     <!--Preview-->
     <Grid Name="CaptureContainer">
-        <!--<VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="ApplicationViewStates">
-
-                <VisualState x:Name="Landscape">
-                    <Storyboard>
-                        
-                    </Storyboard>
-                </VisualState>
-
-                <VisualState x:Name="Portrait">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rect_1" Storyboard.TargetProperty="Fill">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Brown"/>
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rect_2" Storyboard.TargetProperty="Fill">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Purple"/>
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rect_3" Storyboard.TargetProperty="Fill">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Orange"/>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>-->
-
+        <TextBlock Name="NoCameraMsg" Visibility="Collapsed" FontSize="32" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <CaptureElement Name="Preview"  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"/>
 
         <Grid Name="VideoRecordBtn" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">

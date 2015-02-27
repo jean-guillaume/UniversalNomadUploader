@@ -24,12 +24,13 @@ namespace UniversalNomadUploader
         public Camera()
         {
             m_CurrentState = State.Instantiated;
-        }
+        }        
 
-        /**
-         *Initialize encoding for the photo and the video
-         *Return: useful for Preview.Source = await camera.Initialize(CaptureUse.Video);
-         */
+        /// <summary>
+        /// Initialize the camera, this method have to be called before any action
+        /// </summary>
+        /// <param name="_use">Define the purpose of the Camera (Video or Photo)</param>
+        /// <returns>Return a MedicaCapture object. It should be use to initialize a UI CaptureElement. If failed return null</returns>
         public async Task<MediaCapture> Initialize(CaptureUse _use = CaptureUse.Photo)
         {
             if (m_CurrentState != State.Instantiated && m_CurrentState != State.Initialized)
@@ -45,20 +46,48 @@ namespace UniversalNomadUploader
             }
 
             // Create MediaCapture and init
-            m_mediaCapture = new MediaCapture();            
-            await m_mediaCapture.InitializeAsync();
+            m_mediaCapture = new MediaCapture();
+
+            try
+            {
+                await m_mediaCapture.InitializeAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
             m_mediaCapture.SetPreviewRotation(VideoRotation.Clockwise90Degrees);
-            m_mediaCapture.VideoDeviceController.PrimaryUse = _use;            
+            m_mediaCapture.VideoDeviceController.PrimaryUse = _use;
 
             m_imgEncodingProp = ImageEncodingProperties.CreateJpeg();
             m_videoEncodingProp = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto);
 
             m_captureUse = _use;
             m_CurrentState = State.Initialized;
-            
+
+            m_mediaCapture.Failed += CameraMediaCapture_Failed;
+            m_mediaCapture.RecordLimitationExceeded += CameraMediaCapture_RecordLimitationExceeded;
+
             return m_mediaCapture;
         }
 
+        //TODO implement exceptions
+        void CameraMediaCapture_RecordLimitationExceeded(MediaCapture sender)
+        {
+            throw new NotImplementedException();
+        }
+
+        void CameraMediaCapture_Failed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Take a picture
+        /// </summary>
+        /// <param name="_fileName"> Name of the file where the picture will be saved</param>
+        /// <returns> StorageFile object containing the picture. Return null if not initialized or is currently recording</returns>
         public async Task<StorageFile> takePicture(String _fileName)
         {
             StorageFile storageFile = null;
@@ -84,6 +113,11 @@ namespace UniversalNomadUploader
             return storageFile;
         }
 
+        /// <summary>
+        /// Start the recording of a video
+        /// </summary>
+        /// <param name="_fileName">Name of the file where the video will be saved.</param>
+        /// <returns>StorageFile object containing the picture. Return null if not initialized or is currently recording</returns>
         public async Task<StorageFile> startRecording(String _fileName)
         {
             StorageFile storageFile = null;
@@ -119,6 +153,10 @@ namespace UniversalNomadUploader
             return storageFile;
         }
 
+        /// <summary>
+        /// Stop the actual record. If the camera is not recording the method do nothing.
+        /// </summary>
+        /// <returns></returns>
         public async Task stopVideoRecording()
         {
             if (m_CurrentState != State.Recording && m_CurrentState != State.PreviewingAndRecording)
@@ -127,7 +165,7 @@ namespace UniversalNomadUploader
             }
 
             await m_mediaCapture.StopRecordAsync();
-            
+
             if (m_CurrentState == State.PreviewingAndRecording)
             {
                 m_CurrentState = State.Previewing;
@@ -138,6 +176,10 @@ namespace UniversalNomadUploader
             }
         }
 
+        /// <summary>
+        /// Start the preview of the camera
+        /// </summary>
+        /// <returns></returns>
         public async Task startPreview()
         {
             if (m_CurrentState != State.Initialized && m_CurrentState != State.Recording)
@@ -157,6 +199,10 @@ namespace UniversalNomadUploader
             }
         }
 
+        /// <summary>
+        /// Stop the preview of the camera
+        /// </summary>
+        /// <returns></returns>
         public async Task stopPreview()
         {
             if (m_CurrentState != State.Previewing && m_CurrentState != State.PreviewingAndRecording)
@@ -177,6 +223,11 @@ namespace UniversalNomadUploader
             }
         }
 
+        /// <summary>
+        /// Give the rotation angle of the phone in degrees
+        /// </summary>
+        /// <param name="_orientation"> Orientation object</param>
+        /// <returns>Orientation angle in degrees</returns>
         public Double OrientationAngle(SimpleOrientation _orientation)
         {
             switch (_orientation)
@@ -204,6 +255,9 @@ namespace UniversalNomadUploader
             return 0;
         }
 
+        /// <summary>
+        /// free all ressources of the Camera object
+        /// </summary>
         public void Dispose()
         {
             if (m_mediaCapture != null)
@@ -213,6 +267,9 @@ namespace UniversalNomadUploader
             }
         }
 
+        /// <summary>
+        /// Exception thrown when a Camera object initialized as CaptureUse.Photo try to capture a video and vice versa
+        /// </summary>
         public class MediaTypeException : Exception
         {
             public MediaTypeException(string message)

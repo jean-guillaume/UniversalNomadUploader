@@ -24,6 +24,11 @@ namespace UniversalNomadUploader
             m_Microphone = new Microphone();
         }
 
+        /// <summary>
+        /// Initialize the recording device for capture a Photo/Video/Audio record
+        /// </summary>
+        /// <param name="_captureType">Type of record</param>
+        /// <returns>Access to the device handler, should be only used to initialize a UI CaptureElement for a Photo/Video record</returns>
         public async Task<MediaCapture> Initialize(CaptureType _captureType = CaptureType.Photo)
         {
             MediaCapture mediaCapture = null;
@@ -31,7 +36,7 @@ namespace UniversalNomadUploader
             switch (_captureType)
             {
                 case (CaptureType.Audio):
-                    m_Microphone.Initialize();
+                   mediaCapture = await m_Microphone.Initialize();
                     break;
 
                 case (CaptureType.Video):
@@ -49,6 +54,11 @@ namespace UniversalNomadUploader
             return mediaCapture;
         }
 
+        /// <summary>
+        /// Take a picture
+        /// </summary>
+        /// <param name="_filename">Name of the file where the picture will be saved</param>
+        /// <returns>StorageFile object containing the picture. Return null if not initialized or is currently recording</returns>
         public async Task<StorageFile> TakePicture(String _filename)
         {
             try
@@ -61,6 +71,11 @@ namespace UniversalNomadUploader
             }
         }
 
+        /// <summary>
+        /// Start the recording of a video
+        /// </summary>
+        /// <param name="_fileName">Name of the file where the video will be saved.</param>
+        /// <returns>StorageFile object containing the picture. Return null if not initialized or is currently recording</returns>
         public async Task<StorageFile> StartVideoRecord(String _filename)
         {
             try
@@ -91,6 +106,11 @@ namespace UniversalNomadUploader
         public Double getOrientationAngle(SimpleOrientation _orientation)
         {
             return m_Camera.OrientationAngle(_orientation);
+        }
+
+        public void DisposeCamera()
+        {
+            m_Camera.Dispose();
         }
                 
         public async Task<StorageFile> StartAudioRecord(String _filename)

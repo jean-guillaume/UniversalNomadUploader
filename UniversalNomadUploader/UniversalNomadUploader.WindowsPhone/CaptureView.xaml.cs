@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.DataModels.SQLModels;
+using Windows.Devices.Enumeration;
 using Windows.Devices.Sensors;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -44,7 +45,8 @@ namespace UniversalNomadUploader
             Default,
             AudioRecording,
             VideoRecording,
-            SavingName
+            SavingName,
+            NoCamera
         }
 
         public CaptureView()
@@ -62,7 +64,6 @@ namespace UniversalNomadUploader
                 m_simpleorientation.OrientationChanged += new TypedEventHandler<SimpleOrientationSensor, SimpleOrientationSensorOrientationChangedEventArgs>(OrientationChanged);
             }
         }
-
 
         private async void OrientationChanged(object sender, SimpleOrientationSensorOrientationChangedEventArgs e)
         {
@@ -94,7 +95,8 @@ namespace UniversalNomadUploader
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             UIState(PageState.Default);
-            Preview.Source = await m_dataManager.InitializeCamera(CaptureType.Photo);
+
+            Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Photo);
             await Preview.Source.StartPreviewAsync();
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
         }
@@ -103,7 +105,14 @@ namespace UniversalNomadUploader
         {
             UIState(PageState.Default);
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.None;
-            await Preview.Source.StopPreviewAsync();
+
+            if (Preview.Source != null)
+            {
+                await Preview.Source.StopPreviewAsync();
+                m_dataManager.StopVideoRecord();
+            }
+
+            m_dataManager.DisposeCamera();
         }
 
         async void Current_Activated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
@@ -112,11 +121,13 @@ namespace UniversalNomadUploader
             {
                 UIState(PageState.Default);
                 await Preview.Source.StopPreviewAsync();
+                m_dataManager.StopVideoRecord();
+                m_dataManager.StopAudioRecord();
             }
 
             if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.CodeActivated)
             {
-                Preview.Source = await m_dataManager.InitializeCamera(CaptureType.Photo);
+                Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Photo);
             }
         }
 
@@ -140,21 +151,15 @@ namespace UniversalNomadUploader
             }
         }
 
-
-        /*private async void LeavePreviewMode_Click(object sender, RoutedEventArgs e)
-        {            
-            DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-            await m_camera.stopPreview();
-            freeResources();
-        }*/
-
         private void UIState(PageState _state)
         {
             switch (_state)
             {
                 case PageState.Default:
+                    SaveName.IsEnabled = false;
                     Appbar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    //Appbar.IsEnabled = true;
+                    RecordVideo.IsEnabled = true;
+                    RecordVideo.IsEnabled = true;                    
 
                     AudioRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     VideoRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
@@ -163,7 +168,7 @@ namespace UniversalNomadUploader
 
                 case PageState.AudioRecording:
                     Appbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                    //Appbar.IsEnabled = false;
+                    RecordVideo.IsEnabled = false;
 
                     AudioRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
@@ -171,36 +176,42 @@ namespace UniversalNomadUploader
 
                 case PageState.VideoRecording:
                     Appbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                    //Appbar.IsEnabled = false;
+                    RecordVideo.IsEnabled = false;
 
                     VideoRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     break;
 
                 case PageState.SavingName:
+                    SaveName.IsEnabled = true;
                     Appbar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    //Appbar.IsEnabled = false;
 
                     VideoRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     AudioRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                    
                     NewName.Text = "";
                     NewName.Focus(FocusState.Pointer);
+                    break;
+
+                case PageState.NoCamera:
+                    Appbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+
+                    NoCameraMsg.Text += "No camera detected.\n";
+                    NoCameraMsg.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     break;
             }
         }
 
         private async void TakePicture_Click(object sender, RoutedEventArgs e)
         {
-            /* for (int i = 0; i < 30; i++)
-             {*/
             String fileName = Guid.NewGuid().ToString();
             m_file = await m_dataManager.TakePicture(fileName);
 
             if (m_file == null)
             {
                 await Preview.Source.StopPreviewAsync();
-                Preview.Source = await m_dataManager.InitializeCamera(CaptureType.Photo);
+                Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Photo);
                 await Preview.Source.StartPreviewAsync();
                 m_file = await m_dataManager.TakePicture(fileName);
             }
@@ -208,46 +219,17 @@ namespace UniversalNomadUploader
             m_mimeTypeEvi = MimeTypes.Picture;
 
             UIState(PageState.SavingName);
-            /*
-            //////////////////////////////
-            NewName.Text = "b";
-            //////////////////////////
-            if (await m_dataManager.AddEvidence(m_file, NewName.Text, m_mimeTypeEvi) == -1)
-            {
-                String message = "";
-                if (String.IsNullOrEmpty(NewName.Text) == true)
-                {
-                    message = "The evidence must have a name";
-                }
-                else
-                {
-                    message = "The evidence has failed to be saved";
-                }
-
-                MessageDialog msgDialog = new MessageDialog(message, "Required");
-                await msgDialog.ShowAsync();
-                UIState(PageState.SavingName);
-                return;
-            }
-            m_file = null; // put in the initial value for the next test on null
-            UIState(PageState.Default);
-        }*/
         }
 
         private async void StartVideoRecord_Click(object sender, RoutedEventArgs e)
         {
             UIState(PageState.VideoRecording);
-
             String fileName = Guid.NewGuid().ToString();
-            m_file = await m_dataManager.StartVideoRecord(fileName);
 
-            if (m_file == null)
-            {
-                await Preview.Source.StopPreviewAsync();
-                Preview.Source = await m_dataManager.InitializeCamera(CaptureType.Video);
-                await Preview.Source.StartPreviewAsync();
-                m_file = await m_dataManager.StartVideoRecord(Guid.NewGuid().ToString());
-            }
+            await Preview.Source.StopPreviewAsync();
+            Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Video);
+            await Preview.Source.StartPreviewAsync();
+            m_file = await m_dataManager.StartVideoRecord(Guid.NewGuid().ToString());
         }
 
         private void StopRecordVideo_Click(object sender, RoutedEventArgs e)
@@ -268,7 +250,7 @@ namespace UniversalNomadUploader
 
             if (m_file == null)
             {
-                await m_dataManager.InializeMicrophone();
+                await m_dataManager.InitializeMediaCapture(CaptureType.Audio);
                 m_file = await m_dataManager.StartAudioRecord(Guid.NewGuid().ToString());
             }
         }
@@ -284,6 +266,8 @@ namespace UniversalNomadUploader
 
         private async void SaveName_Click(object sender, RoutedEventArgs e)
         {
+            UIState(PageState.Default);
+
             if (await m_dataManager.AddEvidence(m_file, NewName.Text, m_mimeTypeEvi) == -1)
             {
                 String message = "";
@@ -304,7 +288,6 @@ namespace UniversalNomadUploader
 
             if (m_mimeTypeEvi == MimeTypes.Movie || m_mimeTypeEvi == MimeTypes.Picture)
             {
-
                 StorageFolder VideoThumbs = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFolderAsync("_VidThumbs", CreationCollisionOption.OpenIfExists);
                 StorageFile VideoThumb = await VideoThumbs.CreateFileAsync(m_file.DisplayName + ".jpg", CreationCollisionOption.ReplaceExisting);
 
@@ -317,7 +300,6 @@ namespace UniversalNomadUploader
             }
 
             m_file = null; // put in the initial state
-            UIState(PageState.Default);
         }
 
         private void CancelSaveName_Click(object sender, RoutedEventArgs e)
