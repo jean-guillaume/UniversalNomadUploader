@@ -62,7 +62,7 @@ namespace UniversalNomadUploader
 
             m_imgEncodingProp = ImageEncodingProperties.CreateJpeg();
             m_videoEncodingProp = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto);
-
+                        
             m_captureUse = _use;
             m_CurrentState = State.Initialized;
 
@@ -72,15 +72,14 @@ namespace UniversalNomadUploader
             return m_mediaCapture;
         }
 
-        //TODO implement exceptions
         void CameraMediaCapture_RecordLimitationExceeded(MediaCapture sender)
         {
-            throw new NotImplementedException();
+            throw new Exception("The recording has stopped because you exceeded the maximum recording length.");
         }
 
         void CameraMediaCapture_Failed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)
         {
-            throw new NotImplementedException();
+            throw new Exception("The camera capture failed: {0}\n" + errorEventArgs.Message);
         }
 
         /// <summary>

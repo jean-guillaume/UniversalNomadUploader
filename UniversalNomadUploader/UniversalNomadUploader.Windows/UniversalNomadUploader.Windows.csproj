@@ -108,8 +108,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="EvidenceView.xaml.cs">
-      <DependentUpon>EvidenceView.xaml</DependentUpon>
+    <Compile Include="DataManager.cs" />
+    <Compile Include="EvidenceViewer.xaml.cs">
+      <DependentUpon>EvidenceViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Logon.xaml.cs">
       <DependentUpon>Logon.xaml</DependentUpon>
@@ -179,7 +180,7 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="EvidenceView.xaml">
+    <Page Include="EvidenceViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

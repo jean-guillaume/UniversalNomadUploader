@@ -34,6 +34,7 @@ namespace UniversalNomadUploader
 
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private DataManager m_dataManager = null;
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
@@ -88,7 +89,7 @@ namespace UniversalNomadUploader
         /// session. The state will be null the first time a page is visited.</param>
         private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            
+
         }
 
         /// <summary>
@@ -126,11 +127,17 @@ namespace UniversalNomadUploader
 
         #endregion
 
-
-        
-
         private async void logon_Click(object sender, RoutedEventArgs e)
         {
+            ////TODO : suppress
+            //Username.Text = "BASSESSOR1";
+            //Password.Password = "Test1234";
+            //GlobalVariables.SelectedServer = ServerEnum.UAT1;
+            //UAT2.IsChecked = false;
+            //DEV.IsChecked = false;
+            //MessageDialog a = new MessageDialog("HACK HACK HACK");
+            //await a.ShowAsync();
+
             logon.IsEnabled = false;
             ShowProgress();
             if (String.IsNullOrWhiteSpace(Username.Text))
@@ -149,55 +156,37 @@ namespace UniversalNomadUploader
                 logon.IsEnabled = true;
                 return;
             }
-            ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
-            roamingSettings.Values["Username"] = Username.Text;
-            Boolean HasAuthed = false;
-            if (GlobalVariables.HasInternetAccess())
+
+            m_dataManager = new DataManager(Username.Text, Password.Password);
+
+            switch((await m_dataManager.ConnectToServer()))
             {
-                Guid Session = await APIAuthenticationUtil.Authenticate(Username.Text.ToUpper(), Password.Password, GlobalVariables.SelectedServer);
-                if (Session != Guid.Empty)
-                {
-                    String ErrorMessage = String.Empty;
-                    try
-                    {
-                        await SQLUserUtil.InsertUser(new FunctionnalUser() { Username = Username.Text.ToUpper(), SessionID = Session }, Password.Password);
-                        await SQLUserUtil.UpdateUser(await APIUserUtil.GetProfile());
-                    }
-                    catch (ApiException exception)
-                    {
-                        ErrorMessage = exception.Message;
-                    }
-                    HideProgress();
-                    if (ErrorMessage != String.Empty)
-                    {
-                        MessageDialog msg = new MessageDialog(ErrorMessage, "Access denied");
-                        await msg.ShowAsync();
-                        HideProgress();
-                        logon.IsEnabled = true;
-                        return;
-                    }
-                    GlobalVariables.IsOffline = false;
-                    HasAuthed = true;
-                    this.Frame.Navigate(typeof(EvidenceView));
-                }
+                case connectionStatus.success:
+                    this.Frame.Navigate(typeof(EvidenceViewer), m_dataManager);
+                    return;
+                case connectionStatus.badPassword:
+                    MessageDialog msg = new MessageDialog("Incorrect Password", "Required");
+                    await msg.ShowAsync();
+                    break;
+                case connectionStatus.badUsername:
+                    MessageDialog msg0 = new MessageDialog("Incorrect Password", "Required");
+                    await msg0.ShowAsync();
+                    break;
+                case connectionStatus.sqlError:
+                    MessageDialog msg1 = new MessageDialog("Failed to register into the database", "Database error");
+                    await msg1.ShowAsync();
+                    break;
+                case connectionStatus.authenticationFailed:
+                    MessageDialog msg2 = new MessageDialog("Incorrect user or password", "Authentication failure");
+                    await msg2.ShowAsync();
+                    break;
+                default:
+                    MessageDialog msg3 = new MessageDialog("Unattented result", "Unknown error");
+                    await msg3.ShowAsync();
+                    break;
             }
-            else
-            {
-                if (SQLUserUtil.AuthenticateOffline(Username.Text, Password.Password))
-                {
-                    GlobalVariables.IsOffline = true;
-                    HasAuthed = true;
-                    this.Frame.Navigate(typeof(EvidenceView));
-                }
-            }
-            if (!HasAuthed)
-            {
-                MessageDialog msg = new MessageDialog("Incorrect Username or Password", "Access denied");
-                await msg.ShowAsync();
-                HideProgress();
-                logon.IsEnabled = true;
-                return;
-            }
+
+            HideProgress();
         }
 
         private void ShowProgress()
@@ -208,28 +197,7 @@ namespace UniversalNomadUploader
         private void HideProgress()
         {
             SyncProgress.IsIndeterminate = false;
-        }
-
-        private void Live_Click(object sender, RoutedEventArgs e)
-        {
-            GlobalVariables.SelectedServer = ServerEnum.Live;
-            Practice.IsChecked = false;
-            Beta.IsChecked = false;
-        }
-
-        private void Practice_Click(object sender, RoutedEventArgs e)
-        {
-            GlobalVariables.SelectedServer = ServerEnum.Practice;
-            Beta.IsChecked = false;
-            Live.IsChecked = false;
-        }
-
-        private void Beta_Click(object sender, RoutedEventArgs e)
-        {
-            GlobalVariables.SelectedServer = ServerEnum.Beta;
-            Practice.IsChecked = false;
-            Live.IsChecked = false;
-        }
+        }       
 
         private void pageTitle_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
@@ -265,9 +233,42 @@ namespace UniversalNomadUploader
             }
         }
 
+        private void Live_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalVariables.SelectedServer = ServerEnum.Live;
+            Practice.IsChecked = false;
+            Beta.IsChecked = false;
+            UAT1.IsChecked = false;
+            UAT2.IsChecked = false;
+            DEV.IsChecked = false;
+        }
+
+        private void Practice_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalVariables.SelectedServer = ServerEnum.Practice;
+            Beta.IsChecked = false;
+            Live.IsChecked = false;
+            UAT1.IsChecked = false;
+            UAT2.IsChecked = false;
+            DEV.IsChecked = false;
+        }
+
+        private void Beta_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalVariables.SelectedServer = ServerEnum.Beta;
+            Practice.IsChecked = false;
+            Live.IsChecked = false;
+            UAT1.IsChecked = false;
+            UAT2.IsChecked = false;
+            DEV.IsChecked = false;
+        }
+
         private void UAT1_Click(object sender, RoutedEventArgs e)
         {
             GlobalVariables.SelectedServer = ServerEnum.UAT1;
+            Practice.IsChecked = false;
+            Beta.IsChecked = false;
+            Live.IsChecked = false;
             UAT2.IsChecked = false;
             DEV.IsChecked = false;
         }
@@ -275,6 +276,9 @@ namespace UniversalNomadUploader
         private void UAT2_Click(object sender, RoutedEventArgs e)
         {
             GlobalVariables.SelectedServer = ServerEnum.UAT2;
+            Practice.IsChecked = false;
+            Beta.IsChecked = false;
+            Live.IsChecked = false;
             UAT1.IsChecked = false;
             DEV.IsChecked = false;
         }
@@ -282,6 +286,9 @@ namespace UniversalNomadUploader
         private void DEV_Click(object sender, RoutedEventArgs e)
         {
             GlobalVariables.SelectedServer = ServerEnum.DEV;
+            Practice.IsChecked = false;
+            Beta.IsChecked = false;
+            Live.IsChecked = false;
             UAT1.IsChecked = false;
             UAT2.IsChecked = false;
         }

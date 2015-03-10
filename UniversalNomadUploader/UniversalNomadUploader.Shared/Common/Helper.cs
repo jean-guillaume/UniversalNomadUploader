@@ -42,6 +42,5 @@ namespace UniversalNomadUploader.Common
 
             return groupDictionary.Select(x => x.Value).ToList();
         }
-
     }
 }

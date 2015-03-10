@@ -194,10 +194,12 @@
 
         <Grid Name="VideoRecordBtn" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
             <AppBarButton Name="StopRecordVideo" Icon="Stop" Click="StopRecordVideo_Click" />
-        </Grid>
-        <Grid Name="AudioRecordBtn" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
+        </Grid>        
+        <StackPanel Name="AudioRecordBtn" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
+            <AppBarButton Name="RestartRecordAudio" Icon="Play" Click="RestartRecordAudio_Click" IsEnabled="False" Visibility="Collapsed" />
+            <AppBarButton Name="PauseRecordAudio" Icon="Pause" Click="PauseRecordAudio_Click" Visibility="Collapsed"/> <!--TODO UPDATE wait next update of windows phone to put it visible -->
             <AppBarButton Name="StopRecordAudio" Icon="Stop" Click="StopRecordAudio_Click" />
-        </Grid>
+        </StackPanel>
 
         <Grid Name="SavingNameGrid" Visibility="Collapsed">
             <Grid>
@@ -232,7 +234,7 @@
                 </AppBarButton.RenderTransform>
                 <SymbolIcon Symbol="Video" />
             </AppBarButton>
-            <AppBarButton Name="RecordAudio" Label="Record Audio" IsCompact="True" Click="StartRecordAudio_Click" RenderTransformOrigin="0.5, 0.5" >
+            <AppBarButton Name="RecordAudio" Label="Record Audio" IsCompact="True" Click="StartAudioRecord_Click" RenderTransformOrigin="0.5, 0.5" >
                 <AppBarButton.RenderTransform>
                     <RotateTransform/>
                 </AppBarButton.RenderTransform>

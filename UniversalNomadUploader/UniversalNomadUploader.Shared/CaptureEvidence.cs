@@ -35,10 +35,6 @@ namespace UniversalNomadUploader
 
             switch (_captureType)
             {
-                case (CaptureType.Audio):
-                   mediaCapture = await m_Microphone.Initialize();
-                    break;
-
                 case (CaptureType.Video):
                     mediaCapture = await m_Camera.Initialize(CaptureUse.Video);
                     break;
@@ -65,9 +61,9 @@ namespace UniversalNomadUploader
             {
                 return await m_Camera.takePicture(_filename);
             }
-            catch (Camera.MediaTypeException)
+            catch (Camera.MediaTypeException ex)
             {
-                return null;
+                throw ex;
             }
         }
 
@@ -82,23 +78,23 @@ namespace UniversalNomadUploader
             {
                 return await m_Camera.startRecording(_filename);
             }
-            catch (Camera.MediaTypeException)
+            catch (Camera.MediaTypeException ex)
             {
-                return null;
+                throw ex;
             }
         }
 
-        public async void StopVideoRecord()
+        public async Task StopVideoRecord()
         {
             await m_Camera.stopVideoRecording();
         }        
 
-        public async void StartPreview()
+        public async Task StartPreview()
         {
             await m_Camera.startPreview();
         }
 
-        public async void StopPreview()
+        public async Task StopPreview()
         {
             await m_Camera.stopPreview();
         }
@@ -111,16 +107,26 @@ namespace UniversalNomadUploader
         public void DisposeCamera()
         {
             m_Camera.Dispose();
-        }
-                
-        public async Task<StorageFile> StartAudioRecord(String _filename)
+        }                
+        
+        public async Task StartAudioRecord()
         {
-            return await m_Microphone.StartRecord(_filename);
+            await m_Microphone.StartRecord();
         }
 
-        public async void StopAudioRecord()
+        public async Task PauseAudioRecord()
+        {
+            await m_Microphone.PauseRecord();
+        }
+
+        public async Task StopAudioRecord()
         {
             await m_Microphone.StopRecord();
+        }
+
+        public async Task<StorageFile> SaveAudioRecord(String _fileName)
+        {
+            return await m_Microphone.SaveRecord(_fileName);
         }
     }
 }

@@ -34,6 +34,9 @@ namespace UniversalNomadUploader
     {
 #if WINDOWS_PHONE_APP
         private TransitionCollection transitions;
+        public const bool IsPhone = true;
+#else
+        public const bool IsPhone = false;
 #endif
 
         /// <summary>
@@ -48,6 +51,8 @@ namespace UniversalNomadUploader
             InitHandlers();
             HockeyClient.Current.Configure("c8b1504ef7282c9ab3f776ed69b8751e");
         }
+
+
 
         void App_Resuming(object sender, object e)
         {

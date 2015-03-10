@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UniversalNomadUploader.Common;
 using UniversalNomadUploader.DataModels.Enums;
 
 namespace UniversalNomadUploader.DataModels.FunctionalModels
@@ -68,7 +69,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
                     case MimeTypes.Database:
                         return new System.Uri("ms-appx:///Assets/FileIcons/Database.png");
                     case MimeTypes.Movie:
-                        return new System.Uri(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "/_VidThumbs/" + FileName + ".jpg");
+                        return new System.Uri(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "/" + GlobalVariables.thumbnailFolderName + "/" + FileName + ".jpg");
                     case MimeTypes.PDF:
                         return new System.Uri("ms-appx:///Assets/FileIcons/PDF.png");
                     case MimeTypes.Picture:

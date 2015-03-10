@@ -18,6 +18,7 @@ using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
+using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
 using Windows.Storage.Search;
 using Windows.Storage.Streams;
@@ -40,12 +41,15 @@ namespace UniversalNomadUploader
     /// <summary>
     /// A page that displays a grouped collection of items.
     /// </summary>
-    public sealed partial class EvidenceView : Page
+    public sealed partial class EvidenceViewer : Page
     {
-       /* private NavigationHelper navigationHelper;
+        private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
         private CancellationTokenSource cts;
-        private Evidence CurrentEvidence = null;
+        private FunctionnalEvidence CurrentEvidence = null;
+        private StorageFile m_currentEviFile = null;
+        private MimeTypes m_currentEviType = MimeTypes.Unknown;
+        private DataManager m_dataManager;
         public enum RecordingMode
         {
             Initializing,
@@ -54,12 +58,8 @@ namespace UniversalNomadUploader
             Stopped
         };
         private RecordingMode CurrentMode;
-        private MediaCapture _mediaCapture;
-        private IRandomAccessStream _audioStream;
         private DispatcherTimer _timer;
         private TimeSpan _elapsedTime;
-        private AudioEncodingQuality _encodingQuality = AudioEncodingQuality.Auto;
-        private Byte[] _PausedBuffer;
         private object[] selectedItems;
 
         private enum PageState
@@ -70,7 +70,6 @@ namespace UniversalNomadUploader
             RecordingAudio,
             Default
         }
-
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
@@ -92,27 +91,27 @@ namespace UniversalNomadUploader
             }
         }
 
-        public EvidenceView()
+        public EvidenceViewer()
         {
             cts = new CancellationTokenSource();
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
-            this.Loaded += EvidenceView_Loaded;
+            //this.Loaded += EvidenceViewer_Loaded;
             this.ContentStack.MaxHeight = Window.Current.Bounds.Height - 140.0;
             this.itemGridView.MaxHeight = Window.Current.Bounds.Height - 140.0;
             this.itemGridView.MinHeight = Window.Current.Bounds.Height - 140.0;
         }
 
-        void EvidenceView_Loaded(object sender, RoutedEventArgs e)
+        /*void EvidenceViewer_Loaded(object sender, RoutedEventArgs e)
         {
             ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
             if (roamingSettings.Values["Username"] != null)
             {
                 Username.Text = roamingSettings.Values["Username"].ToString();
-                Password.Focus(FocusState.Pointer);
+                
             }
-        }
+        }*/
 
         /// <summary>
         /// Populates the page with content passed during navigation.  Any saved state is also
@@ -125,16 +124,9 @@ namespace UniversalNomadUploader
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
-            try
-            {
-                await InitMediaCapture();
-            }
-            catch (Exception)
-            {
-            }
+            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");            
             UpdateRecordingControls(RecordingMode.Initializing);
             InitTimer();
             RebindItems();
@@ -153,6 +145,15 @@ namespace UniversalNomadUploader
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            m_dataManager = (DataManager)e.Parameter;
+
+            if (m_dataManager == null)
+            {
+                m_dataManager = new DataManager("", "");
+            }
+
+            Password.Focus(FocusState.Pointer);
+
             navigationHelper.OnNavigatedTo(e);
         }
 
@@ -165,96 +166,27 @@ namespace UniversalNomadUploader
 
         private async void RebindItems()
         {
-            var coll = await EvidenceUtil.GetEvidenceAsync();
-            var res = coll.GroupBy(x => x.CreatedDate.Date.ToString("dd MMM yyyy")).OrderByDescending(x => Convert.ToDateTime(x.Key));
-            this.DefaultViewModel["Groups"] = res;
-            BottomAppBar.IsOpen = coll.Count() == 0;
+            var evidenceGrouped = await m_dataManager.ReadAllEvidence();
+            this.defaultViewModel["EvidenceItems"] = evidenceGrouped;
+            BottomAppBar.IsOpen = evidenceGrouped.Count == 0;
         }
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
         {
-            if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess() || await AuthenticationUtil.VerifySessionAsync())
-            {
-                expandLoginAnimation.Begin();
-                GlobalVariables.IsOffline = !GlobalVariables.HasInternetAccess();
-                if (GlobalVariables.IsOffline)
-                {
-                    NewLoginReason.Text = "Your are currently offline please sign in to upload";
-                }
-                else
-                {
-                    NewLoginReason.Text = "Your session has expired please sign in again";
-                }
-            }
-            else
-            {
-                SetupUploads();
-            }
-        }
 
-        private async void SetupUploads()
-        {
             itemGridView.IsEnabled = false;
             DisableButtons(PageState.Uploading);
             SyncProgress.IsIndeterminate = true;
             SyncProgress.Visibility = Visibility.Visible;
-            foreach (Evidence item in itemGridView.SelectedItems)
+            foreach (FunctionnalEvidence item in itemGridView.SelectedItems)
             {
-                StorageFile file = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync(item.FileName + "." + item.Extension);
-                BackgroundUploader uploader = new BackgroundUploader();
-                uploader.SetRequestHeader("FileName", (item.Name == null) ? "" : item.Name);
-                uploader.SetRequestHeader("ContentType", file.ContentType);
-                uploader.SetRequestHeader("Extension", file.FileType.Replace(".", ""));
-                uploader.SetRequestHeader("X-SessionID", GlobalVariables.LoggedInUser.SessionID.ToString());
-                UploadOperation upload = uploader.CreateUpload(new Uri(((GlobalVariables.SelectedServer == ServerEnum.DEV) ? "http://" : "https://") + ServerUtil.getServerWSUrl() + "/User/MobileUploadEvidence"), file);
-                await HandleUploadAsync(upload, true, item);
+                await m_dataManager.UploadEvidence(item);
             }
             SyncProgress.IsIndeterminate = false;
             SyncProgress.Visibility = Visibility.Collapsed;
             RebindItems();
             itemGridView.IsEnabled = true;
             DisableButtons(PageState.Default);
-        }
-
-        private async Task HandleUploadAsync(UploadOperation upload, bool start, Evidence item)
-        {
-            try
-            {
-                Progress<UploadOperation> progressCallback = new Progress<UploadOperation>(UploadProgress);
-                if (start)
-                {
-                    // Start the upload and attach a progress handler.
-                    await upload.StartAsync().AsTask(cts.Token, progressCallback);
-                }
-                else
-                {
-                    // The upload was already running when the application started, re-attach the progress handler.
-                    await upload.AttachAsync().AsTask(cts.Token, progressCallback);
-                }
-                item.HasTryUploaded = true;
-                item.UploadedDate = DateTime.Now;
-                EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                await EventLogUtil.InsertEventAsync(item.Name + " uploaded successfully", LogType.Upload);
-            }
-            catch (TaskCanceledException)
-            {
-                item.HasTryUploaded = true;
-                item.UploadError = "Upload was cancelled (Task cancellation)";
-                EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                EventLogUtil.InsertEvent(item.Name + " uploaded cancelled", LogType.Upload);
-            }
-            catch (Exception ex)
-            {
-                item.HasTryUploaded = true;
-                item.UploadError = ex.Message;
-                EvidenceUtil.UpdateEvidenceSyncStatus(item);
-                EventLogUtil.InsertEvent(item.Name + " uploaded failed, reason: " + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Upload);
-            }
-        }
-
-        private void UploadProgress(UploadOperation obj)
-        {
-
         }
 
         private async void displayMessage(string message, string title)
@@ -269,16 +201,16 @@ namespace UniversalNomadUploader
             {
                 FileStatusTitle.Text = "File status:";
                 FileStatus.Text = "";
-                FileDetails.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name; 
-                if (((Evidence)itemGridView.SelectedItem).HasTryUploaded)
+                FileDetails.Text = (((FunctionnalEvidence)itemGridView.SelectedItem).Name == null) ? "" : ((FunctionnalEvidence)itemGridView.SelectedItem).Name;
+                if (((FunctionnalEvidence)itemGridView.SelectedItem).HasTryUploaded)
                 {
-                    if (((Evidence)itemGridView.SelectedItem).UploadError != null && ((Evidence)itemGridView.SelectedItem).UploadError != "")
+                    if (((FunctionnalEvidence)itemGridView.SelectedItem).UploadError != null && ((FunctionnalEvidence)itemGridView.SelectedItem).UploadError != "")
                     {
-                        FileStatus.Text += "Error uploading: " + ((Evidence)itemGridView.SelectedItem).UploadError.ToString();
+                        FileStatus.Text += "Error uploading: " + ((FunctionnalEvidence)itemGridView.SelectedItem).UploadError.ToString();
                     }
                     else
                     {
-                        FileStatus.Text += "Date uploaded: " + ((Evidence)itemGridView.SelectedItem).UploadedDate.ToString("dd MMM yyyy");
+                        FileStatus.Text += "Date uploaded: " + ((FunctionnalEvidence)itemGridView.SelectedItem).UploadedDate.ToString("dd MMM yyyy");
                     }
 
                 }
@@ -296,7 +228,7 @@ namespace UniversalNomadUploader
                 FileDetailsRename.Visibility = Visibility.Collapsed;
                 FileDetailsRename.Text = "";
                 FileStatusTitle.Text = "Info:";
-                FileStatus.Text =  this.itemGridView.SelectedItems.Count.ToString() + " selected items";
+                FileStatus.Text = this.itemGridView.SelectedItems.Count.ToString() + " selected items";
             }
             else
             {
@@ -311,7 +243,7 @@ namespace UniversalNomadUploader
             }
             Upload.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
             Delete.Visibility = (itemGridView.SelectedItems.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
-            
+
             if (FileInfoGrid.Height == 0 && RecorderGrid.Height == 0 && itemGridView.SelectedItems.Count > 0)
             {
                 expandInfoAnimation.Begin();
@@ -341,53 +273,117 @@ namespace UniversalNomadUploader
                 reduceRecorderAnimation.Begin();
             }
             FileInfoGrid.RowDefinitions[0].Height = (itemGridView.SelectedItems.Count <= 1) ? new GridLength(1, GridUnitType.Star) : new GridLength(0.0);
+
         }
 
         private async void Rename_Click(object sender, RoutedEventArgs e)
         {
-            if (Rename.Content.ToString() == "Edit" && itemGridView.SelectedItems.Count > 0)
-            {
-                Rename.Style = (Style)(App.Current as App).Resources["SaveButtonStyle"];
-                Rename.Content = "Save";
-                FileDetails.Visibility = Visibility.Collapsed;
-                FileDetailsRename.Visibility = Visibility.Visible;
-                FileDetailsRename.Text = (((Evidence)itemGridView.SelectedItem).Name == null) ? "" : ((Evidence)itemGridView.SelectedItem).Name;
-                FileDetailsRename.Focus(FocusState.Pointer);
-                FileDetailsRename.Select(FileDetailsRename.Text.Length, 0);
-            }
-            else if (itemGridView.SelectedItems.Count > 0)
-            {
-                Evidence evi = ((Evidence)itemGridView.SelectedItem);
-                evi.Name = FileDetailsRename.Text;
-                await EvidenceUtil.UpdateEvidenceNameAsync(evi);
-                Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
-                Rename.Content = "Edit";
-                FileDetails.Visibility = Visibility.Visible;
-                FileDetailsRename.Visibility = Visibility.Collapsed;
-                FileDetailsRename.Text = "";
-                SearchTerm.Text = "";
-                RebindItems();
-            }
+             if (Rename.Content.ToString() == "Edit" && itemGridView.SelectedItems.Count > 0)
+             {
+                 Rename.Style = (Style)(App.Current as App).Resources["SaveButtonStyle"];
+                 Rename.Content = "Save";
+                 FileDetails.Visibility = Visibility.Collapsed;
+                 FileDetailsRename.Visibility = Visibility.Visible;
+                 FileDetailsRename.Text = (((FunctionnalEvidence)itemGridView.SelectedItem).Name == null) ? "" : ((FunctionnalEvidence)itemGridView.SelectedItem).Name;
+                 FileDetailsRename.Focus(FocusState.Pointer);
+                 FileDetailsRename.Select(FileDetailsRename.Text.Length, 0);
+             }
+             else if (itemGridView.SelectedItems.Count > 0)
+             {
+                 FunctionnalEvidence evi = ((FunctionnalEvidence)itemGridView.SelectedItem);
+                 evi.Name = FileDetailsRename.Text;
+                 await m_dataManager.UpdateEvidence(evi);
+                 Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
+                 Rename.Content = "Edit";
+                 FileDetails.Visibility = Visibility.Visible;
+                 FileDetailsRename.Visibility = Visibility.Collapsed;
+                 FileDetailsRename.Text = "";
+                 SearchTerm.Text = "";
+                 RebindItems();
+             }
         }
 
         private async void SaveName_Click(object sender, RoutedEventArgs e)
         {
-            if (CurrentEvidence != null)
+            EvidenceStatus evidenceStatus = EvidenceStatus.OK;
+            if (m_currentEviFile == null && m_currentEviType == MimeTypes.Audio)
             {
-                CurrentEvidence.Name = NewName.Text;
-                await EvidenceUtil.UpdateEvidenceNameAsync(CurrentEvidence);
+                String fileName = Guid.NewGuid().ToString();                
+                m_currentEviFile = await m_dataManager.SaveAudioRecord(fileName);
             }
-            else
+
+            if (m_currentEviFile != null)
             {
-                Evidence evi = ((Evidence)itemGridView.SelectedItem);
-                evi.Name = NewName.Text;
-                await EvidenceUtil.UpdateEvidenceNameAsync(evi);
+                evidenceStatus = await m_dataManager.AddEvidence(m_currentEviFile, NewName.Text, m_currentEviType);
+                await m_dataManager.StopAudioRecord(); //TODO check if not an another place to stop the record
             }
+
+            if (evidenceStatus != EvidenceStatus.OK)
+            {
+                String message = "";
+                switch (evidenceStatus)
+                {
+                    case EvidenceStatus.BadEvidenceName:
+                        message = "The evidence must have a name";
+                        break;
+                    case EvidenceStatus.BadFileName:
+                        message = "The evidence has failed to be saved";
+                        break;
+                    case EvidenceStatus.MaximumSizeFileExceeded:
+                        message = "The file can't be saved because he is exceeding the maximum size.";
+                        break;
+                    default:
+                        message = "Unknown error";
+                        break;
+                }
+                
+                MessageDialog msgDialog = new MessageDialog(message, "Warning");
+                await msgDialog.ShowAsync();
+            }
+            else if(m_currentEviType == MimeTypes.Movie)
+            {
+                await CreateThumbnail();
+            }
+
+            m_currentEviFile = null;
+            m_currentEviType = MimeTypes.Unknown;
             CurrentEvidence = null;
             HideNewName();
             RebindItems();
             NewName.Text = "";
             DisableButtons(PageState.Default);
+        }
+
+        private async Task CreateThumbnail()
+        {
+            ThumbnailMode thumbnailMode;
+
+            switch (m_currentEviType)
+            {
+                case MimeTypes.Movie:
+                    thumbnailMode = ThumbnailMode.VideosView;
+                    break;
+
+                case MimeTypes.Audio:
+                    thumbnailMode = ThumbnailMode.MusicView;
+                    break;
+
+                case MimeTypes.Picture:
+                    thumbnailMode = ThumbnailMode.PicturesView;
+                    break;
+
+                default:
+                    thumbnailMode = ThumbnailMode.SingleItem;
+                    break;
+            }
+
+            StorageFolder thumbs = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFolderAsync(GlobalVariables.thumbnailFolderName, CreationCollisionOption.OpenIfExists);
+            StorageFile thumb = await thumbs.CreateFileAsync(m_currentEviFile.DisplayName + ".jpg", CreationCollisionOption.ReplaceExisting);
+
+            using (var stream = await m_currentEviFile.GetThumbnailAsync(thumbnailMode))
+            {
+                stream.AsStream().CopyTo(await thumb.OpenStreamForWriteAsync());
+            }
         }
 
         private void CancelNameChange_Click(object sender, RoutedEventArgs e)
@@ -477,14 +473,29 @@ namespace UniversalNomadUploader
             }
         }
 
-        private async void RecordButton_Click(object sender, RoutedEventArgs e)
+        private void CaptureAudio_Click(object sender, RoutedEventArgs e)
         {
-            MediaEncodingProfile encodingProfile = MediaEncodingProfile.CreateMp3(_encodingQuality);
+            if (RecorderGrid.Height == 0)
+            {
+                ShowAudioControls();
+                BottomAppBar.IsOpen = false;
+            }
+            else
+            {
+                HideAudioControls();
+            }
+
+        }
+
+
+        private async void RecordAudioButton_Click(object sender, RoutedEventArgs e)
+        {
+            String filename = Guid.NewGuid().ToString();
+
             try
             {
-                await InitMediaCapture();
-                _audioStream = new InMemoryRandomAccessStream();
-                await _mediaCapture.StartRecordToStreamAsync(encodingProfile, _audioStream);
+                await m_dataManager.StartAudioRecord();
+                m_currentEviType = MimeTypes.Audio;
                 UpdateRecordingControls(RecordingMode.Recording);
                 _timer.Start();
             }
@@ -494,90 +505,29 @@ namespace UniversalNomadUploader
             }
         }
 
-        private async void StpButton_Click(object sender, RoutedEventArgs e)
+        private async void StpAudioButton_Click(object sender, RoutedEventArgs e)
         {
-            await _mediaCapture.StopRecordAsync();
+            await m_dataManager.StopAudioRecord();
+
             UpdateRecordingControls(RecordingMode.Stopped);
             _timer.Stop();
             _elapsedTime = new TimeSpan();
         }
 
-        private async void PauseButton_Click(object sender, RoutedEventArgs e)
+        private async void PauseAudioButton_Click(object sender, RoutedEventArgs e)
         {
-            await _mediaCapture.StopRecordAsync();
+            await m_dataManager.PauseAudioRecord();
             _timer.Stop();
-            using (var dataReader = new DataReader(_audioStream.GetInputStreamAt(0)))
-            {
-                await dataReader.LoadAsync((uint)_audioStream.Size);
-                if (_PausedBuffer == null)
-                {
-                    _PausedBuffer = new byte[(int)_audioStream.Size];
-                    dataReader.ReadBytes(_PausedBuffer);
-                }
-                else
-                {
-                    int currlength = _PausedBuffer.Length;
-                    byte[] temp = new byte[(int)_audioStream.Size];
-                    dataReader.ReadBytes(temp);
-                    Array.Resize(ref _PausedBuffer, (int)_audioStream.Size + _PausedBuffer.Length);
-                    Array.Copy(temp, 0, _PausedBuffer, currlength, temp.Length);
-                }
-
-                UpdateRecordingControls(RecordingMode.Paused);
-            }
+            UpdateRecordingControls(RecordingMode.Paused);
         }
 
-        private async void SvButton_Click(object sender, RoutedEventArgs e)
+        private void SvButton_Click(object sender, RoutedEventArgs e)
         {
-            Evidence evi = new Evidence();
-            evi.FileName = Guid.NewGuid().ToString();
-            evi.Extension = "mp3";
-            evi.CreatedDate = DateTime.Now;
-            evi.ServerID = (int)GlobalVariables.SelectedServer;
-            evi.Name = "Audio File";
-            evi.Type = MimeTypes.Audio;
-            StorageFile _file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(evi.FileName + ".mp3", CreationCollisionOption.OpenIfExists);
-            using (var dataReader = new DataReader(_audioStream.GetInputStreamAt(0)))
-            {
-                await dataReader.LoadAsync((uint)_audioStream.Size);
-                byte[] buffer = new byte[(int)_audioStream.Size];
-                dataReader.ReadBytes(buffer);
-                if (_PausedBuffer != null && CurrentMode != RecordingMode.Paused)
-                {
-                    int currlength = _PausedBuffer.Length;
-                    Array.Resize(ref _PausedBuffer, buffer.Length + _PausedBuffer.Length);
-                    Array.Copy(buffer, 0, _PausedBuffer, currlength, buffer.Length);
-                    await FileIO.WriteBytesAsync(_file, _PausedBuffer);
-                }
-                else if (CurrentMode == RecordingMode.Paused)
-                {
-                    await FileIO.WriteBytesAsync(_file, _PausedBuffer);
-                }
-                else
-                {
-                    await FileIO.WriteBytesAsync(_file, buffer);
-                }
-                UpdateRecordingControls(RecordingMode.Initializing);
-            }
-            evi.Size = Convert.ToDouble((await _file.GetBasicPropertiesAsync()).Size);
-            evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-            evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
-            CurrentEvidence = evi;
             HideAudioControls();
             InitTimer();
             ShowNewName();
         }
 
-
-        private async Task InitMediaCapture()
-        {
-            _mediaCapture = new MediaCapture();
-            var captureInitSettings = new MediaCaptureInitializationSettings();
-            captureInitSettings.StreamingCaptureMode = StreamingCaptureMode.Audio;
-            await _mediaCapture.InitializeAsync(captureInitSettings);
-            _mediaCapture.Failed += MediaCaptureOnFailed;
-            _mediaCapture.RecordLimitationExceeded += MediaCaptureOnRecordLimitationExceeded;
-        }
 
         private void UpdateRecordingControls(RecordingMode recordingMode)
         {
@@ -628,43 +578,36 @@ namespace UniversalNomadUploader
             Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
         }
 
-        private async void MediaCaptureOnRecordLimitationExceeded(MediaCapture sender)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-            {
-                await sender.StopRecordAsync();
-                var warningMessage = new MessageDialog("The recording has stopped because you exceeded the maximum recording length.", "Recording Stopped");
-                await warningMessage.ShowAsync();
-            });
-        }
-
-        private async void MediaCaptureOnFailed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-            {
-                var warningMessage = new MessageDialog(String.Format("The audio capture failed: {0}", errorEventArgs.Message), "Capture Failed");
-                await warningMessage.ShowAsync();
-            });
-        }
-
         private async void CancelAudioButton_Click(object sender, RoutedEventArgs e)
         {
+            String exceptionMessage = "";
+
             _timer.Stop();
             try
             {
-                await _mediaCapture.StopRecordAsync();
+                await m_dataManager.StopAudioRecord();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                exceptionMessage = ex.Message;
             }
+
+            if (exceptionMessage.Length > 0)
+            {
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    var warningMessage = new MessageDialog(String.Format("The audio capture failed to stop: {0}", exceptionMessage), "Capture Failed");
+                    await warningMessage.ShowAsync();
+                });
+            }
+
+            m_currentEviFile = null;
+            m_currentEviType = MimeTypes.Unknown;
             ResetTimer();
             Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
             UpdateRecordingControls(RecordingMode.Initializing);
-            _PausedBuffer = null;
             HideAudioControls();
         }
-
 
         private void ResetTimer()
         {
@@ -673,47 +616,26 @@ namespace UniversalNomadUploader
 
         private async void CapturePhoto_Click(object sender, RoutedEventArgs e)
         {
-            CameraCaptureUI camera = new CameraCaptureUI();
-            StorageFile newPhoto = await camera.CaptureFileAsync(CameraCaptureUIMode.Photo);
+            String filename = Guid.NewGuid().ToString();
+            StorageFile newPhoto = await m_dataManager.TakePicture(filename);
+
             if (newPhoto != null)
             {
-                Evidence evi = new Evidence();
-                evi.FileName = Guid.NewGuid().ToString();
-                evi.Extension = newPhoto.FileType.Replace(".", "");
-                evi.CreatedDate = DateTime.Now;
-                evi.Name = "Photo";
-                evi.ServerID = (int)GlobalVariables.SelectedServer;
-                evi.Type = MimeTypes.Picture;
-                await newPhoto.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newPhoto.FileType, NameCollisionOption.ReplaceExisting);
-                evi.Size = Convert.ToDouble((await newPhoto.GetBasicPropertiesAsync()).Size);
-                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
-                CurrentEvidence = evi;
+                m_currentEviFile = newPhoto;
+                m_currentEviType = MimeTypes.Picture;
                 ShowNewName();
             }
         }
 
         private async void CaptureVideo_Click(object sender, RoutedEventArgs e)
         {
-            CameraCaptureUI video = new CameraCaptureUI();
-            StorageFile newVideo = await video.CaptureFileAsync(CameraCaptureUIMode.Video);
-            StorageFolder VideoThumbs = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFolderAsync("_VidThumbs", CreationCollisionOption.OpenIfExists);
+            String filename = Guid.NewGuid().ToString();
+            StorageFile newVideo = await m_dataManager.StartVideoRecord(filename);
+
             if (newVideo != null)
             {
-                Evidence evi = new Evidence();
-                evi.FileName = Guid.NewGuid().ToString();
-                evi.Extension = newVideo.FileType.Replace(".", "");
-                evi.CreatedDate = DateTime.Now;
-                evi.Name = "Video";
-                evi.ServerID = (int)GlobalVariables.SelectedServer;
-                evi.Type = MimeTypes.Movie;
-                await newVideo.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + newVideo.FileType, NameCollisionOption.ReplaceExisting);
-                evi.Size = Convert.ToDouble((await newVideo.GetBasicPropertiesAsync()).Size);
-                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
-                StorageFile VideoThumb = await VideoThumbs.CreateFileAsync(evi.FileName + ".jpg", CreationCollisionOption.ReplaceExisting);
-                (await newVideo.GetThumbnailAsync(Windows.Storage.FileProperties.ThumbnailMode.VideosView)).AsStream().CopyTo(await VideoThumb.OpenStreamForWriteAsync());
-                CurrentEvidence = evi;
+                m_currentEviFile = newVideo;
+                m_currentEviType = MimeTypes.Movie;
                 ShowNewName();
             }
         }
@@ -721,9 +643,7 @@ namespace UniversalNomadUploader
         private void ShowNewName()
         {
             NameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            NewName.Text = CurrentEvidence.Name;
             NewName.Focus(FocusState.Keyboard);
-            NewName.Select(NewName.Text.Length, 0);
             DisableButtons(PageState.Renaming);
         }
 
@@ -773,22 +693,7 @@ namespace UniversalNomadUploader
                 reduceInfoAnimation.Begin();
             }
         }
-
-
-        private void CaptureAudio_Click(object sender, RoutedEventArgs e)
-        {
-            if (RecorderGrid.Height == 0)
-            {
-                ShowAudioControls();
-                BottomAppBar.IsOpen = false;
-            }
-            else
-            {
-                HideAudioControls();
-            }
-
-        }
-
+              
         private async void Delete_Click(object sender, RoutedEventArgs e)
         {
             MessageDialog diag = new MessageDialog("Are you sure you want to delete the selected file(s)?", "Confirm deletion!");
@@ -796,17 +701,37 @@ namespace UniversalNomadUploader
             diag.Commands.Add(new UICommand("Cancel", new UICommandInvokedHandler(this.ConfirmDelete)));
             await diag.ShowAsync();
         }
-
+        
         private async void ConfirmDelete(IUICommand command)
         {
             if (command.Label == "Confirm")
             {
-                foreach (var item in itemGridView.SelectedItems)
+                foreach (FunctionnalEvidence item in itemGridView.SelectedItems)
                 {
-                    Evidence evi = (Evidence)item;
-                    await EvidenceUtil.DeleteAsync(evi);
-                    await (await StorageFile.GetFileFromPathAsync(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + evi.FileName + "." + evi.Extension)).DeleteAsync();
-                    await EventLogUtil.InsertEventAsync(evi.Name + " Deleted on " + DateTime.Now.ToString(), LogType.Delete);
+                    await m_dataManager.DeleteEvidence(item);
+                    if (item.Type == MimeTypes.Movie)
+                    {
+                        Boolean exceptionCatched = false;
+
+                        try
+                        {
+                            StorageFolder thumbnailFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync(GlobalVariables.thumbnailFolderName);
+                            StorageFile eviThumbnailFile = await thumbnailFolder.GetFileAsync(item.FileName + ".jpg");
+                            await eviThumbnailFile.DeleteAsync();
+                        }
+                        catch (Exception)
+                        {
+                            exceptionCatched = true;                      
+                        }
+
+                        if(exceptionCatched == true)
+                        {
+                            var warningMessage = new MessageDialog(String.Format("Failed to delete the evidence: {0}", item.Name), "Failed to delete");
+                            await warningMessage.ShowAsync();
+                            RebindItems();   
+                        }
+                    }
+                    await SQLEventLogUtil.InsertEventAsync(item.Name + " Deleted on " + DateTime.Now.ToString(), LogType.Delete);
                 }
                 RebindItems();
             }
@@ -814,30 +739,24 @@ namespace UniversalNomadUploader
 
         private async void Import_Click(object sender, RoutedEventArgs e)
         {
-            FileOpenPicker openPicker = new FileOpenPicker();
-            openPicker.ViewMode = PickerViewMode.Thumbnail;
-            openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            FileOpenPicker filePicker = new FileOpenPicker();
+            filePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            filePicker.ViewMode = PickerViewMode.Thumbnail;
+            filePicker.FileTypeFilter.Clear();
             foreach (KeyValuePair<String, MimeTypes> extension in GlobalVariables.ValidExtensions())
             {
-                openPicker.FileTypeFilter.Add(extension.Key);
+                filePicker.FileTypeFilter.Add(extension.Key);
             }
-            StorageFile file = await openPicker.PickSingleFileAsync();
-            if (file != null)
+
+            StorageFile importedFile = await filePicker.PickSingleFileAsync();
+            m_currentEviFile = await importedFile.CopyAsync(Windows.Storage.ApplicationData.Current.LocalFolder, importedFile.DisplayName + importedFile.FileType, NameCollisionOption.ReplaceExisting);
+
+            if (m_currentEviFile != null)
             {
-                Evidence evi = new Evidence();
-                evi.FileName = Guid.NewGuid().ToString();
-                evi.Extension = file.FileType.Replace(".", "");
-                evi.CreatedDate = DateTime.Now;
-                evi.Name = "Imported file";
-                evi.Type = GlobalVariables.GetMimeTypeFromExtension(file.FileType);
-                evi.ServerID = (int)GlobalVariables.SelectedServer;
-                await file.CopyAsync(Windows.Storage.ApplicationData.Current.LocalFolder, evi.FileName + file.FileType, NameCollisionOption.ReplaceExisting);
-                evi.Size = Convert.ToDouble((await file.GetBasicPropertiesAsync()).Size);
-                evi.UserID = GlobalVariables.LoggedInUser.LocalID;
-                evi.LocalID = await EvidenceUtil.InsertEvidenceAsync(evi);
-                CurrentEvidence = evi;
-                ShowNewName();
+                m_currentEviType = GlobalVariables.GetMimeTypeFromExtension(m_currentEviFile.FileType);
             }
+
+            ShowNewName();
         }
 
         private async void logon_Click(object sender, RoutedEventArgs e)
@@ -848,6 +767,7 @@ namespace UniversalNomadUploader
                 MessageDialog msg = new MessageDialog("Please enter a Username", "Required");
                 await msg.ShowAsync();
                 HideProgress();
+                logon.IsEnabled = true;
                 return;
             }
             if (String.IsNullOrWhiteSpace(Password.Password))
@@ -855,45 +775,37 @@ namespace UniversalNomadUploader
                 MessageDialog msg = new MessageDialog("Please enter a Password", "Required");
                 await msg.ShowAsync();
                 HideProgress();
+                logon.IsEnabled = true;
                 return;
             }
 
-            Boolean HasAuthed = false;
-            if (GlobalVariables.HasInternetAccess())
+            m_dataManager = new DataManager(Username.Text, Password.Password);
+
+            switch ((await m_dataManager.ConnectToServer()))
             {
-                if (Username.Text.ToUpper() != GlobalVariables.LoggedInUser.Username)
-                {
-                    MessageDialog msg = new MessageDialog("You can only log in as the user that you are logged in as offline", "Username");
+                case connectionStatus.success:
+                    this.Frame.Navigate(typeof(EvidenceViewer), m_dataManager);
+                    return;
+                case connectionStatus.badPassword:
+                    MessageDialog msg = new MessageDialog("Incorrect Password", "Required");
                     await msg.ShowAsync();
-                    HideProgress();
-                    return;
-                }
-                Guid Session = await AuthenticationUtil.Authenticate(Username.Text.ToUpper(), Password.Password, GlobalVariables.SelectedServer);
-                if (Session != Guid.Empty)
-                {
-                    GlobalVariables.IsOffline = false;
-                    GlobalVariables.LoggedInUser.SessionID = Session;
-                    await UniversalNomadUploader.SQLUtils.UserUtil.UpdateUser(GlobalVariables.LoggedInUser);
-                    HasAuthed = true;
-                    HideProgress();
-                    reduceLoginAnimation.Begin();
-                    SetupUploads();
-                    return;
-                }
-            }
-            else
-            {
-                MessageDialog msg = new MessageDialog("Unable to to connect to the server, please check your internet connection", "Connection!");
-                await msg.ShowAsync();
-                HideProgress();
-                return;
-            }
-            if (!HasAuthed)
-            {
-                MessageDialog msg = new MessageDialog("Incorrect Username or Password", "Access denied");
-                await msg.ShowAsync();
-                HideProgress();
-                return;
+                    break;
+                case connectionStatus.badUsername:
+                    MessageDialog msg0 = new MessageDialog("Incorrect Password", "Required");
+                    await msg0.ShowAsync();
+                    break;
+                case connectionStatus.sqlError:
+                    MessageDialog msg1 = new MessageDialog("Failed to register into the database", "Database error");
+                    await msg1.ShowAsync();
+                    break;
+                case connectionStatus.authenticationFailed:
+                    MessageDialog msg2 = new MessageDialog("Incorrect user or password", "Authentication failure");
+                    await msg2.ShowAsync();
+                    break;
+                default:
+                    MessageDialog msg3 = new MessageDialog("Unattented result", "Unknown error");
+                    await msg3.ShowAsync();
+                    break;
             }
         }
 
@@ -938,7 +850,7 @@ namespace UniversalNomadUploader
             itemGridView.SelectedItems.CopyTo(selectedItems, 0);
             if (SearchTerm.Text.Length >= 3)
             {
-                var searchRes = (itemGridView.Items.OfType<Evidence>()).Where(x => x.Name.ToUpper().Contains(SearchTerm.Text.ToUpper()));
+                var searchRes = (itemGridView.Items.OfType<FunctionnalEvidence>()).Where(x => x.Name.ToUpper().Contains(SearchTerm.Text.ToUpper()));
                 foreach (var item in itemGridView.Items)
                 {
                     if (!searchRes.Contains(item))
@@ -1009,6 +921,6 @@ namespace UniversalNomadUploader
                 NewName.Focus(FocusState.Programmatic);
                 e.Handled = true;
             }
-        }*/
+        }
     }
 }

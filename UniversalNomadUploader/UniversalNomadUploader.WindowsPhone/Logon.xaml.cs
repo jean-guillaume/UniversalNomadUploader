@@ -62,7 +62,6 @@ namespace UniversalNomadUploader
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
             this.Loaded += Logon_Loaded;
-            m_dataManager = new DataManager();
         }
 
         async void Logon_Loaded(object sender, RoutedEventArgs e)
@@ -158,11 +157,33 @@ namespace UniversalNomadUploader
                 return;
             }
 
-            ServerManager server = new ServerManager(Username.Text, Password.Password);
+            m_dataManager = new DataManager(Username.Text, Password.Password);
 
-            if (await server.Connect() == 0)
+            switch ((await m_dataManager.ConnectToServer()))
             {
-                this.Frame.Navigate(typeof(EvidenceViewer), m_dataManager);
+                case connectionStatus.success:
+                    this.Frame.Navigate(typeof(EvidenceViewer), m_dataManager);
+                    return;
+                case connectionStatus.badPassword:
+                    MessageDialog msg = new MessageDialog("Incorrect Password", "Required");
+                    await msg.ShowAsync();
+                    break;
+                case connectionStatus.badUsername:
+                    MessageDialog msg0 = new MessageDialog("Incorrect Password", "Required");
+                    await msg0.ShowAsync();
+                    break;
+                case connectionStatus.sqlError:
+                    MessageDialog msg1 = new MessageDialog("Failed to register into the database", "Database error");
+                    await msg1.ShowAsync();
+                    break;
+                case connectionStatus.authenticationFailed:
+                    MessageDialog msg2 = new MessageDialog("Incorrect user or password", "Authentication failure");
+                    await msg2.ShowAsync();
+                    break;
+                default:
+                    MessageDialog msg3 = new MessageDialog("Unattented result", "Unknown error");
+                    await msg3.ShowAsync();
+                    break;
             }
         }
 

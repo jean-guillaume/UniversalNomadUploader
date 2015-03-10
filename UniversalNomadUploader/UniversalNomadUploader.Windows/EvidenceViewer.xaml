@@ -1,6 +1,6 @@
-﻿<Page
+﻿ <Page
     x:Name="pageRoot"
-    x:Class="UniversalNomadUploader.EvidenceView"
+    x:Class="UniversalNomadUploader.EvidenceViewer"
     DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -11,17 +11,14 @@
     RequestedTheme="Light"
     mc:Ignorable="d">
 
-    <!--
     <Page.Resources>
-        -->
-    <!--
+        <!--
             Collection of grouped items displayed by this page, bound to a subset
             of the complete item list because items in groups cannot be virtualized
         -->
-    <!--
         <CollectionViewSource
             x:Name="groupedItemsViewSource"
-            Source="{Binding Groups}"
+            Source="{Binding EvidenceItems}"
             IsSourceGrouped="true"
             />
 
@@ -118,11 +115,11 @@
 
     </Page.Resources>
 
-    --><!--
+    <!--
         This grid acts as a root panel for the page that defines two rows:
         * Row 0 contains the back button and page title
         * Row 1 contains the rest of the page layout
-    --><!--
+    -->
     <Grid Name="ContainerGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ChildrenTransitions>
             <TransitionCollection>
@@ -145,9 +142,9 @@
                 <TextBlock Text="Audio Recorder" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="0" Margin="140,0,0,0" FontSize="26" Foreground="{StaticResource FadedBlackBrush}" />
                 <StackPanel VerticalAlignment="Center" Grid.Column="0" HorizontalAlignment="Center" >
                     <StackPanel Orientation="Horizontal">
-                        <Button Name="RecordButton" Style="{StaticResource RecordButtonStyle}" Click="RecordButton_Click" Margin="0,0,5,0" />
-                        <Button Name="StpButton" Style="{StaticResource StopButtonStyle}" Click="StpButton_Click" Margin="0,0,5,0" />
-                        <Button Name="PauseButton" Style="{StaticResource PauseButtonStyle}" Click="PauseButton_Click" Margin="0,0,5,0" />
+                        <Button Name="RecordButton" Style="{StaticResource RecordButtonStyle}" Click="RecordAudioButton_Click" Margin="0,0,5,0" />
+                        <Button Name="StpButton" Style="{StaticResource StopButtonStyle}" Click="StpAudioButton_Click" Margin="0,0,5,0" />
+                        <Button Name="PauseButton" Style="{StaticResource PauseButtonStyle}" Click="PauseAudioButton_Click" Margin="0,0,5,0" />
                         <Border BorderBrush="{StaticResource RecordingBorderBrush}" BorderThickness="2" Background="White">
                             <TextBlock Name="Duration" FontSize="{StaticResource ExtraLargeFontSize}" TextAlignment="Center" Foreground="{StaticResource FadedBlackBrush}" VerticalAlignment="Center" Text="{Binding }" Margin="20,0,20,0" ></TextBlock>
                         </Border>
@@ -221,7 +218,7 @@
                 </Grid>
                 <Button Name="InfoCancel" Style="{StaticResource CloseButtonStyle}" Content="Close" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Column="1" Grid.RowSpan="2" Click="InfoCancel_Click" Visibility="Visible" />
             </Grid>
-            --><!-- Horizontal scrolling grid --><!--
+            <!-- Horizontal scrolling grid -->
             <GridView
                     x:Name="itemGridView"
                     AutomationProperties.AutomationId="ItemGridView"
@@ -279,7 +276,7 @@
                 </GridView.GroupStyle>
             </GridView>
         </StackPanel>
-        --><!-- Back button and page title --><!--
+        <!-- Back button and page title -->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
@@ -335,7 +332,4 @@
             </CommandBar.PrimaryCommands>
         </CommandBar>
     </Page.BottomAppBar>
-    -->
 </Page>
-
-    

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using UniversalNomadUploader.Common;
 using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.DataModels.SQLModels;
 using Windows.Devices.Enumeration;
@@ -52,7 +53,7 @@ namespace UniversalNomadUploader
         public CaptureView()
         {
             this.InitializeComponent();
-            m_dataManager = new DataManager();
+            m_dataManager = new DataManager("","");
             HardwareButtons.BackPressed += HardwareButtons_BackPressed;
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
 
@@ -109,7 +110,7 @@ namespace UniversalNomadUploader
             if (Preview.Source != null)
             {
                 await Preview.Source.StopPreviewAsync();
-                m_dataManager.StopVideoRecord();
+                await m_dataManager.StopVideoRecord();
             }
 
             m_dataManager.DisposeCamera();
@@ -121,8 +122,8 @@ namespace UniversalNomadUploader
             {
                 UIState(PageState.Default);
                 await Preview.Source.StopPreviewAsync();
-                m_dataManager.StopVideoRecord();
-                m_dataManager.StopAudioRecord();
+                await m_dataManager.StopVideoRecord();
+                await m_dataManager.StopAudioRecord();
             }
 
             if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.CodeActivated)
@@ -223,8 +224,7 @@ namespace UniversalNomadUploader
 
         private async void StartVideoRecord_Click(object sender, RoutedEventArgs e)
         {
-            UIState(PageState.VideoRecording);
-            String fileName = Guid.NewGuid().ToString();
+            UIState(PageState.VideoRecording);            
 
             await Preview.Source.StopPreviewAsync();
             Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Video);
@@ -232,32 +232,38 @@ namespace UniversalNomadUploader
             m_file = await m_dataManager.StartVideoRecord(Guid.NewGuid().ToString());
         }
 
-        private void StopRecordVideo_Click(object sender, RoutedEventArgs e)
+        private async void StopRecordVideo_Click(object sender, RoutedEventArgs e)
         {
-            m_dataManager.StopVideoRecord();
+            await m_dataManager.StopVideoRecord();
 
             m_mimeTypeEvi = MimeTypes.Movie;
 
             UIState(PageState.SavingName);
         }
 
-        private async void StartRecordAudio_Click(object sender, RoutedEventArgs e)
+        private async void StartAudioRecord_Click(object sender, RoutedEventArgs e)
         {
             UIState(PageState.AudioRecording);
-
-            String filename = Guid.NewGuid().ToString();
-            m_file = await m_dataManager.StartAudioRecord(filename);
-
-            if (m_file == null)
-            {
-                await m_dataManager.InitializeMediaCapture(CaptureType.Audio);
-                m_file = await m_dataManager.StartAudioRecord(Guid.NewGuid().ToString());
-            }
+            await m_dataManager.StartAudioRecord();
         }
 
-        private void StopRecordAudio_Click(object sender, RoutedEventArgs e)
+        private async void PauseRecordAudio_Click(object sender, RoutedEventArgs e)
         {
-            m_dataManager.StopAudioRecord();
+            PauseRecordAudio.IsEnabled = false;
+            RestartRecordAudio.IsEnabled = true;
+            await m_dataManager.PauseAudioRecord();            
+        }
+
+        private async void RestartRecordAudio_Click(object sender, RoutedEventArgs e)
+        {
+            PauseRecordAudio.IsEnabled = true;
+            RestartRecordAudio.IsEnabled = false;
+            await m_dataManager.StartAudioRecord();
+        }
+
+        private async void StopRecordAudio_Click(object sender, RoutedEventArgs e)
+        {
+            await m_dataManager.StopAudioRecord();
 
             m_mimeTypeEvi = MimeTypes.Audio;
 
@@ -268,16 +274,30 @@ namespace UniversalNomadUploader
         {
             UIState(PageState.Default);
 
-            if (await m_dataManager.AddEvidence(m_file, NewName.Text, m_mimeTypeEvi) == -1)
+            if( m_mimeTypeEvi == MimeTypes.Audio )
+            {
+                String fileName = Guid.NewGuid().ToString();
+                m_file = await m_dataManager.SaveAudioRecord(fileName);
+            }
+
+            EvidenceStatus evidenceStatus = await m_dataManager.AddEvidence(m_file, NewName.Text, m_mimeTypeEvi);
+            if ( evidenceStatus != EvidenceStatus.OK )
             {
                 String message = "";
-                if (String.IsNullOrEmpty(NewName.Text) == true)
+                switch (evidenceStatus)
                 {
-                    message = "The evidence must have a name";
-                }
-                else
-                {
-                    message = "The evidence has failed to be saved";
+                    case EvidenceStatus.BadEvidenceName:
+                        message = "The evidence must have a name";
+                        break;
+                    case EvidenceStatus.BadFileName:
+                        message = "The evidence has failed to be saved";
+                        break;
+                    case EvidenceStatus.MaximumSizeFileExceeded:
+                        message = "The file exceed the maximum size";
+                        break;
+                    default:
+                        message = "Unknown error";
+                        break;
                 }
 
                 MessageDialog msgDialog = new MessageDialog(message, "Required");
@@ -288,7 +308,7 @@ namespace UniversalNomadUploader
 
             if (m_mimeTypeEvi == MimeTypes.Movie || m_mimeTypeEvi == MimeTypes.Picture)
             {
-                StorageFolder VideoThumbs = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFolderAsync("_VidThumbs", CreationCollisionOption.OpenIfExists);
+                StorageFolder VideoThumbs = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFolderAsync(GlobalVariables.thumbnailFolderName, CreationCollisionOption.OpenIfExists);
                 StorageFile VideoThumb = await VideoThumbs.CreateFileAsync(m_file.DisplayName + ".jpg", CreationCollisionOption.ReplaceExisting);
 
                 using (var stream = await m_file.GetThumbnailAsync(ThumbnailMode.VideosView))
@@ -305,6 +325,6 @@ namespace UniversalNomadUploader
         private void CancelSaveName_Click(object sender, RoutedEventArgs e)
         {
             UIState(PageState.Default);
-        }
+        }       
     }
 }

@@ -13,6 +13,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
             this.OrganisationID = user.OrganisationID;
+            this.MaximumUploadSize = user.MaximumUploadSize;
         }
 
         public FunctionnalUser(SQLModels.SQLUser dbuser)
@@ -25,6 +26,7 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             this.ServerID = dbuser.LocalID;
             this.SessionID = dbuser.SessionID;
             this.Username = dbuser.Username;
+            this.MaximumUploadSize = dbuser.MaximumUploadSize;
         }
 
         public FunctionnalUser()
@@ -39,5 +41,6 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
         public String FirstName { get; set; }
         public String LastName { get; set; }
         public int OrganisationID { get; set; }
+        public int MaximumUploadSize { get; set; }
     }
 }

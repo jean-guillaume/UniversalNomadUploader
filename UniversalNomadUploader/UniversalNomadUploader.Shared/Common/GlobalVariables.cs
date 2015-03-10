@@ -15,6 +15,7 @@ namespace UniversalNomadUploader.Common
         public static ServerEnum SelectedServer { get { return _SelectedServer; } set { _SelectedServer = value; } }
         public static String dbPath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.Current.Resources["DatabaseName"].ToString());
         private static FunctionnalUser _LoggedInUser = null;
+        public const String thumbnailFolderName = "_VidThumbs";
         public static FunctionnalUser LoggedInUser
         {
             get
@@ -138,5 +139,20 @@ namespace UniversalNomadUploader.Common
                 return MimeTypes.Unknown;
             }
         }
+
+        public static Boolean IsWindowsPhone()
+        {
+            Windows.Security.ExchangeActiveSyncProvisioning.EasClientDeviceInformation deviceInfo = new Windows.Security.ExchangeActiveSyncProvisioning.EasClientDeviceInformation();
+
+            if (deviceInfo.OperatingSystem == "WINDOWS")
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
     }
 }
