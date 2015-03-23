@@ -187,6 +187,7 @@ namespace UniversalNomadUploader
             }
 
             HideProgress();
+            logon.IsEnabled = true;
         }
 
         private void ShowProgress()

@@ -212,7 +212,6 @@ namespace UniversalNomadUploader
                     {
                         FileStatus.Text += "Date uploaded: " + ((FunctionnalEvidence)itemGridView.SelectedItem).UploadedDate.ToString("dd MMM yyyy");
                     }
-
                 }
                 else
                 {

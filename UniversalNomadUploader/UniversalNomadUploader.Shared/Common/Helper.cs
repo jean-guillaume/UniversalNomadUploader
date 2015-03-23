@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Windows.Globalization.Collation;
+using System.IO;
+using Windows.Storage;
+using System.Threading.Tasks;
 
 namespace UniversalNomadUploader.Common
 {
@@ -41,6 +44,39 @@ namespace UniversalNomadUploader.Common
             }
 
             return groupDictionary.Select(x => x.Value).ToList();
+        }
+
+        public async static Task<List<StorageFile>> SplitFile(StorageFile _inputFile, int _chunkSize, StorageFolder _path)
+        {            
+            byte[] buffer = new byte[_chunkSize];
+            List<StorageFile> partFile = new List<StorageFile>();
+
+            using (Stream input = await _inputFile.OpenStreamForReadAsync() )
+            {
+                int index = 0;
+                while (input.Position < input.Length)
+                {
+                    StorageFile destFilePart = await _path.CreateFileAsync(_inputFile.DisplayName+"."+index,CreationCollisionOption.ReplaceExisting);
+                    using (Stream output = await destFilePart.OpenStreamForWriteAsync())
+                    {
+                        int chunkBytesRead = 0;
+                        while (chunkBytesRead < _chunkSize)
+                        {
+                            int bytesRead = input.Read(buffer, chunkBytesRead, _chunkSize - chunkBytesRead);
+                            if (bytesRead == 0)
+                            {
+                                break;
+                            }
+                            chunkBytesRead += bytesRead;
+                        }
+                        output.Write(buffer, 0, chunkBytesRead);
+                    }
+                    partFile.Add(destFilePart);
+                    index++;
+                }
+            }
+
+            return partFile;
         }
     }
 }

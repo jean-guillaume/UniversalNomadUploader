@@ -222,19 +222,34 @@ namespace UniversalNomadUploader
             UIState(PageState.SavingName);
         }
 
+        int time = 0;
+        DispatcherTimer m_dispatcherTimer;
         private async void StartVideoRecord_Click(object sender, RoutedEventArgs e)
         {
-            UIState(PageState.VideoRecording);            
+            UIState(PageState.VideoRecording);
 
+            m_dispatcherTimer = new DispatcherTimer();
+            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            m_dispatcherTimer.Tick += EachSeconds;
+            
             await Preview.Source.StopPreviewAsync();
             Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Video);
             await Preview.Source.StartPreviewAsync();
             m_file = await m_dataManager.StartVideoRecord(Guid.NewGuid().ToString());
+            m_dispatcherTimer.Start();
+        }
+
+        private void EachSeconds(object sender, object o)
+        {            
+            Timer.Text = time++.ToString();
         }
 
         private async void StopRecordVideo_Click(object sender, RoutedEventArgs e)
         {
             await m_dataManager.StopVideoRecord();
+
+            m_dispatcherTimer.Stop();
+            time = 0;
 
             m_mimeTypeEvi = MimeTypes.Movie;
 
@@ -263,7 +278,7 @@ namespace UniversalNomadUploader
 
         private async void StopRecordAudio_Click(object sender, RoutedEventArgs e)
         {
-            await m_dataManager.StopAudioRecord();
+            await m_dataManager.StopAudioRecord();            
 
             m_mimeTypeEvi = MimeTypes.Audio;
 

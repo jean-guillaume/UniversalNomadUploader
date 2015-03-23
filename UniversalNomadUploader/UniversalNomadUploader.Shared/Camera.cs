@@ -61,7 +61,7 @@ namespace UniversalNomadUploader
             m_mediaCapture.VideoDeviceController.PrimaryUse = _use;
 
             m_imgEncodingProp = ImageEncodingProperties.CreateJpeg();
-            m_videoEncodingProp = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto);
+            m_videoEncodingProp = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Ntsc);
                         
             m_captureUse = _use;
             m_CurrentState = State.Initialized;
