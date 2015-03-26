@@ -161,22 +161,22 @@ namespace UniversalNomadUploader
 
             switch((await m_dataManager.ConnectToServer()))
             {
-                case connectionStatus.success:
+                case connectionStatus.Success:
                     this.Frame.Navigate(typeof(EvidenceViewer), m_dataManager);
                     return;
-                case connectionStatus.badPassword:
+                case connectionStatus.BadPassword:
                     MessageDialog msg = new MessageDialog("Incorrect Password", "Required");
                     await msg.ShowAsync();
                     break;
-                case connectionStatus.badUsername:
+                case connectionStatus.BadUsername:
                     MessageDialog msg0 = new MessageDialog("Incorrect Password", "Required");
                     await msg0.ShowAsync();
                     break;
-                case connectionStatus.sqlError:
+                case connectionStatus.SqlError:
                     MessageDialog msg1 = new MessageDialog("Failed to register into the database", "Database error");
                     await msg1.ShowAsync();
                     break;
-                case connectionStatus.authenticationFailed:
+                case connectionStatus.AuthenticationFailed:
                     MessageDialog msg2 = new MessageDialog("Incorrect user or password", "Authentication failure");
                     await msg2.ShowAsync();
                     break;

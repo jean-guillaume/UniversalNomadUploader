@@ -20,8 +20,8 @@
                                 Storyboard.TargetName="RecordAudio"
                                 Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"/>
         </Storyboard>
-             
-                      
+
+
 
         <!-- Default style for Windows.UI.Xaml.Controls.AppBarButton -->
         <Style TargetType="AppBarButton">
@@ -189,17 +189,20 @@
 
     <!--Preview-->
     <Grid Name="CaptureContainer">
-        <TextBlock Name="NoCameraMsg" Visibility="Collapsed" FontSize="32" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        
         <CaptureElement Name="Preview"  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"/>
-        <TextBlock x:Name="Timer" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="White" Text="ROTOTO" FontSize="32"/>
-        
+        <TextBlock Name="CameraMsg" Visibility="Visible" FontSize="24" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="Timer" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="White" FontSize="32"/>
+            <TextBlock x:Name="MaxTime" Text="/15:00" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="White" FontSize="32"/>
+        </StackPanel>
         <Grid Name="VideoRecordBtn" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
             <AppBarButton Name="StopRecordVideo" Icon="Stop" Click="StopRecordVideo_Click" />
-        </Grid>        
+        </Grid>
         <StackPanel Name="AudioRecordBtn" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
             <AppBarButton Name="RestartRecordAudio" Icon="Play" Click="RestartRecordAudio_Click" IsEnabled="False" Visibility="Collapsed" />
-            <AppBarButton Name="PauseRecordAudio" Icon="Pause" Click="PauseRecordAudio_Click" Visibility="Collapsed"/> <!--TODO UPDATE wait next update of windows phone to put it visible -->
+            <AppBarButton Name="PauseRecordAudio" Icon="Pause" Click="PauseRecordAudio_Click" Visibility="Collapsed"/>
+            <!--TODO UPDATE wait next update of windows phone to put it visible -->
             <AppBarButton Name="StopRecordAudio" Icon="Stop" Click="StopRecordAudio_Click" />
         </StackPanel>
 
@@ -228,13 +231,13 @@
                 <AppBarButton.RenderTransform>
                     <RotateTransform/>
                 </AppBarButton.RenderTransform>
-                <SymbolIcon Symbol="Camera" />
+                <SymbolIcon Name="TakePictureSymbolIcon" Symbol="Camera" />
             </AppBarButton>
             <AppBarButton Name="RecordVideo" Label="Record Video" IsCompact="True" Click="StartVideoRecord_Click" RenderTransformOrigin="0.5, 0.5">
                 <AppBarButton.RenderTransform>
                     <RotateTransform/>
                 </AppBarButton.RenderTransform>
-                <SymbolIcon Symbol="Video" />
+                <SymbolIcon Name="RecordVideoSymbolIcon" Symbol="Video" />
             </AppBarButton>
             <AppBarButton Name="RecordAudio" Label="Record Audio" IsCompact="True" Click="StartAudioRecord_Click" RenderTransformOrigin="0.5, 0.5" >
                 <AppBarButton.RenderTransform>

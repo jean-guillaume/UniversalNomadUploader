@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UniversalNomadUploader.DataModels.Enums;
+using UniversalNomadUploader.SQLUtils;
 using Windows.Devices.Sensors;
 using Windows.Graphics.Display;
 using Windows.Media.Capture;
@@ -13,12 +15,12 @@ namespace UniversalNomadUploader
 {
     public enum CaptureType { Audio, Photo, Video };
 
-    public class CaptureEvidence
+    public class CaptureDeviceManager
     {
         private Camera m_Camera;
         private Microphone m_Microphone;
 
-        public CaptureEvidence()
+        public CaptureDeviceManager()
         {
             m_Camera = new Camera();
             m_Microphone = new Microphone();
@@ -58,11 +60,17 @@ namespace UniversalNomadUploader
         public async Task<StorageFile> TakePicture(String _filename)
         {
             try
-            {
+            {   
                 return await m_Camera.takePicture(_filename);
             }
             catch (Camera.MediaTypeException ex)
             {
+                SQLEventLogUtil.InsertEvent("Failed to capture a photo, reason :" + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Capture);
+                throw ex;
+            }
+            catch(Exception ex)
+            {
+                SQLEventLogUtil.InsertEvent("Failed to capture a photo, reason :" + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Capture);
                 throw ex;
             }
         }
@@ -80,6 +88,12 @@ namespace UniversalNomadUploader
             }
             catch (Camera.MediaTypeException ex)
             {
+                SQLEventLogUtil.InsertEvent("Failed to start a video record, reason :" + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Capture);
+                throw ex;
+            }
+            catch(Exception ex)
+            {
+                SQLEventLogUtil.InsertEvent("Failed to start a video record, reason :" + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Capture);
                 throw ex;
             }
         }
@@ -111,7 +125,15 @@ namespace UniversalNomadUploader
         
         public async Task StartAudioRecord()
         {
-            await m_Microphone.StartRecord();
+            try
+            { 
+                await m_Microphone.StartRecord();
+            }
+            catch(Exception ex)
+            {
+                SQLEventLogUtil.InsertEvent("Failed to start an audio record, reason :" + ex.Message + Environment.NewLine + Environment.NewLine + "Stack trace: " + Environment.NewLine + ex.StackTrace, LogType.Capture);
+                throw ex;
+            }
         }
 
         public async Task PauseAudioRecord()

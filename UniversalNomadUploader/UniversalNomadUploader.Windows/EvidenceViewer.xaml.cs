@@ -173,23 +173,40 @@ namespace UniversalNomadUploader
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
         {
-
+            Boolean failed = false;
+            String failReason = null;
             itemGridView.IsEnabled = false;
             DisableButtons(PageState.Uploading);
             SyncProgress.IsIndeterminate = true;
             SyncProgress.Visibility = Visibility.Visible;
             foreach (FunctionnalEvidence item in itemGridView.SelectedItems)
             {
-                await m_dataManager.UploadEvidence(item);
+                if(await m_dataManager.UploadEvidence(item) != UploadStatus.OK)
+                {
+                    failed = true;
+                    if(itemGridView.SelectedItems.Count > 1)
+                    {
+                        failReason = "One or more evidence failed to be uploaded.";
+                    }
+                    else if(itemGridView.SelectedItems.Count == 1)
+                    {
+                        failReason = "Evidence failed to be uploaded.";
+                    }
+                }
             }
             SyncProgress.IsIndeterminate = false;
             SyncProgress.Visibility = Visibility.Collapsed;
             RebindItems();
             itemGridView.IsEnabled = true;
             DisableButtons(PageState.Default);
+
+            if(failed == true )
+            {
+                await displayMessage(failReason, "Upload failed");
+            }
         }
 
-        private async void displayMessage(string message, string title)
+        private async Task displayMessage(string message, string title)
         {
             MessageDialog msg = new MessageDialog(message, title);
             await msg.ShowAsync();
@@ -202,21 +219,7 @@ namespace UniversalNomadUploader
                 FileStatusTitle.Text = "File status:";
                 FileStatus.Text = "";
                 FileDetails.Text = (((FunctionnalEvidence)itemGridView.SelectedItem).Name == null) ? "" : ((FunctionnalEvidence)itemGridView.SelectedItem).Name;
-                if (((FunctionnalEvidence)itemGridView.SelectedItem).HasTryUploaded)
-                {
-                    if (((FunctionnalEvidence)itemGridView.SelectedItem).UploadError != null && ((FunctionnalEvidence)itemGridView.SelectedItem).UploadError != "")
-                    {
-                        FileStatus.Text += "Error uploading: " + ((FunctionnalEvidence)itemGridView.SelectedItem).UploadError.ToString();
-                    }
-                    else
-                    {
-                        FileStatus.Text += "Date uploaded: " + ((FunctionnalEvidence)itemGridView.SelectedItem).UploadedDate.ToString("dd MMM yyyy");
-                    }
-                }
-                else
-                {
-                    FileStatus.Text += "Not uploaded";
-                }
+                FileStatus.Text = ((FunctionnalEvidence)itemGridView.SelectedItem).FileStatus;                
             }
             else if (this.itemGridView.SelectedItems.Count > 1)
             {
@@ -319,24 +322,24 @@ namespace UniversalNomadUploader
 
             if (evidenceStatus != EvidenceStatus.OK)
             {
-                String message = "";
+                String failReason = "";
                 switch (evidenceStatus)
                 {
                     case EvidenceStatus.BadEvidenceName:
-                        message = "The evidence must have a name";
+                        failReason = "The evidence must have a name";
                         break;
                     case EvidenceStatus.BadFileName:
-                        message = "The evidence has failed to be saved";
+                        failReason = "The evidence has failed to be saved";
                         break;
                     case EvidenceStatus.MaximumSizeFileExceeded:
-                        message = "The file can't be saved because he is exceeding the maximum size.";
+                        failReason = "The file can't be saved because he is exceeding the maximum size.";
                         break;
                     default:
-                        message = "Unknown error";
+                        failReason = "Unknown error";
                         break;
                 }
                 
-                MessageDialog msgDialog = new MessageDialog(message, "Warning");
+                MessageDialog msgDialog = new MessageDialog(failReason, "Warning");
                 await msgDialog.ShowAsync();
             }
             else if(m_currentEviType == MimeTypes.Movie)
@@ -490,17 +493,28 @@ namespace UniversalNomadUploader
         private async void RecordAudioButton_Click(object sender, RoutedEventArgs e)
         {
             String filename = Guid.NewGuid().ToString();
+            Boolean captureFailed = false;
+            String failReason = null;
 
             try
             {
-                await m_dataManager.StartAudioRecord();
-                m_currentEviType = MimeTypes.Audio;
+                await m_dataManager.StartAudioRecord();                
                 UpdateRecordingControls(RecordingMode.Recording);
                 _timer.Start();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                displayMessage("Please allow Nomad Uploader to access your microphone from the permissions charm.", "Microphone Access");
+                failReason = ex.Message;
+                captureFailed = true;                
+            }
+
+            if (captureFailed == true)
+            {
+                await displayMessage(failReason, "Failed to start an audio record");
+            }
+            else
+            {
+                m_currentEviType = MimeTypes.Audio;
             }
         }
 
@@ -782,22 +796,22 @@ namespace UniversalNomadUploader
 
             switch ((await m_dataManager.ConnectToServer()))
             {
-                case connectionStatus.success:
+                case connectionStatus.Success:
                     this.Frame.Navigate(typeof(EvidenceViewer), m_dataManager);
                     return;
-                case connectionStatus.badPassword:
+                case connectionStatus.BadPassword:
                     MessageDialog msg = new MessageDialog("Incorrect Password", "Required");
                     await msg.ShowAsync();
                     break;
-                case connectionStatus.badUsername:
+                case connectionStatus.BadUsername:
                     MessageDialog msg0 = new MessageDialog("Incorrect Password", "Required");
                     await msg0.ShowAsync();
                     break;
-                case connectionStatus.sqlError:
+                case connectionStatus.SqlError:
                     MessageDialog msg1 = new MessageDialog("Failed to register into the database", "Database error");
                     await msg1.ShowAsync();
                     break;
-                case connectionStatus.authenticationFailed:
+                case connectionStatus.AuthenticationFailed:
                     MessageDialog msg2 = new MessageDialog("Incorrect user or password", "Authentication failure");
                     await msg2.ShowAsync();
                     break;

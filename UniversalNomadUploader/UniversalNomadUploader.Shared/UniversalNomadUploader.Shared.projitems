@@ -18,7 +18,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Camera.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CaptureEvidence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CaptureDeviceManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceListGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\GlobalVariables.cs" />
@@ -39,6 +39,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\MimeTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ServerEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ConnectionStatusCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\UploadStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\FunctionalModels\FunctionnalEvidence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\FunctionalModels\FunctionnalUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\SQLEventLog.cs" />

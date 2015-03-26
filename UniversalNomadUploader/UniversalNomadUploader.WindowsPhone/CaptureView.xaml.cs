@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using UniversalNomadUploader.Common;
 using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.DataModels.SQLModels;
@@ -14,6 +15,7 @@ using Windows.Graphics.Display;
 using Windows.Phone.UI.Input;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
@@ -40,6 +42,8 @@ namespace UniversalNomadUploader
         StorageFile m_file = null;
         MimeTypes m_mimeTypeEvi;
         Double m_currentAngle = 0;
+        DispatcherTimer m_dispatcherTimer;
+        TimeSpan m_elapsedTime;
 
         private enum PageState
         {
@@ -53,10 +57,9 @@ namespace UniversalNomadUploader
         public CaptureView()
         {
             this.InitializeComponent();
-            m_dataManager = new DataManager("","");
+            m_dataManager = new DataManager("", "");
             HardwareButtons.BackPressed += HardwareButtons_BackPressed;
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-
             m_simpleorientation = SimpleOrientationSensor.GetDefault();
 
             // Assign an event handler for the sensor orientation-changed event
@@ -96,9 +99,7 @@ namespace UniversalNomadUploader
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             UIState(PageState.Default);
-
-            Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Photo);
-            await Preview.Source.StartPreviewAsync();
+            await SwitchCaptureMode(MimeTypes.Picture);
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
         }
 
@@ -128,7 +129,7 @@ namespace UniversalNomadUploader
 
             if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.CodeActivated)
             {
-                Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Photo);
+                await SwitchCaptureMode(MimeTypes.Picture);
             }
         }
 
@@ -160,7 +161,8 @@ namespace UniversalNomadUploader
                     SaveName.IsEnabled = false;
                     Appbar.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     RecordVideo.IsEnabled = true;
-                    RecordVideo.IsEnabled = true;                    
+                    RecordVideo.IsEnabled = true;
+                    initTimer();
 
                     AudioRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     VideoRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
@@ -190,7 +192,7 @@ namespace UniversalNomadUploader
                     VideoRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     AudioRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    
+
                     NewName.Text = "";
                     NewName.Focus(FocusState.Pointer);
                     break;
@@ -198,50 +200,144 @@ namespace UniversalNomadUploader
                 case PageState.NoCamera:
                     Appbar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
-                    NoCameraMsg.Text += "No camera detected.\n";
-                    NoCameraMsg.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                    CameraMsg.Text += "No camera detected.\n";
+                    CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     break;
+            }
+        }
+
+        private void initTimer()
+        {
+            m_elapsedTime = new TimeSpan();
+            m_dispatcherTimer = new DispatcherTimer();
+            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            m_dispatcherTimer.Tick += EachSeconds;
+            Timer.Text = m_elapsedTime.ToString(@"mm\:ss");
+        }
+
+        private async void EachSeconds(object sender, object o)
+        {
+            m_elapsedTime = m_elapsedTime.Add(m_dispatcherTimer.Interval);
+            Timer.Text = m_elapsedTime.ToString(@"mm\:ss");
+
+            //TODO put in a global var
+            if (m_elapsedTime.Minutes == GlobalVariables.maxRecordTimeMinute)
+            {
+                if (m_mimeTypeEvi == MimeTypes.Audio)
+                {
+                    StopRecordAudio_Click(null, null);
+                }
+                else if (m_mimeTypeEvi == MimeTypes.Movie)
+                {
+                    StopRecordVideo_Click(null, null);
+                }
+
+                await DisplayMessage("The record is stopped because it reached the maximum length authorized", "Maximum length reached");
             }
         }
 
         private async void TakePicture_Click(object sender, RoutedEventArgs e)
         {
+            if (m_mimeTypeEvi != MimeTypes.Picture)
+            {
+                CameraMsg.Text = "Switching to Photo mode...";
+                CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Visible;
+
+                await SwitchCaptureMode(MimeTypes.Picture);
+                CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+
+                RecordVideoSymbolIcon.Foreground = new SolidColorBrush(Colors.White);
+                TakePictureSymbolIcon.Foreground = new SolidColorBrush(Colors.GreenYellow);
+
+                return;
+            }
+
+            Boolean doSwitch = false;
+            String failReason = null;
             String fileName = Guid.NewGuid().ToString();
-            m_file = await m_dataManager.TakePicture(fileName);
+
+            try
+            {
+                await SwitchCaptureMode(MimeTypes.Movie);
+                m_file = await m_dataManager.TakePicture(fileName);
+            }
+            catch (Camera.MediaTypeException ex)
+            {
+                doSwitch = true;
+                failReason = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                failReason = ex.Message;
+            }
+            finally
+            {
+                m_file = null;
+            }
 
             if (m_file == null)
             {
-                await Preview.Source.StopPreviewAsync();
-                Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Photo);
-                await Preview.Source.StartPreviewAsync();
-                m_file = await m_dataManager.TakePicture(fileName);
+                await DisplayMessage(failReason, "Failed to capture a photo");
+            }
+            else
+            {
+                UIState(PageState.SavingName);
+            }
+
+            if (doSwitch == true)
+            {
+                await SwitchCaptureMode(MimeTypes.Picture);
             }
 
             m_mimeTypeEvi = MimeTypes.Picture;
 
-            UIState(PageState.SavingName);
         }
 
-        int time = 0;
-        DispatcherTimer m_dispatcherTimer;
         private async void StartVideoRecord_Click(object sender, RoutedEventArgs e)
         {
+            if (m_mimeTypeEvi != MimeTypes.Movie)
+            {
+                CameraMsg.Text = "Switching to Video mode...";
+                CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Visible;
+
+                await SwitchCaptureMode(MimeTypes.Movie);
+
+                CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                return;
+            }
+
             UIState(PageState.VideoRecording);
+            Boolean doSwitch = false;
+            String failReason = null;
 
-            m_dispatcherTimer = new DispatcherTimer();
-            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            m_dispatcherTimer.Tick += EachSeconds;
-            
-            await Preview.Source.StopPreviewAsync();
-            Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Video);
-            await Preview.Source.StartPreviewAsync();
-            m_file = await m_dataManager.StartVideoRecord(Guid.NewGuid().ToString());
-            m_dispatcherTimer.Start();
-        }
+            try
+            {
+                m_dispatcherTimer.Start();
+                m_file = await m_dataManager.StartVideoRecord(Guid.NewGuid().ToString());
+            }
+            catch (Camera.MediaTypeException ex)
+            {
+                doSwitch = true;
+                failReason = ex.Message;
+                m_file = null;
+            }
+            catch (Exception ex)
+            {
+                failReason = ex.Message;
+                m_file = null;
+            }
 
-        private void EachSeconds(object sender, object o)
-        {            
-            Timer.Text = time++.ToString();
+            if (m_file == null)
+            {
+                await DisplayMessage(failReason, "Failed to start a video record");
+            }
+
+            if (doSwitch == true)
+            {
+                await SwitchCaptureMode(MimeTypes.Movie);
+            }
+
+            m_mimeTypeEvi = MimeTypes.Movie;
         }
 
         private async void StopRecordVideo_Click(object sender, RoutedEventArgs e)
@@ -249,9 +345,6 @@ namespace UniversalNomadUploader
             await m_dataManager.StopVideoRecord();
 
             m_dispatcherTimer.Stop();
-            time = 0;
-
-            m_mimeTypeEvi = MimeTypes.Movie;
 
             UIState(PageState.SavingName);
         }
@@ -259,14 +352,37 @@ namespace UniversalNomadUploader
         private async void StartAudioRecord_Click(object sender, RoutedEventArgs e)
         {
             UIState(PageState.AudioRecording);
-            await m_dataManager.StartAudioRecord();
+
+            Boolean captureFailed = false;
+            String failReason = null;
+
+            try
+            {
+                m_dispatcherTimer.Start();
+                await m_dataManager.StartAudioRecord();
+            }
+            catch (Exception ex)
+            {
+                captureFailed = true;
+                failReason = ex.Message;
+            }
+
+            if (captureFailed == true)
+            {
+                await DisplayMessage(failReason, "Failed to start an audio record");
+            }
+            else
+            {
+                m_mimeTypeEvi = MimeTypes.Audio;
+            }
         }
 
         private async void PauseRecordAudio_Click(object sender, RoutedEventArgs e)
         {
             PauseRecordAudio.IsEnabled = false;
             RestartRecordAudio.IsEnabled = true;
-            await m_dataManager.PauseAudioRecord();            
+            await m_dataManager.PauseAudioRecord();
+            m_dispatcherTimer.Stop();
         }
 
         private async void RestartRecordAudio_Click(object sender, RoutedEventArgs e)
@@ -274,13 +390,13 @@ namespace UniversalNomadUploader
             PauseRecordAudio.IsEnabled = true;
             RestartRecordAudio.IsEnabled = false;
             await m_dataManager.StartAudioRecord();
+            m_dispatcherTimer.Start();
         }
 
         private async void StopRecordAudio_Click(object sender, RoutedEventArgs e)
         {
-            await m_dataManager.StopAudioRecord();            
-
-            m_mimeTypeEvi = MimeTypes.Audio;
+            await m_dataManager.StopAudioRecord();
+            m_dispatcherTimer.Stop();
 
             UIState(PageState.SavingName);
         }
@@ -289,14 +405,14 @@ namespace UniversalNomadUploader
         {
             UIState(PageState.Default);
 
-            if( m_mimeTypeEvi == MimeTypes.Audio )
+            if (m_mimeTypeEvi == MimeTypes.Audio)
             {
                 String fileName = Guid.NewGuid().ToString();
                 m_file = await m_dataManager.SaveAudioRecord(fileName);
             }
 
             EvidenceStatus evidenceStatus = await m_dataManager.AddEvidence(m_file, NewName.Text, m_mimeTypeEvi);
-            if ( evidenceStatus != EvidenceStatus.OK )
+            if (evidenceStatus != EvidenceStatus.OK)
             {
                 String message = "";
                 switch (evidenceStatus)
@@ -315,8 +431,7 @@ namespace UniversalNomadUploader
                         break;
                 }
 
-                MessageDialog msgDialog = new MessageDialog(message, "Required");
-                await msgDialog.ShowAsync();
+                await DisplayMessage(message, "Required");
                 UIState(PageState.SavingName);
                 return;
             }
@@ -334,12 +449,52 @@ namespace UniversalNomadUploader
                 await m_file.MoveAsync(Windows.Storage.ApplicationData.Current.LocalFolder, m_file.DisplayName + m_file.FileType, NameCollisionOption.ReplaceExisting);
             }
 
-            m_file = null; // put in the initial state
+            m_file = null; // put in the initial state of the variable
         }
 
         private void CancelSaveName_Click(object sender, RoutedEventArgs e)
         {
             UIState(PageState.Default);
-        }       
+        }
+
+        private async Task SwitchCaptureMode(MimeTypes _captureMode)
+        {
+            if (_captureMode == MimeTypes.Picture)
+            {
+                if (Preview.Source != null)
+                {
+                    CameraMsg.Text = "Switching to Photo capture mode...";
+                    CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                    await Preview.Source.StopPreviewAsync();                    
+                }
+                Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Photo);
+                TakePictureSymbolIcon.Foreground = new SolidColorBrush(Colors.GreenYellow);
+                RecordVideoSymbolIcon.Foreground = new SolidColorBrush(Colors.White);
+                m_mimeTypeEvi = _captureMode;
+                await Preview.Source.StartPreviewAsync();
+                CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            }
+            else if (_captureMode == MimeTypes.Movie)
+            {
+                if (Preview.Source != null)
+                {
+                    await Preview.Source.StopPreviewAsync();
+                    CameraMsg.Text = "Switching to Video capture mode...";
+                    CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                }
+                Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Video);
+                TakePictureSymbolIcon.Foreground = new SolidColorBrush(Colors.White);
+                RecordVideoSymbolIcon.Foreground = new SolidColorBrush(Colors.GreenYellow);
+                m_mimeTypeEvi = _captureMode;
+                await Preview.Source.StartPreviewAsync();
+                CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            }
+        }
+
+        private async Task DisplayMessage(String _message, String _title)
+        {
+            MessageDialog msg = new MessageDialog(_message, _title);
+            await msg.ShowAsync();
+        }
     }
 }

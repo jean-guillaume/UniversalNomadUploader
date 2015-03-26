@@ -6,10 +6,10 @@ namespace UniversalNomadUploader.Common
 {
     public enum connectionStatus
     {
-        success,
-        badPassword,
-        badUsername,
-        sqlError,
-        authenticationFailed
+        Success,
+        BadPassword,
+        BadUsername,
+        SqlError,
+        AuthenticationFailed
     }    
 }

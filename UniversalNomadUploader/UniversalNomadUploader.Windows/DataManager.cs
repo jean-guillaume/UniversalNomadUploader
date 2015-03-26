@@ -23,11 +23,11 @@ namespace UniversalNomadUploader
     {
         private DBManager m_DBManager;
         private ServerManager m_ServerManager;
-        private CaptureEvidence m_CaptureEvidence;
+        private CaptureDeviceManager m_CaptureEvidence;
 
         public DataManager(String _username, String _password)
         {
-            m_CaptureEvidence = new CaptureEvidence();
+            m_CaptureEvidence = new CaptureDeviceManager();
             m_DBManager = new DBManager();
             m_ServerManager = new ServerManager(_username, _password);
         }
@@ -61,16 +61,8 @@ namespace UniversalNomadUploader
         {
             await m_DBManager.DeleteEvidence(_evi);
 
-            try
-            {
-                StorageFile eviFile = await ApplicationData.Current.LocalFolder.GetFileAsync(_evi.FileName + "." + _evi.Extension);
-                await eviFile.DeleteAsync();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
+            StorageFile eviFile = await ApplicationData.Current.LocalFolder.GetFileAsync(_evi.FileName + "." + _evi.Extension);
+            await eviFile.DeleteAsync();
         }
 
         /// <summary>
@@ -146,14 +138,14 @@ namespace UniversalNomadUploader
         /// </summary>
         /// <param name="_evi">Evidence to upload</param>
         /// <returns></returns>
-        public async Task UploadEvidence(FunctionnalEvidence _evi)
+        public async Task<UploadStatus> UploadEvidence(FunctionnalEvidence _evi)
         {
             if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess() || await APIAuthenticationUtil.VerifySessionAsync())
             {
                 throw new Exception("No internet connection");
             }
 
-            await m_ServerManager.UploadEvidence(_evi);
+            return await m_ServerManager.UploadEvidence(_evi);
         }
 
         public void CancelProcessing()

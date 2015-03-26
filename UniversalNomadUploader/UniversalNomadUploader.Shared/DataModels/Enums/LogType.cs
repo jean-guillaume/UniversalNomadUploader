@@ -7,6 +7,7 @@ namespace UniversalNomadUploader.DataModels.Enums
     public enum LogType
     {
         Upload = 1,
-        Delete = 2
+        Delete = 2,
+        Capture = 3
     }
 }

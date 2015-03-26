@@ -132,21 +132,18 @@ namespace UniversalNomadUploader
 
         private async void logon_Click(object sender, RoutedEventArgs e)
         {
-            //TODO : suppress
-            Username.Text = "BASSESSOR1";
-            Password.Password = "Test1234";
-            GlobalVariables.SelectedServer = ServerEnum.UAT1;
-            UAT2.IsChecked = false;
-            DEV.IsChecked = false;
-            MessageDialog a = new MessageDialog("HACK HACK HACK");
-            await a.ShowAsync();
-
+            logon.IsEnabled = false;
+            Username.IsEnabled = false;
+            Password.IsEnabled = false;
             ShowProgress();
             if (String.IsNullOrWhiteSpace(Username.Text))
             {
                 MessageDialog msg = new MessageDialog("Please enter a Username", "Required");
                 await msg.ShowAsync();
                 HideProgress();
+                logon.IsEnabled = true;
+                Username.IsEnabled = true;
+                Password.IsEnabled = true;
                 return;
             }
             if (String.IsNullOrWhiteSpace(Password.Password))
@@ -154,29 +151,31 @@ namespace UniversalNomadUploader
                 MessageDialog msg = new MessageDialog("Please enter a Password", "Required");
                 await msg.ShowAsync();
                 HideProgress();
+                logon.IsEnabled = true;
+                Username.IsEnabled = true;
+                Password.IsEnabled = true;
                 return;
             }
 
             m_dataManager = new DataManager(Username.Text, Password.Password);
-
             switch ((await m_dataManager.ConnectToServer()))
             {
-                case connectionStatus.success:
+                case connectionStatus.Success:
                     this.Frame.Navigate(typeof(EvidenceViewer), m_dataManager);
                     return;
-                case connectionStatus.badPassword:
+                case connectionStatus.BadPassword:
                     MessageDialog msg = new MessageDialog("Incorrect Password", "Required");
                     await msg.ShowAsync();
                     break;
-                case connectionStatus.badUsername:
+                case connectionStatus.BadUsername:
                     MessageDialog msg0 = new MessageDialog("Incorrect Password", "Required");
                     await msg0.ShowAsync();
                     break;
-                case connectionStatus.sqlError:
+                case connectionStatus.SqlError:
                     MessageDialog msg1 = new MessageDialog("Failed to register into the database", "Database error");
                     await msg1.ShowAsync();
                     break;
-                case connectionStatus.authenticationFailed:
+                case connectionStatus.AuthenticationFailed:
                     MessageDialog msg2 = new MessageDialog("Incorrect user or password", "Authentication failure");
                     await msg2.ShowAsync();
                     break;
@@ -185,6 +184,9 @@ namespace UniversalNomadUploader
                     await msg3.ShowAsync();
                     break;
             }
+            logon.IsEnabled = true;
+            Username.IsEnabled = true;
+            Password.IsEnabled = true;
         }
 
         private void ShowProgress()

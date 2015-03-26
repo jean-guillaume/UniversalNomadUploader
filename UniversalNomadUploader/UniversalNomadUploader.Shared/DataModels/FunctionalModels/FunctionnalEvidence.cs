@@ -111,6 +111,28 @@ namespace UniversalNomadUploader.DataModels.FunctionalModels
             }
         }
 
+        public String FileStatus
+        {
+            get
+            {
+                if (HasTryUploaded)
+                {
+                    if (UploadError != null && UploadError != "")
+                    {
+                        return "Error uploading: " + UploadError;
+                    }
+                    else
+                    {
+                        return "Date uploaded: " + UploadedDate.ToString("dd MMM yyyy");
+                    }
+                }
+                else
+                {
+                    return "Not uploaded";
+                }
+            }
+        }
+
         public bool IsUploading { get; set; }
     }
 }

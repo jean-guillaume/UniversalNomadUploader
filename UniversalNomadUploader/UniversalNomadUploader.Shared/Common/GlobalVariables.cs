@@ -16,6 +16,7 @@ namespace UniversalNomadUploader.Common
         public static String dbPath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.Current.Resources["DatabaseName"].ToString());
         private static FunctionnalUser _LoggedInUser = null;
         public const String thumbnailFolderName = "_VidThumbs";
+        public static int maxRecordTimeMinute = 15;
         public static FunctionnalUser LoggedInUser
         {
             get
