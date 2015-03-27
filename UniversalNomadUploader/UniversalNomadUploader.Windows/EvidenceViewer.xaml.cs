@@ -126,7 +126,7 @@ namespace UniversalNomadUploader
         /// session.  The state will be null the first time a page is visited.</param>
         private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");            
+            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
             UpdateRecordingControls(RecordingMode.Initializing);
             InitTimer();
             RebindItems();
@@ -181,14 +181,14 @@ namespace UniversalNomadUploader
             SyncProgress.Visibility = Visibility.Visible;
             foreach (FunctionnalEvidence item in itemGridView.SelectedItems)
             {
-                if(await m_dataManager.UploadEvidence(item) != UploadStatus.OK)
+                if (await m_dataManager.UploadEvidence(item) != UploadStatus.OK)
                 {
                     failed = true;
-                    if(itemGridView.SelectedItems.Count > 1)
+                    if (itemGridView.SelectedItems.Count > 1)
                     {
                         failReason = "One or more evidence failed to be uploaded.";
                     }
-                    else if(itemGridView.SelectedItems.Count == 1)
+                    else if (itemGridView.SelectedItems.Count == 1)
                     {
                         failReason = "Evidence failed to be uploaded.";
                     }
@@ -200,7 +200,7 @@ namespace UniversalNomadUploader
             itemGridView.IsEnabled = true;
             DisableButtons(PageState.Default);
 
-            if(failed == true )
+            if (failed == true)
             {
                 await displayMessage(failReason, "Upload failed");
             }
@@ -219,7 +219,7 @@ namespace UniversalNomadUploader
                 FileStatusTitle.Text = "File status:";
                 FileStatus.Text = "";
                 FileDetails.Text = (((FunctionnalEvidence)itemGridView.SelectedItem).Name == null) ? "" : ((FunctionnalEvidence)itemGridView.SelectedItem).Name;
-                FileStatus.Text = ((FunctionnalEvidence)itemGridView.SelectedItem).FileStatus;                
+                FileStatus.Text = ((FunctionnalEvidence)itemGridView.SelectedItem).FileStatus;
             }
             else if (this.itemGridView.SelectedItems.Count > 1)
             {
@@ -280,29 +280,46 @@ namespace UniversalNomadUploader
 
         private async void Rename_Click(object sender, RoutedEventArgs e)
         {
-             if (Rename.Content.ToString() == "Edit" && itemGridView.SelectedItems.Count > 0)
-             {
-                 Rename.Style = (Style)(App.Current as App).Resources["SaveButtonStyle"];
-                 Rename.Content = "Save";
-                 FileDetails.Visibility = Visibility.Collapsed;
-                 FileDetailsRename.Visibility = Visibility.Visible;
-                 FileDetailsRename.Text = (((FunctionnalEvidence)itemGridView.SelectedItem).Name == null) ? "" : ((FunctionnalEvidence)itemGridView.SelectedItem).Name;
-                 FileDetailsRename.Focus(FocusState.Pointer);
-                 FileDetailsRename.Select(FileDetailsRename.Text.Length, 0);
-             }
-             else if (itemGridView.SelectedItems.Count > 0)
-             {
-                 FunctionnalEvidence evi = ((FunctionnalEvidence)itemGridView.SelectedItem);
-                 evi.Name = FileDetailsRename.Text;
-                 await m_dataManager.UpdateEvidence(evi);
-                 Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
-                 Rename.Content = "Edit";
-                 FileDetails.Visibility = Visibility.Visible;
-                 FileDetailsRename.Visibility = Visibility.Collapsed;
-                 FileDetailsRename.Text = "";
-                 SearchTerm.Text = "";
-                 RebindItems();
-             }
+            if (Rename.Content.ToString() == "Edit" && itemGridView.SelectedItems.Count > 0)
+            {
+                Rename.Style = (Style)(App.Current as App).Resources["SaveButtonStyle"];
+                Rename.Content = "Save";
+                FileDetails.Visibility = Visibility.Collapsed;
+                FileDetailsRename.Visibility = Visibility.Visible;
+                FileDetailsRename.Text = (((FunctionnalEvidence)itemGridView.SelectedItem).Name == null) ? "" : ((FunctionnalEvidence)itemGridView.SelectedItem).Name;
+                FileDetailsRename.Focus(FocusState.Pointer);
+                FileDetailsRename.Select(FileDetailsRename.Text.Length, 0);
+            }
+            else if (itemGridView.SelectedItems.Count > 0)
+            {
+                Boolean failed = false;
+                String failReason = null;
+                FunctionnalEvidence evi = ((FunctionnalEvidence)itemGridView.SelectedItem);
+                evi.Name = FileDetailsRename.Text;
+
+                try
+                {
+                    await m_dataManager.UpdateEvidence(evi);
+                }
+                catch (SQLite.SQLiteException ex)
+                {
+                    failed = true;
+                    failReason = ex.Message;
+                }
+
+                if (failed == true)
+                {
+                    await displayMessage("Evidence not updated:" + failReason, "SQL error");
+                }
+
+                Rename.Style = (Style)(App.Current as App).Resources["EditButtonStyle"];
+                Rename.Content = "Edit";
+                FileDetails.Visibility = Visibility.Visible;
+                FileDetailsRename.Visibility = Visibility.Collapsed;
+                FileDetailsRename.Text = "";
+                SearchTerm.Text = "";
+                RebindItems();
+            }
         }
 
         private async void SaveName_Click(object sender, RoutedEventArgs e)
@@ -310,41 +327,58 @@ namespace UniversalNomadUploader
             EvidenceStatus evidenceStatus = EvidenceStatus.OK;
             if (m_currentEviFile == null && m_currentEviType == MimeTypes.Audio)
             {
-                String fileName = Guid.NewGuid().ToString();                
+                String fileName = Guid.NewGuid().ToString();
                 m_currentEviFile = await m_dataManager.SaveAudioRecord(fileName);
             }
 
+            Boolean failed = false;
+            String failReason = null;
+
             if (m_currentEviFile != null)
             {
-                evidenceStatus = await m_dataManager.AddEvidence(m_currentEviFile, NewName.Text, m_currentEviType);
-                await m_dataManager.StopAudioRecord(); //TODO check if not an another place to stop the record
+                try
+                {
+                    evidenceStatus = await m_dataManager.AddEvidence(m_currentEviFile, NewName.Text, m_currentEviType);
+                }
+                catch (SQLite.SQLiteException ex)
+                {
+                    failed = true;
+                    failReason = ex.Message;
+                }
+
+                if (failed == true)
+                {
+                    await displayMessage("Evidence not saved:" + failReason, "SQL error");
+                }
             }
 
-            if (evidenceStatus != EvidenceStatus.OK)
+            if (failed == false)
             {
-                String failReason = "";
-                switch (evidenceStatus)
+                if (evidenceStatus != EvidenceStatus.OK)
                 {
-                    case EvidenceStatus.BadEvidenceName:
-                        failReason = "The evidence must have a name";
-                        break;
-                    case EvidenceStatus.BadFileName:
-                        failReason = "The evidence has failed to be saved";
-                        break;
-                    case EvidenceStatus.MaximumSizeFileExceeded:
-                        failReason = "The file can't be saved because he is exceeding the maximum size.";
-                        break;
-                    default:
-                        failReason = "Unknown error";
-                        break;
+                    switch (evidenceStatus)
+                    {
+                        case EvidenceStatus.BadEvidenceName:
+                            failReason = "The evidence must have a name";
+                            break;
+                        case EvidenceStatus.BadFileName:
+                            failReason = "The evidence has failed to be saved";
+                            break;
+                        case EvidenceStatus.MaximumSizeFileExceeded:
+                            failReason = "The file can't be saved because he is exceeding the maximum size.";
+                            break;
+                        default:
+                            failReason = "Unknown error";
+                            break;
+                    }
+
+                    MessageDialog msgDialog = new MessageDialog(failReason, "Warning");
+                    await msgDialog.ShowAsync();
                 }
-                
-                MessageDialog msgDialog = new MessageDialog(failReason, "Warning");
-                await msgDialog.ShowAsync();
-            }
-            else if(m_currentEviType == MimeTypes.Movie)
-            {
-                await CreateThumbnail();
+                else if (m_currentEviType == MimeTypes.Movie)
+                {
+                    await CreateThumbnail();
+                }
             }
 
             m_currentEviFile = null;
@@ -498,14 +532,14 @@ namespace UniversalNomadUploader
 
             try
             {
-                await m_dataManager.StartAudioRecord();                
+                await m_dataManager.StartAudioRecord();
                 UpdateRecordingControls(RecordingMode.Recording);
                 _timer.Start();
             }
             catch (Exception ex)
             {
                 failReason = ex.Message;
-                captureFailed = true;                
+                captureFailed = true;
             }
 
             if (captureFailed == true)
@@ -539,6 +573,63 @@ namespace UniversalNomadUploader
             HideAudioControls();
             InitTimer();
             ShowNewName();
+        }
+
+        private async void CapturePhoto_Click(object sender, RoutedEventArgs e)
+        {
+            String filename = Guid.NewGuid().ToString();
+            StorageFile newPhoto = await m_dataManager.TakePicture(filename);
+
+            if (newPhoto != null)
+            {
+                m_currentEviFile = newPhoto;
+                m_currentEviType = MimeTypes.Picture;
+                ShowNewName();
+            }
+        }
+
+        private async void CaptureVideo_Click(object sender, RoutedEventArgs e)
+        {
+            String filename = Guid.NewGuid().ToString();
+            StorageFile newVideo = await m_dataManager.StartVideoRecord(filename);
+
+            if (newVideo != null)
+            {
+                m_currentEviFile = newVideo;
+                m_currentEviType = MimeTypes.Movie;
+                ShowNewName();
+            }
+        }
+
+        private async void CancelAudioButton_Click(object sender, RoutedEventArgs e)
+        {
+            String exceptionMessage = "";
+
+            _timer.Stop();
+            try
+            {
+                await m_dataManager.StopAudioRecord();
+            }
+            catch (Exception ex)
+            {
+                exceptionMessage = ex.Message;
+            }
+
+            if (exceptionMessage.Length > 0)
+            {
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    var warningMessage = new MessageDialog(String.Format("The audio capture failed to stop: {0}", exceptionMessage), "Capture Failed");
+                    await warningMessage.ShowAsync();
+                });
+            }
+
+            m_currentEviFile = null;
+            m_currentEviType = MimeTypes.Unknown;
+            ResetTimer();
+            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
+            UpdateRecordingControls(RecordingMode.Initializing);
+            HideAudioControls();
         }
 
 
@@ -585,41 +676,20 @@ namespace UniversalNomadUploader
             Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
         }
 
-        private void TimerOnTick(object sender, object o)
+        private async void TimerOnTick(object sender, object o)
         {
             _elapsedTime = _elapsedTime.Add(_timer.Interval);
             Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
-        }
 
-        private async void CancelAudioButton_Click(object sender, RoutedEventArgs e)
-        {
-            String exceptionMessage = "";
-
-            _timer.Stop();
-            try
+            if (_elapsedTime.Minutes == GlobalVariables.maxRecordTimeMinute)
             {
-                await m_dataManager.StopAudioRecord();
-            }
-            catch (Exception ex)
-            {
-                exceptionMessage = ex.Message;
-            }
-
-            if (exceptionMessage.Length > 0)
-            {
-                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                if (m_currentEviType == MimeTypes.Audio)
                 {
-                    var warningMessage = new MessageDialog(String.Format("The audio capture failed to stop: {0}", exceptionMessage), "Capture Failed");
-                    await warningMessage.ShowAsync();
-                });
-            }
+                    StpAudioButton_Click(null, null);
+                }
 
-            m_currentEviFile = null;
-            m_currentEviType = MimeTypes.Unknown;
-            ResetTimer();
-            Duration.DataContext = _elapsedTime.ToString(@"mm\:ss");
-            UpdateRecordingControls(RecordingMode.Initializing);
-            HideAudioControls();
+                await displayMessage("The record is stopped because it reached the maximum length authorized", "Maximum length reached");
+            }
         }
 
         private void ResetTimer()
@@ -627,31 +697,7 @@ namespace UniversalNomadUploader
             InitTimer();
         }
 
-        private async void CapturePhoto_Click(object sender, RoutedEventArgs e)
-        {
-            String filename = Guid.NewGuid().ToString();
-            StorageFile newPhoto = await m_dataManager.TakePicture(filename);
 
-            if (newPhoto != null)
-            {
-                m_currentEviFile = newPhoto;
-                m_currentEviType = MimeTypes.Picture;
-                ShowNewName();
-            }
-        }
-
-        private async void CaptureVideo_Click(object sender, RoutedEventArgs e)
-        {
-            String filename = Guid.NewGuid().ToString();
-            StorageFile newVideo = await m_dataManager.StartVideoRecord(filename);
-
-            if (newVideo != null)
-            {
-                m_currentEviFile = newVideo;
-                m_currentEviType = MimeTypes.Movie;
-                ShowNewName();
-            }
-        }
 
         private void ShowNewName()
         {
@@ -706,7 +752,8 @@ namespace UniversalNomadUploader
                 reduceInfoAnimation.Begin();
             }
         }
-              
+
+
         private async void Delete_Click(object sender, RoutedEventArgs e)
         {
             MessageDialog diag = new MessageDialog("Are you sure you want to delete the selected file(s)?", "Confirm deletion!");
@@ -714,14 +761,32 @@ namespace UniversalNomadUploader
             diag.Commands.Add(new UICommand("Cancel", new UICommandInvokedHandler(this.ConfirmDelete)));
             await diag.ShowAsync();
         }
-        
+
         private async void ConfirmDelete(IUICommand command)
         {
             if (command.Label == "Confirm")
             {
                 foreach (FunctionnalEvidence item in itemGridView.SelectedItems)
                 {
-                    await m_dataManager.DeleteEvidence(item);
+                    String failReason = null;
+                    Boolean failed = false;
+
+                    try
+                    {
+                        await m_dataManager.DeleteEvidence(item);
+                    }
+                    catch(SQLite.SQLiteException ex)
+                    {
+                        failed = true;
+                        failReason = ex.Message;
+                    }
+
+                    if(failed == true)
+                    {
+                        await displayMessage("Evidence not deleted, reason: " + failReason, "SQL server Error");
+                        break;
+                    }
+
                     if (item.Type == MimeTypes.Movie)
                     {
                         Boolean exceptionCatched = false;
@@ -734,14 +799,13 @@ namespace UniversalNomadUploader
                         }
                         catch (Exception)
                         {
-                            exceptionCatched = true;                      
+                            exceptionCatched = true;
                         }
 
-                        if(exceptionCatched == true)
+                        if (exceptionCatched == true)
                         {
-                            var warningMessage = new MessageDialog(String.Format("Failed to delete the evidence: {0}", item.Name), "Failed to delete");
-                            await warningMessage.ShowAsync();
-                            RebindItems();   
+                            await displayMessage(String.Format("Failed to delete the evidence: {0}", item.Name), "Failed to delete on file system");                           
+                            RebindItems();
                         }
                     }
                     await SQLEventLogUtil.InsertEventAsync(item.Name + " Deleted on " + DateTime.Now.ToString(), LogType.Delete);

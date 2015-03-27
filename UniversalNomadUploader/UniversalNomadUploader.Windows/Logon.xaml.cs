@@ -129,15 +129,6 @@ namespace UniversalNomadUploader
 
         private async void logon_Click(object sender, RoutedEventArgs e)
         {
-            ////TODO : suppress
-            //Username.Text = "BASSESSOR1";
-            //Password.Password = "Test1234";
-            //GlobalVariables.SelectedServer = ServerEnum.UAT1;
-            //UAT2.IsChecked = false;
-            //DEV.IsChecked = false;
-            //MessageDialog a = new MessageDialog("HACK HACK HACK");
-            //await a.ShowAsync();
-
             logon.IsEnabled = false;
             ShowProgress();
             if (String.IsNullOrWhiteSpace(Username.Text))

@@ -79,4 +79,19 @@ namespace UniversalNomadUploader.Common
             return partFile;
         }
     }
+
+    public class EvidenceGrouped
+    {
+        private String key;
+
+        public EvidenceGrouped(String _key)
+        {
+            key = _key;
+        }
+
+        public String Key
+        {
+            get { return key; }
+        }
+    }
 }

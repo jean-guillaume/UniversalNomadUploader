@@ -20,6 +20,6 @@ namespace UniversalNomadUploader.DataModels.SQLModels
     public String Username { get; set; }
     public String Salt { get; set; }
     public int WasLastLogin { get; set; }
-    public int MaximumUploadSize { get; set; }
+    public int MaximumUploadSize { get; set; }    
   }
 }

@@ -24,7 +24,7 @@ namespace UniversalNomadUploader.Common
                 if (_LoggedInUser == null)
                 {
                     _LoggedInUser =  SQLUtils.SQLUserUtil.GetLastLoggedInUser();
-                    _SelectedServer = (ServerEnum)_LoggedInUser.ServerID; //can throw exception
+                    _SelectedServer = (ServerEnum)_LoggedInUser.ServerID;
                 }
                 return _LoggedInUser;
             }
