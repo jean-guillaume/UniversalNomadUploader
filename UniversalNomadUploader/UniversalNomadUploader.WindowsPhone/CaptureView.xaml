@@ -193,8 +193,8 @@
         <TextBlock Name="CameraMsg" Visibility="Visible" FontSize="24" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
         <StackPanel Orientation="Horizontal">
-            <TextBlock x:Name="Timer" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="White" FontSize="32" Visibility="Collapsed"/>
-            <TextBlock x:Name="MaxTime" Text="/15:00" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="White" FontSize="32" Visibility="Collapsed" />
+            <TextBlock x:Name="Timer" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="White" FontSize="32"/>
+            <TextBlock x:Name="MaxTime" Text="/15:00" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="White" FontSize="32"/>
         </StackPanel>
         <Grid Name="VideoRecordBtn" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
             <AppBarButton Name="StopRecordVideo" Icon="Stop" Click="StopRecordVideo_Click" />
@@ -202,7 +202,7 @@
         <StackPanel Name="AudioRecordBtn" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
             <AppBarButton Name="RestartRecordAudio" Icon="Play" Click="RestartRecordAudio_Click" IsEnabled="False" Visibility="Collapsed" />
             <AppBarButton Name="PauseRecordAudio" Icon="Pause" Click="PauseRecordAudio_Click" Visibility="Collapsed"/>
-            <!--TODO UPDATE 26/03/2015 wait next update of windows phone to put it visible -->
+            <!--TODO UPDATE wait next update of windows phone to put it visible -->
             <AppBarButton Name="StopRecordAudio" Icon="Stop" Click="StopRecordAudio_Click" />
         </StackPanel>
 

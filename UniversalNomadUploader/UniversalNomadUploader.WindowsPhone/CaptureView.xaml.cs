@@ -167,8 +167,6 @@ namespace UniversalNomadUploader
                     AudioRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     VideoRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                    Timer.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                    MaxTime.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     break;
 
                 case PageState.AudioRecording:
@@ -177,8 +175,6 @@ namespace UniversalNomadUploader
 
                     AudioRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                    Timer.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    MaxTime.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     break;
 
                 case PageState.VideoRecording:
@@ -187,8 +183,6 @@ namespace UniversalNomadUploader
 
                     VideoRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                    Timer.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    MaxTime.Visibility = Windows.UI.Xaml.Visibility.Visible;
                     break;
 
                 case PageState.SavingName:
@@ -197,7 +191,7 @@ namespace UniversalNomadUploader
 
                     VideoRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                     AudioRecordBtn.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                    SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;                    
+                    SavingNameGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
 
                     NewName.Text = "";
                     NewName.Focus(FocusState.Pointer);
@@ -226,6 +220,7 @@ namespace UniversalNomadUploader
             m_elapsedTime = m_elapsedTime.Add(m_dispatcherTimer.Interval);
             Timer.Text = m_elapsedTime.ToString(@"mm\:ss");
 
+            //TODO put in a global var
             if (m_elapsedTime.Minutes == GlobalVariables.maxRecordTimeMinute)
             {
                 if (m_mimeTypeEvi == MimeTypes.Audio)
@@ -251,6 +246,9 @@ namespace UniversalNomadUploader
                 await SwitchCaptureMode(MimeTypes.Picture);
                 CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
+                RecordVideoSymbolIcon.Foreground = new SolidColorBrush(Colors.White);
+                TakePictureSymbolIcon.Foreground = new SolidColorBrush(Colors.GreenYellow);
+
                 return;
             }
 
@@ -260,17 +258,20 @@ namespace UniversalNomadUploader
 
             try
             {
+                await SwitchCaptureMode(MimeTypes.Movie);
                 m_file = await m_dataManager.TakePicture(fileName);
             }
             catch (Camera.MediaTypeException ex)
             {
                 doSwitch = true;
                 failReason = ex.Message;
-                m_file = null;
             }
             catch (Exception ex)
             {
                 failReason = ex.Message;
+            }
+            finally
+            {
                 m_file = null;
             }
 
@@ -464,7 +465,7 @@ namespace UniversalNomadUploader
                 {
                     CameraMsg.Text = "Switching to Photo capture mode...";
                     CameraMsg.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    await Preview.Source.StopPreviewAsync();
+                    await Preview.Source.StopPreviewAsync();                    
                 }
                 Preview.Source = await m_dataManager.InitializeMediaCapture(CaptureType.Photo);
                 TakePictureSymbolIcon.Foreground = new SolidColorBrush(Colors.GreenYellow);

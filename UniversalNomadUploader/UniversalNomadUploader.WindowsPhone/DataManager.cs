@@ -157,7 +157,23 @@ namespace UniversalNomadUploader
         {
             m_ServerManager.CancelProcessing();
         }
-    }    
+    }
+
+    //TODO move this class in his own file
+    public class EvidenceGrouped
+    {
+        private String key;
+
+        public EvidenceGrouped(String _key)
+        {
+            key = _key;
+        }
+
+        public String Key
+        {
+            get { return key; }
+        }
+    }
 }
 
 

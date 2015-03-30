@@ -84,7 +84,6 @@ namespace UniversalNomadUploader
         public async Task<StorageFile> StartVideoRecord(String _fileName)
         {
             CameraCaptureUI video = new CameraCaptureUI();
-            video.VideoSettings.MaxDurationInSeconds = GlobalVariables.maxRecordTimeMinute * 60; // max time in seconds
             StorageFile newVideo = await video.CaptureFileAsync(CameraCaptureUIMode.Video);
             if (newVideo != null)
             {
@@ -153,7 +152,23 @@ namespace UniversalNomadUploader
         {
             m_ServerManager.CancelProcessing();
         }
-    }   
+    }
+
+    //TODO move this class in his own file
+    public class EvidenceGrouped
+    {
+        private String key;
+
+        public EvidenceGrouped(String _key)
+        {
+            key = _key;
+        }
+
+        public String Key
+        {
+            get { return key; }
+        }
+    }
 }
 
 

@@ -11,6 +11,5 @@ namespace UniversalNomadUploader.DataModels.APIModels
         public String LastName { get; set; }
         public int OrganisationID { get; set; }
         public int MaximumUploadSize { get; set; }
-
     }
 }
