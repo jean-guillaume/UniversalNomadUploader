@@ -8,7 +8,7 @@ namespace UniversalNomadUploader.Common
 {
     class UploadErrorMessageVisibilityConverter //: IValueConverter
     {
-        /*public object Convert(object value, Type targetType, object parameter, string culture)
+        public object Convert(object value, Type targetType, object parameter, string culture)
         {
             if (value != null && (String)value != "")
             {
@@ -21,6 +21,6 @@ namespace UniversalNomadUploader.Common
         public object ConvertBack(object value, Type targetType, object parameter, string culture)
         {
             throw new NotImplementedException();
-        }*/
+        }
     }
 }

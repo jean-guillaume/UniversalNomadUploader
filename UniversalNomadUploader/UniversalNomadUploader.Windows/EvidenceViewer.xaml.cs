@@ -46,7 +46,6 @@ namespace UniversalNomadUploader
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
         private CancellationTokenSource cts;
-        private FunctionnalEvidence CurrentEvidence = null;
         private StorageFile m_currentEviFile = null;
         private MimeTypes m_currentEviType = MimeTypes.Unknown;
         private DataManager m_dataManager;
@@ -349,7 +348,6 @@ namespace UniversalNomadUploader
 
             m_currentEviFile = null;
             m_currentEviType = MimeTypes.Unknown;
-            CurrentEvidence = null;
             HideNewName();
             RebindItems();
             NewName.Text = "";

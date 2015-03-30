@@ -22,16 +22,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\EvidenceListGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\GlobalVariables.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\Helper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\NameToNameInfoConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\HasItemsToColor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\Helper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateFlyoutConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateSymbolConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadDateVisibilityConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadedColorConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadErrorMessageFlyoutMessageConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\UploadErrorMessageVisibilityConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\UploadVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\APIModels\APIUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\ApiResponseCodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\Enums\EvidenceStatus.cs" />

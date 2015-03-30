@@ -258,20 +258,17 @@ namespace UniversalNomadUploader
 
             try
             {
-                await SwitchCaptureMode(MimeTypes.Movie);
                 m_file = await m_dataManager.TakePicture(fileName);
             }
             catch (Camera.MediaTypeException ex)
             {
                 doSwitch = true;
                 failReason = ex.Message;
+                m_file = null;
             }
             catch (Exception ex)
             {
                 failReason = ex.Message;
-            }
-            finally
-            {
                 m_file = null;
             }
 
