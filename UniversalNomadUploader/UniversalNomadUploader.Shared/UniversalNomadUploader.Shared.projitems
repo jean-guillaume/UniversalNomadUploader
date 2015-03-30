@@ -41,7 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\SQLEvidence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\SQLServer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataModels\SQLModels\SQLUser.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DBManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EvidenceStorageManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\APIException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Microphone.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServerManager.cs" />

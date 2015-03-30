@@ -83,7 +83,7 @@ namespace UniversalNomadUploader
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            DBManager.InitDB();
+            EvidenceStorageManager.InitDB();
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {

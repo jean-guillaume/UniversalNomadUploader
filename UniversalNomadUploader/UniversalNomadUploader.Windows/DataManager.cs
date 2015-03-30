@@ -19,16 +19,24 @@ using Windows.UI.Xaml.Data;
 
 namespace UniversalNomadUploader
 {
+    /// <summary>
+    /// This class is the link between the back-end of the application and the UI classes. It should stay the only access point to the back-end classes. The exceptions to this rule are:
+    ///-Log handler classes
+    ///-Functional Models classes
+    ///-The video preview classes (Windows Phone 8.1)
+    ///-UI oriented classes (ex: the converters in XAML)
+    ///Because this class is related to the UI, if the UI change the class could have to be modified (Especially on different OS like Windows 8.1 and Windows Phone 8.1).
+    /// </summary>
     public class DataManager
     {
-        private DBManager m_DBManager;
+        private EvidenceStorageManager m_ESM;
         private ServerManager m_ServerManager;
         private CaptureDeviceManager m_CaptureEvidence;
 
         public DataManager(String _username, String _password)
         {
             m_CaptureEvidence = new CaptureDeviceManager();
-            m_DBManager = new DBManager();
+            m_ESM = new EvidenceStorageManager();
             m_ServerManager = new ServerManager(_username, _password);
         }
 
@@ -42,24 +50,24 @@ namespace UniversalNomadUploader
         public async Task<EvidenceStatus> AddEvidence(StorageFile _file, String _name, MimeTypes _mimeType)
         {
             Double size = Convert.ToDouble((await _file.GetBasicPropertiesAsync()).Size);
-            return (await this.m_DBManager.AddEvidence(_file.DisplayName, _file.FileType.Replace(".", ""),
+            return (await this.m_ESM.AddEvidence(_file.DisplayName, _file.FileType.Replace(".", ""),
                                                         DateTime.Now.Date, (int)GlobalVariables.SelectedServer,
                                                         GlobalVariables.LoggedInUser.UserID, _name, _mimeType, size));
         }
 
         public async Task<IList> ReadAllEvidence()
         {
-            return await m_DBManager.readAllEvidence();
+            return await m_ESM.readAllEvidence();
         }
 
         public async Task UpdateEvidence(FunctionnalEvidence _evi)
         {
-            await m_DBManager.UpdateEvidence(_evi);
+            await m_ESM.UpdateEvidence(_evi);
         }
 
         public async Task DeleteEvidence(FunctionnalEvidence _evi)
         {
-            await m_DBManager.DeleteEvidence(_evi);
+            await m_ESM.DeleteEvidence(_evi);
 
             StorageFile eviFile = await ApplicationData.Current.LocalFolder.GetFileAsync(_evi.FileName + "." + _evi.Extension);
             await eviFile.DeleteAsync();
