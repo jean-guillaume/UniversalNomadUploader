@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UniversalNomadUploader.APIUtils;
 using UniversalNomadUploader.Common;
 using UniversalNomadUploader.DataModels.APIModels;
 using UniversalNomadUploader.DataModels.Enums;
@@ -148,7 +147,7 @@ namespace UniversalNomadUploader
         /// <returns></returns>
         public async Task<UploadStatus> UploadEvidence(FunctionnalEvidence _evi)
         {
-            if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess() || await APIAuthenticationUtil.VerifySessionAsync())
+            if (GlobalVariables.IsOffline || !GlobalVariables.HasInternetAccess() || await m_ServerManager.VerifySessionAsync())
             {
                 return UploadStatus.NoInternetConnection;
             }

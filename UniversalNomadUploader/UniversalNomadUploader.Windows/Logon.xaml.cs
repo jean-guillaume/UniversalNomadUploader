@@ -15,7 +15,6 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Popups;
 using UniversalNomadUploader.DataModels.Enums;
-using UniversalNomadUploader.APIUtils;
 using UniversalNomadUploader.DataModels.FunctionalModels;
 using UniversalNomadUploader.Exceptions;
 using Windows.Storage;

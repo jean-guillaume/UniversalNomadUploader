@@ -12,8 +12,6 @@
     <ApplicationDefinition Include="$(MSBuildThisFileDirectory)App.xaml">
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="$(MSBuildThisFileDirectory)APIUtils\APIAuthenticationUtil.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)APIUtils\APIUserUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>

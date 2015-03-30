@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
-using UniversalNomadUploader.APIUtils;
 using UniversalNomadUploader.Common;
 using UniversalNomadUploader.DataModels.Enums;
 using UniversalNomadUploader.DataModels.FunctionalModels;
