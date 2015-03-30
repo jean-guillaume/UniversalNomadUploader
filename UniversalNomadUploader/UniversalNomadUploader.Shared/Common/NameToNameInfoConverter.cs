@@ -5,9 +5,9 @@ using Windows.UI.Xaml.Data;
 
 namespace UniversalNomadUploader.Common
 {
-    public class NameToNameInfoConverter : IValueConverter
+    public class NameToNameInfoConverter// : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, string culture)
+        /*public object Convert(object value, Type targetType, object parameter, string culture)
         {
             return "File Name: " + Environment.NewLine + (String)value;
         }
@@ -15,6 +15,6 @@ namespace UniversalNomadUploader.Common
         public object ConvertBack(object value, Type targetType, object parameter, string culture)
         {
             throw new NotImplementedException();
-        }
+        }*/
     }
 }

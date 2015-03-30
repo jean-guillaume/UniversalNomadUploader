@@ -66,28 +66,11 @@ namespace UniversalNomadUploader
             StorageFile eviThumbnailFile = await thumbnailFolder.GetFileAsync(_evi.FileName + ".jpg");
             await eviThumbnailFile.DeleteAsync();
         }
-        //TODO suppress the region
 
         public async Task<MediaCapture> InitializeMediaCapture(CaptureType _type)
         {
             return await m_CaptureEvidence.Initialize(_type);
         }
-
-        
-        #region ANNOYING REGION 1
-        #endregion
-
-        #region ANNOYING REGION 2
-        #endregion
-
-        #region HI BEN!!! REGION
-        #endregion
-
-        #region ANNOYING REGION 3
-        #endregion
-
-        #region ANNOYING REGION 4
-        #endregion
 
         /// <summary>
         /// Take a picture via Camera class

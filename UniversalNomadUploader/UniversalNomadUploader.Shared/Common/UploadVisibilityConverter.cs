@@ -6,9 +6,9 @@ using Windows.UI.Xaml.Data;
 
 namespace UniversalNomadUploader.Common
 {
-    class UploadVisibilityConverter : IValueConverter
+    class UploadVisibilityConverter //: IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, string culture)
+       /* public object Convert(object value, Type targetType, object parameter, string culture)
         {
             if ((bool)value)
             {
@@ -23,6 +23,6 @@ namespace UniversalNomadUploader.Common
             if (((Visibility)value) ==  Visibility.Visible)
                 return true;
             return false;
-        }
+        }*/
     }
 }

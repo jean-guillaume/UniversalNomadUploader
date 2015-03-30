@@ -6,9 +6,9 @@ using Windows.UI.Xaml.Data;
 
 namespace UniversalNomadUploader.Common
 {
-    class UploadedColorConverter : IValueConverter
+    class UploadedColorConverter// : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, string culture)
+       /* public object Convert(object value, Type targetType, object parameter, string culture)
         {
             if ((DateTime)value != null && (DateTime)value > DateTime.MinValue)
             {
@@ -21,6 +21,6 @@ namespace UniversalNomadUploader.Common
         public object ConvertBack(object value, Type targetType, object parameter, string culture)
         {
             throw new NotImplementedException();
-        }
+        }*/
     }
 }
