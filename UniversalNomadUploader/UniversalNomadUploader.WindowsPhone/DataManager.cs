@@ -69,9 +69,12 @@ namespace UniversalNomadUploader
             StorageFile eviFile = await ApplicationData.Current.LocalFolder.GetFileAsync(_evi.FileName + "." + _evi.Extension);
             await eviFile.DeleteAsync();
 
-            StorageFolder thumbnailFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync("_VidThumbs");
-            StorageFile eviThumbnailFile = await thumbnailFolder.GetFileAsync(_evi.FileName + ".jpg");
-            await eviThumbnailFile.DeleteAsync();
+            if (_evi.Type == MimeTypes.Movie || _evi.Type == MimeTypes.Picture)
+            {
+                StorageFolder thumbnailFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync("_VidThumbs");
+                StorageFile eviThumbnailFile = await thumbnailFolder.GetFileAsync(_evi.FileName + ".jpg");
+                await eviThumbnailFile.DeleteAsync();
+            }
         }
 
         public async Task<MediaCapture> InitializeMediaCapture(CaptureType _type)

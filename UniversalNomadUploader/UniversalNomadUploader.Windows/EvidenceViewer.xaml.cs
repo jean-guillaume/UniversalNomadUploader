@@ -759,7 +759,7 @@ namespace UniversalNomadUploader
             }
 
             StorageFile importedFile = await filePicker.PickSingleFileAsync();
-            m_currentEviFile = await importedFile.CopyAsync(Windows.Storage.ApplicationData.Current.LocalFolder, importedFile.DisplayName + importedFile.FileType, NameCollisionOption.ReplaceExisting);
+            m_currentEviFile = await importedFile.CopyAsync(Windows.Storage.ApplicationData.Current.LocalFolder, Guid.NewGuid().ToString() + importedFile.FileType, NameCollisionOption.GenerateUniqueName);
 
             if (m_currentEviFile != null)
             {
